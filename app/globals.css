@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-rubik);
+
+  /* Custom animations and effects if needed */
+}
+
+:root {
+  --foreground-rgb: 31, 41, 55;
+  --background-start-rgb: 216, 217, 212;
+  --background-end-rgb: 216, 217, 212;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 34, 37, 81;
+    --background-end-rgb: 34, 37, 81;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+  font-family: var(--font-rubik), sans-serif;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
+.dark .glass-card {
+  background: rgba(34, 37, 81, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.premium-button {
+  @apply relative overflow-hidden transition-all duration-300 transform active:scale-95;
+  background: linear-gradient(135deg, #e85c29 0%, #ff8c5f 100%);
+}
+
+.premium-button:hover {
+  @apply shadow-lg;
+  background: linear-gradient(135deg, #d44d1e 0%, #e85c29 100%);
+}
