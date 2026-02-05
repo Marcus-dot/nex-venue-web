@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   description: "Experience conferences, expos, and community gatherings like never before. Discover, connect, and stay in the loop with NexVenue.",
 };
 
+import SmoothScroll from "@/components/ui/SmoothScroll";
+import { Navigation } from "@/components/layout/Navigation";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,7 +26,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${rubik.variable} font-rubik antialiased`}>
         <AuthProvider>
-          {children}
+          <Navigation />
+          <SmoothScroll>
+            {children}
+          </SmoothScroll>
         </AuthProvider>
       </body>
     </html>

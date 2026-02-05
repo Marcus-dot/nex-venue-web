@@ -41,5 +41,35 @@ export const eventService = {
             console.error("Error fetching event by id:", error);
             return null;
         }
+    },
+
+    getEventsByCreator: async (creatorId: string): Promise<Event[]> => {
+        try {
+            const eventsRef = collection(db, "events");
+            const q = query(eventsRef, where("creatorId", "==", creatorId), orderBy("createdAt", "desc"));
+            const snapshot = await getDocs(q);
+            return snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            } as Event));
+        } catch (error) {
+            console.error("Error fetching creator events:", error);
+            return [];
+        }
+    },
+
+    getAttendingEvents: async (userId: string): Promise<Event[]> => {
+        try {
+            const eventsRef = collection(db, "events");
+            const q = query(eventsRef, where("attendees", "array-contains", userId), orderBy("createdAt", "desc"));
+            const snapshot = await getDocs(q);
+            return snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            } as Event));
+        } catch (error) {
+            console.error("Error fetching attending events:", error);
+            return [];
+        }
     }
 };

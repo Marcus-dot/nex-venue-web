@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import gsap from "gsap";
+import { useRef } from "react";
 
 export default function EventDetailsPage() {
     const { id } = useParams();
@@ -30,6 +32,7 @@ export default function EventDetailsPage() {
     const [event, setEvent] = useState<Event | null>(null);
     const [agenda, setAgenda] = useState<AgendaItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!id) return;
@@ -43,6 +46,20 @@ export default function EventDetailsPage() {
                     setAgenda(data);
                 });
                 setLoading(false);
+
+                // Trigger animations after data is loaded
+                setTimeout(() => {
+                    gsap.context(() => {
+                        gsap.from(".animate-up", {
+                            y: 40,
+                            opacity: 0,
+                            duration: 0.8,
+                            stagger: 0.1,
+                            ease: "power4.out"
+                        });
+                    }, containerRef);
+                }, 100);
+
                 return () => unsubscribe();
             } else {
                 router.push("/events");
@@ -59,11 +76,10 @@ export default function EventDetailsPage() {
             </div>
         );
     }
-
     if (!event) return null;
 
     return (
-        <div className="min-h-screen bg-background pb-20">
+        <div ref={containerRef} className="min-h-screen bg-background pb-20">
             {/* Dynamic Background */}
             <div className="fixed top-0 left-0 w-full h-[60vh] -z-10 bg-premium-gradient overflow-hidden">
                 {event.imageUrl && (
@@ -99,7 +115,7 @@ export default function EventDetailsPage() {
 
             <main className="max-w-7xl mx-auto px-8 py-4 grid grid-cols-1 lg:grid-cols-3 gap-12 relative z-10">
                 {/* Left Column: Info & Details */}
-                <div className="lg:col-span-2 space-y-12">
+                <div className="lg:col-span-2 space-y-12 animate-up">
                     {/* Hero Content */}
                     <div>
                         <div className="flex items-center gap-3 text-white/70 font-bold mb-4">
@@ -154,7 +170,7 @@ export default function EventDetailsPage() {
                 </div>
 
                 {/* Right Column: CTA & Organizers */}
-                <div className="space-y-8">
+                <div className="space-y-8 animate-up">
                     <GlassCard className="sticky top-28 !p-8 border-2 border-accent/20">
                         <div className="mb-6">
                             <div className="text-sm font-bold text-surface-dark/40 uppercase tracking-widest mb-1">Status</div>
