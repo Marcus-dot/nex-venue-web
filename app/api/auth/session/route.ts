@@ -3,6 +3,8 @@ import { adminAuth } from "@/lib/firebase/admin";
 
 // firebase-admin uses Node.js crypto APIs — must not run on Edge runtime.
 export const runtime = "nodejs";
+// Never statically pre-render — this route requires runtime env vars and live Firebase.
+export const dynamic = "force-dynamic";
 
 const SESSION_COOKIE_NAME = "nex_session";
 const EXPIRES_IN_MS = 60 * 60 * 24 * 5 * 1000; // 5 days in ms
