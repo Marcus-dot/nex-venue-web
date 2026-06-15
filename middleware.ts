@@ -1,58 +1,60 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { adminAuth } from "@/lib/firebase/admin";
 
-/**
- * Protected routes: any user that is NOT authenticated is redirected to /login.
- * Admin-only routes are enforced client-side via isAdmin (Firestore role check).
- * 
- * NOTE: Firebase auth state is client-side only, so we use a session cookie
- * strategy here — we check for the existence of a Firebase auth cookie that
- * indicates the user has an active session. For full SSR protection, a
- * server-side Firebase Admin SDK verification would be needed (Phase 4).
- */
+// firebase-admin requires Node.js APIs — cannot run on Edge runtime.
+export const runtime = "nodejs";
 
-// Routes that require authentication
-const PROTECTED_PREFIXES = [
-    "/dashboard",
-    "/events/create",
-    "/profile",
-    "/chat",
-    "/notifications",
-];
+const SESSION_COOKIE = "nex_session";
 
-// Routes that should redirect to /events if already authenticated
-const AUTH_ONLY_ROUTES = ["/login", "/register"];
+export async function middleware(request: NextRequest) {
+    const sessionCookie = request.cookies.get(SESSION_COOKIE)?.value;
 
-export function middleware(request: NextRequest) {
-    const { pathname } = request.nextUrl;
-
-    // We check for a lightweight auth session cookie set by AuthContext.
-    const hasAuthCookie = request.cookies.get("nex_auth_session")?.value === "true";
-
-    // Redirect unauthenticated users away from protected routes
-    const isProtected = PROTECTED_PREFIXES.some((prefix) =>
-        pathname.startsWith(prefix)
-    );
-    if (isProtected && !hasAuthCookie) {
-        const url = request.nextUrl.clone();
-        url.pathname = "/login";
-        url.searchParams.set("redirect", pathname);
-        return NextResponse.redirect(url);
+    // No cookie — redirect immediately, no Firebase round-trip needed
+    if (!sessionCookie) {
+        return redirectToLogin(request);
     }
 
-    return NextResponse.next();
+    try {
+        // Verifies signature, expiry, and revocation status
+        const decoded = await adminAuth.verifySessionCookie(
+            sessionCookie,
+            true // checkRevoked — catches manually invalidated sessions
+        );
+
+        // Forward uid to Server Components via request header.
+        // Role is not checked here — Server Components read it from Firestore
+        // or custom claims when needed (Phase 3 admin routes).
+        const headers = new Headers(request.headers);
+        headers.set("x-nex-uid", decoded.uid);
+        return NextResponse.next({ request: { headers } });
+
+    } catch {
+        // Expired, revoked, or tampered cookie — treat as unauthenticated
+        return redirectToLogin(request);
+    }
+}
+
+function redirectToLogin(request: NextRequest): NextResponse {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("redirect", request.nextUrl.pathname);
+    return NextResponse.redirect(url);
 }
 
 export const config = {
     matcher: [
-        /*
-         * Match all request paths EXCEPT:
-         * - _next/static (static files)
-         * - _next/image (image optimization)
-         * - favicon.ico
-         * - API routes
-         * - Public assets
-         */
-        "/((?!_next/static|_next/image|favicon.ico|api|.*\\..*).+)",
+        // Middleware runs on these paths ONLY.
+        // Anything not listed — /qa/*, /api/*, /, /events, /events/[id],
+        // /login, /register, /profile-setup, and all static assets —
+        // never enters middleware. /qa/* is structurally absent, not conditionally skipped.
+        "/dashboard/:path*",
+        "/events/create",
+        "/events/:eventId/manage/:path*",
+        "/events/:eventId/edit/:path*",
+        "/events/:eventId/special-access/:path*",
+        "/profile/:path*",
+        "/settings/:path*",
+        "/chat/:path*",
+        "/notifications/:path*",
     ],
 };
