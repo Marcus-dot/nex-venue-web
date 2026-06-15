@@ -65,22 +65,22 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-background overflow-hidden">
+    <div ref={containerRef} className="min-h-screen bg-background dark:bg-[#0f101e] overflow-hidden">
       {/* Immersive Background */}
       <HeroScene />
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 w-full z-50 bg-background/50 backdrop-blur-xl border-b border-white/10 px-8 py-4">
+      <nav className="fixed top-0 left-0 w-full z-50 bg-background/50 dark:bg-[#0f101e]/80 backdrop-blur-xl border-b border-white/10 dark:border-white/5 px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 group cursor-pointer">
             <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-white font-black text-xl transition-transform group-hover:scale-110">N</div>
-            <span className="text-2xl font-black tracking-tighter text-surface-dark">NexVenue</span>
+            <span className="text-2xl font-black tracking-tighter text-surface-dark dark:text-white">NexVenue</span>
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-sm font-bold text-surface-dark/60 hover:text-accent transition-colors">Features</Link>
-            <Link href="/events" className="text-sm font-bold text-surface-dark/60 hover:text-accent transition-colors">Events</Link>
-            <div className="w-px h-4 bg-surface-dark/10" />
+            <Link href="#features" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent transition-colors">Features</Link>
+            <Link href="/events" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent transition-colors">Events</Link>
+            <div className="w-px h-4 bg-surface-dark/10 dark:bg-white/10" />
             <Link href="/login">
               <Button variant="ghost" className="font-bold">Sign In</Button>
             </Link>
@@ -100,12 +100,12 @@ export default function LandingPage() {
                 <Zap size={16} /> The Future of Events
               </div>
 
-              <h1 className="text-7xl md:text-8xl font-black text-surface-dark tracking-tighter leading-[0.9]">
+              <h1 className="text-7xl md:text-8xl font-black text-surface-dark dark:text-white tracking-tighter leading-[0.9]">
                 Elevate Your <br />
                 <span className="text-transparent bg-clip-text bg-premium-gradient">Experience</span>
               </h1>
 
-              <p className="text-xl text-surface-dark/60 font-medium max-w-lg leading-relaxed">
+              <p className="text-xl text-surface-dark/60 dark:text-white/60 font-medium max-w-lg leading-relaxed">
                 Experience conferences, expos, and gatherings like never before.
                 Real-time interaction, dynamic agendas, and meaningful connections.
               </p>
@@ -126,11 +126,11 @@ export default function LandingPage() {
               <div className="flex items-center gap-6 pt-8">
                 <div className="flex -space-x-3">
                   {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="w-10 h-10 rounded-full bg-surface-dark/10 border-2 border-white flex items-center justify-center text-[10px] font-black">U{i}</div>
+                    <div key={i} className="w-10 h-10 rounded-full bg-surface-dark/10 dark:bg-white/10 border-2 border-white dark:border-gray-900 flex items-center justify-center text-[10px] font-black dark:text-white">U{i}</div>
                   ))}
                 </div>
-                <p className="text-sm font-bold text-surface-dark/40">
-                  Joined by <span className="text-surface-dark font-black">10,000+</span> attendees
+                <p className="text-sm font-bold text-surface-dark/40 dark:text-white/40">
+                  Joined by <span className="text-surface-dark dark:text-white font-black">10,000+</span> attendees
                 </p>
               </div>
             </div>
@@ -174,8 +174,8 @@ export default function LandingPage() {
         {/* Features Section */}
         <section id="features" className="py-32 px-8">
           <div className="max-w-7xl mx-auto text-center mb-20">
-            <h2 className="text-5xl font-black text-surface-dark tracking-tighter mb-6">Built for Modern Events</h2>
-            <p className="text-lg text-surface-dark/60 font-medium max-w-2xl mx-auto">
+            <h2 className="text-5xl font-black text-surface-dark dark:text-white tracking-tighter mb-6">Built for Modern Events</h2>
+            <p className="text-lg text-surface-dark/60 dark:text-white/60 font-medium max-w-2xl mx-auto">
               Everything you need to run, attend, or discover amazing event experiences in one powerful platform.
             </p>
           </div>
@@ -202,8 +202,8 @@ export default function LandingPage() {
                 <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center text-accent mb-8 group-hover:scale-110 transition-transform">
                   <feature.icon size={28} />
                 </div>
-                <h3 className="text-2xl font-black text-surface-dark mb-4">{feature.title}</h3>
-                <p className="text-surface-dark/60 font-medium leading-relaxed">{feature.desc}</p>
+                <h3 className="text-2xl font-black text-surface-dark dark:text-white mb-4">{feature.title}</h3>
+                <p className="text-surface-dark/60 dark:text-white/60 font-medium leading-relaxed">{feature.desc}</p>
               </GlassCard>
             ))}
           </div>
@@ -211,18 +211,18 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white/80 border-t border-surface-dark/5 py-12 px-8">
+      <footer className="bg-white/80 dark:bg-gray-950/80 border-t border-surface-dark/5 dark:border-white/5 py-12 px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-white font-black">N</div>
-            <span className="text-xl font-black tracking-tight text-surface-dark">NexVenue</span>
+            <span className="text-xl font-black tracking-tight text-surface-dark dark:text-white">NexVenue</span>
           </div>
           <div className="flex gap-8">
-            <Link href="#" className="text-sm font-bold text-surface-dark/60 hover:text-accent">Privacy</Link>
-            <Link href="#" className="text-sm font-bold text-surface-dark/60 hover:text-accent">Terms</Link>
-            <Link href="#" className="text-sm font-bold text-surface-dark/60 hover:text-accent">Contact</Link>
+            <Link href="#" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Privacy</Link>
+            <Link href="#" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Terms</Link>
+            <Link href="#" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Contact</Link>
           </div>
-          <p className="text-sm font-bold text-surface-dark/20 uppercase tracking-widest">© 2026 NexVenue Inc.</p>
+          <p className="text-sm font-bold text-surface-dark/20 dark:text-white/20 uppercase tracking-widest">© 2026 NexVenue Inc.</p>
         </div>
       </footer>
     </div>

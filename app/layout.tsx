@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Rubik } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { ToastProvider } from "@/context/ToastContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const rubik = Rubik({
   subsets: ["latin"],
@@ -16,6 +18,7 @@ export const metadata: Metadata = {
 
 import SmoothScroll from "@/components/ui/SmoothScroll";
 import { Navigation } from "@/components/layout/Navigation";
+import { ThemeSync } from "@/components/layout/ThemeSync";
 
 export default function RootLayout({
   children,
@@ -23,14 +26,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${rubik.variable} font-rubik antialiased`}>
-        <AuthProvider>
-          <Navigation />
-          <SmoothScroll>
-            {children}
-          </SmoothScroll>
-        </AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${rubik.variable} font-rubik antialiased`} suppressHydrationWarning>
+        <ThemeProvider>
+          <AuthProvider>
+            <ThemeSync />
+            <ToastProvider>
+              <Navigation />
+              <SmoothScroll>
+                {children}
+              </SmoothScroll>
+            </ToastProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

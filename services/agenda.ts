@@ -5,7 +5,14 @@ import {
     query,
     where,
     onSnapshot,
-    orderBy
+    orderBy,
+    addDoc,
+    doc,
+    updateDoc,
+    deleteDoc,
+    writeBatch,
+    arrayUnion,
+    arrayRemove
 } from "firebase/firestore";
 import { AgendaItem } from "@/types/agenda";
 
@@ -74,5 +81,89 @@ export const agendaService = {
             })) as AgendaItem[];
             callback(sortAgendaItems(items));
         });
+    },
+
+    // === WRITE OPERATIONS / ADMIN ===
+
+    createAgendaItem: async (itemData: Omit<AgendaItem, "id" | "createdAt" | "updatedAt" | "createdBy" | "lastEditedBy"> & { createdBy?: string, lastEditedBy?: string }): Promise<string> => {
+        try {
+            const newItem = {
+                ...itemData,
+                order: itemData.order ?? 0,
+                updatedAt: Date.now(),
+                createdAt: Date.now(),
+                lastEditedBy: itemData.lastEditedBy || "system",
+                createdBy: itemData.createdBy || "system",
+            } as AgendaItem;
+            const agendasRef = collection(db, "agendas");
+            const docRef = await addDoc(agendasRef, newItem);
+            return docRef.id;
+        } catch (error) {
+            console.error("Error creating agenda item:", error);
+            throw error;
+        }
+    },
+
+    updateAgendaItem: async (id: string, itemData: Partial<AgendaItem>): Promise<void> => {
+        try {
+            const itemRef = doc(db, "agendas", id);
+            await updateDoc(itemRef, itemData);
+        } catch (error) {
+            console.error("Error updating agenda item:", error);
+            throw error;
+        }
+    },
+
+    deleteAgendaItem: async (id: string): Promise<void> => {
+        try {
+            const itemRef = doc(db, "agendas", id);
+            await deleteDoc(itemRef);
+        } catch (error) {
+            console.error("Error deleting agenda item:", error);
+            throw error;
+        }
+    },
+
+    setCurrentAgendaItem: async (eventId: string, itemId: string | null): Promise<void> => {
+        try {
+            const eventRef = doc(db, "events", eventId);
+            await updateDoc(eventRef, {
+                currentAgendaItem: itemId || null,
+                agendaLastUpdated: Date.now()
+            });
+        } catch (error) {
+            console.error("Error updating current agenda item:", error);
+            throw error;
+        }
+    },
+
+    selectSimultaneousEvent: async (eventId: string, itemId: string, userId: string, simultaneousGroupId: string): Promise<void> => {
+        try {
+            // First, find all agenda items in this group
+            const agendasRef = collection(db, "agendas");
+            const q = query(
+                agendasRef, 
+                where("eventId", "==", eventId),
+                where("simultaneousGroupId", "==", simultaneousGroupId)
+            );
+            
+            const snapshot = await getDocs(q);
+            const batch = writeBatch(db);
+            
+            // Remove user from all other items in the group, add to the selected one
+            snapshot.docs.forEach((document) => {
+                const ref = doc(db, "agendas", document.id);
+                if (document.id === itemId) {
+                    batch.update(ref, { attendeeSelections: arrayUnion(userId) });
+                } else {
+                    batch.update(ref, { attendeeSelections: arrayRemove(userId) });
+                }
+            });
+            
+            await batch.commit();
+        } catch (error) {
+            console.error("Error selecting simultaneous event:", error);
+            throw error;
+        }
     }
 };

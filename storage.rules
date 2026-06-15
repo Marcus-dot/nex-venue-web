@@ -1,0 +1,24 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // ---------------- EVENTS ----------------
+    // Allow anyone to read event images
+    // Allow authenticated users to upload event banner images
+    match /events/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // ---------------- USER PROFILES ----------------
+    // Users can read any avatar, but only write their own
+    match /users/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // ---------------- DEFAULT ----------------
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

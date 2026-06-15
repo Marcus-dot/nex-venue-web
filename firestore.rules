@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ---------------- USERS ----------------
+    // Allow users to read any user's public info, but only write their own
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // ---------------- EVENTS & PARTICIPANTS ----------------
+    match /events/{eventId} {
+      allow read, write: if request.auth != null;
+
+      // Rules for the nested participants (Speakers, Exhibitors, etc.)
+      match /participants/{userId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null;
+      }
+    }
+    
+    // ---------------- ROLE REQUESTS ----------------
+    match /roleRequests/{requestId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // ---------------- AGENDAS ----------------
+    match /agendas/{agendaId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // ---------------- MESSAGING (Chats & Notifications) ----------------
+    match /notifications/{notificationId} {
+      allow read, write: if request.auth != null;
+    }
+    match /chats/{chatId} {
+      allow read, write: if request.auth != null;
+    }
+    match /chats/{chatId}/messages/{messageId} {
+      allow read, write: if request.auth != null;
+    }
+    match /chatRooms/{chatRoomId} {
+      allow read, write: if request.auth != null;
+    }
+    match /chatRooms/{chatRoomId}/messages/{messageId} {
+      allow read, write: if request.auth != null;
+    }
+    match /directConversations/{conversationId} {
+      allow read, write: if request.auth != null;
+    }
+    match /directConversations/{conversationId}/messages/{messageId} {
+      allow read, write: if request.auth != null;
+    }
+    match /messages/{messageId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // ---------------- FCM TOKENS ----------------
+    // Users can read/write their own notification tokens
+    match /fcmTokens/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

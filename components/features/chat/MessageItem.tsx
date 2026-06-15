@@ -32,7 +32,7 @@ export const MessageItem = ({ message, isConsecutive }: MessageItemProps) => {
             )}
         >
             {!isConsecutive && !isOwnMessage && (
-                <span className="text-xs font-bold text-surface-dark/40 mb-1 ml-4">
+                <span className="text-xs font-bold text-surface-dark/40 dark:text-white/40 mb-1 ml-4">
                     {message.senderName}
                 </span>
             )}
@@ -42,7 +42,7 @@ export const MessageItem = ({ message, isConsecutive }: MessageItemProps) => {
                     "max-w-[70%] px-5 py-3 rounded-2xl shadow-sm relative group",
                     isOwnMessage
                         ? "bg-accent text-white rounded-tr-sm"
-                        : "bg-surface-dark/5 text-surface-dark rounded-tl-sm"
+                        : "bg-surface-dark/5 dark:bg-white/10 text-surface-dark dark:text-white rounded-tl-sm"
                 )}
             >
                 <p className="text-sm font-medium leading-relaxed">{message.message}</p>

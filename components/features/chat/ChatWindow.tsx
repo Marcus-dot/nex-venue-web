@@ -21,6 +21,7 @@ export const ChatWindow = ({ id, type, name }: ChatWindowProps) => {
     const [loading, setLoading] = useState(true);
     const [inputText, setInputText] = useState("");
     const scrollRef = useRef<HTMLDivElement>(null);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         if (!id || !user) return;
@@ -45,12 +46,31 @@ export const ChatWindow = ({ id, type, name }: ChatWindowProps) => {
         }
     }, [messages]);
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputText(e.target.value);
+        if (type !== 'direct' || !user) return;
+
+        // Note: For event chats we disable typing indicators to prevent massive write volumes
+        
+        chatService.setTypingStatus(id, user.uid, true);
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        
+        typingTimeoutRef.current = setTimeout(() => {
+            chatService.setTypingStatus(id, user.uid, false);
+        }, 2000);
+    };
+
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!inputText.trim() || !user || !profile) return;
 
         const text = inputText;
         setInputText("");
+
+        if (type === 'direct') {
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            chatService.setTypingStatus(id, user.uid, false);
+        }
 
         try {
             if (type === 'event') {
@@ -76,17 +96,17 @@ export const ChatWindow = ({ id, type, name }: ChatWindowProps) => {
     };
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-white relative">
-            <header className="px-8 py-4 border-b border-surface-dark/5 flex items-center justify-between">
+        <div className="flex-1 flex flex-col h-full bg-white dark:bg-gray-950 relative">
+            <header className="px-8 py-4 border-b border-surface-dark/5 dark:border-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center text-accent font-black text-xl">
                         {name[0]}
                     </div>
                     <div>
-                        <h3 className="font-black text-surface-dark">{name}</h3>
+                        <h3 className="font-black text-surface-dark dark:text-white">{name}</h3>
                         <div className="flex items-center gap-1.5">
                             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                            <span className="text-[10px] font-black text-surface-dark/40 uppercase tracking-widest">Live Connection</span>
+                            <span className="text-[10px] font-black text-surface-dark/40 dark:text-white/40 uppercase tracking-widest">Live Connection</span>
                         </div>
                     </div>
                 </div>
@@ -106,10 +126,10 @@ export const ChatWindow = ({ id, type, name }: ChatWindowProps) => {
                     </div>
                 ) : messages.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center opacity-40 text-center">
-                        <div className="w-20 h-20 bg-surface-dark/5 rounded-full flex items-center justify-center mb-6">
+                        <div className="w-20 h-20 bg-surface-dark/5 dark:bg-white/5 rounded-full flex items-center justify-center mb-6">
                             <Send size={40} className="-rotate-45" />
                         </div>
-                        <h4 className="text-xl font-black text-surface-dark mb-2">No messages yet</h4>
+                        <h4 className="text-xl font-black text-surface-dark dark:text-white mb-2">No messages yet</h4>
                         <p className="text-sm font-medium max-w-xs">Start the conversation by sending a message below.</p>
                     </div>
                 ) : (
@@ -126,10 +146,10 @@ export const ChatWindow = ({ id, type, name }: ChatWindowProps) => {
             <footer className="p-6">
                 <form onSubmit={handleSend} className="relative">
                     <input
-                        className="w-full bg-surface-dark/5 border-none rounded-2xl pl-6 pr-16 py-4 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none min-h-[56px]"
+                        className="w-full bg-surface-dark/5 dark:bg-white/5 border-none rounded-2xl pl-6 pr-16 py-4 text-sm font-medium text-surface-dark dark:text-white placeholder:text-surface-dark/30 dark:placeholder:text-white/30 focus:ring-2 focus:ring-accent/20 outline-none min-h-14"
                         placeholder={`Message ${name}...`}
                         value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
+                        onChange={handleInputChange}
                     />
                     <button
                         type="submit"

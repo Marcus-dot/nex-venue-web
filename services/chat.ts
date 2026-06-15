@@ -11,7 +11,8 @@ import {
     updateDoc,
     getDoc,
     limit,
-    serverTimestamp
+    serverTimestamp,
+    documentId
 } from "firebase/firestore";
 import { ChatMessage, ChatRoom, DirectConversation } from "@/types/chat";
 
@@ -32,6 +33,9 @@ export const chatService = {
                 ...doc.data()
             })) as ChatMessage[];
             callback(messages);
+        }, (error) => {
+            if (error.code === 'permission-denied') return; // Ignore on logout
+            console.error("Error subscribing to event messages:", error);
         });
     },
 
@@ -59,8 +63,11 @@ export const chatService = {
             // Update room's last message
             const roomRef = doc(db, "chatRooms", eventId);
             await updateDoc(roomRef, {
-                lastMessage: message.trim().substring(0, 50),
-                lastMessageTimestamp: Date.now()
+                lastMessage: {
+                    ...messageData,
+                    id: docRef.id
+                },
+                lastActivity: Date.now()
             }).catch(() => { }); // Ignore if room doesn't exist yet
 
             return docRef.id;
@@ -90,6 +97,9 @@ export const chatService = {
                 ...doc.data()
             })) as ChatMessage[];
             callback(messages);
+        }, (error) => {
+            if (error.code === 'permission-denied') return; // Ignore on logout
+            console.error("Error subscribing to direct messages:", error);
         });
     },
 
@@ -122,13 +132,21 @@ export const chatService = {
         await setDoc(convRef, {
             id: conversationId,
             participants: [senderId, recipientId],
-            participantDetails: {
-                [senderId]: { name: senderName, phone: senderPhone },
-                [recipientId]: { name: recipientName, phone: recipientPhone }
+            participantNames: {
+                [senderId]: senderName,
+                [recipientId]: recipientName
             },
-            lastMessage: message.trim(),
-            lastMessageTimestamp: timestamp,
-            updatedAt: timestamp
+            participantPhones: {
+                [senderId]: senderPhone,
+                [recipientId]: recipientPhone
+            },
+            lastMessage: {
+                ...messageData,
+                id: docRef.id
+            },
+            lastActivity: timestamp,
+            isActive: true, // Assuming isActive should be true when sending a message
+            createdAt: timestamp // In real app, we'd preserve createdAt if it exists
         }, { merge: true });
 
         return docRef.id;
@@ -139,7 +157,7 @@ export const chatService = {
         const q = query(
             convRef,
             where("participants", "array-contains", userId),
-            orderBy("updatedAt", "desc")
+            orderBy("lastActivity", "desc")
         );
 
         return onSnapshot(q, (snapshot) => {
@@ -147,7 +165,23 @@ export const chatService = {
                 ...doc.data()
             })) as DirectConversation[];
             callback(conversations);
+        }, (error) => {
+            if (error.code === 'permission-denied') return; // Ignore on logout
+            console.error("Error subscribing to conversations:", error);
         });
+    },
+
+    setTypingStatus: async (conversationId: string, userId: string, isTyping: boolean) => {
+        try {
+            const convRef = doc(db, "directConversations", conversationId);
+            await setDoc(convRef, {
+                typingIndicator: {
+                    [userId]: isTyping ? Date.now() : 0
+                }
+            }, { merge: true });
+        } catch (error) {
+            console.error("Failed to update typing indicator:", error);
+        }
     },
 
     updateUserPresence: async (userId: string, isOnline: boolean) => {
@@ -156,5 +190,32 @@ export const chatService = {
             isOnline,
             lastSeen: Date.now()
         }).catch(() => { });
+    },
+
+    subscribeToUsersPresence: (userIds: string[], callback: (presenceMap: { [uid: string]: { isOnline: boolean, lastSeen: number } }) => void) => {
+        if (!userIds || userIds.length === 0) {
+            callback({});
+            return () => {};
+        }
+
+        const usersRef = collection(db, "users");
+        // Firestore 'in' queries are limited to 10 items.
+        const chunk = userIds.slice(0, 10);
+        const q = query(usersRef, where(documentId(), "in", chunk));
+
+        return onSnapshot(q, (snapshot) => {
+            const map: any = {};
+            snapshot.docs.forEach(document => {
+                const data = document.data();
+                map[document.id] = {
+                    isOnline: data.isOnline || false,
+                    lastSeen: data.lastSeen || 0
+                };
+            });
+            callback(map);
+        }, (error) => {
+            if (error.code === 'permission-denied') return; // Ignore on logout
+            console.error("Error subscribing to user presence:", error);
+        });
     }
 };

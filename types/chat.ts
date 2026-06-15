@@ -17,8 +17,7 @@ export interface ChatRoom {
     eventId: string;
     eventTitle: string;
     participants: string[]; // Array of user IDs
-    lastMessage?: string;
-    lastMessageTimestamp?: number;
+    lastMessage?: ChatMessage;
     lastActivity: number;
     isActive: boolean;
 }
@@ -26,17 +25,13 @@ export interface ChatRoom {
 export interface DirectConversation {
     id: string; // Generated from participant IDs
     participants: string[]; // Array of 2 user IDs
-    participantDetails: {
-        [userId: string]: {
-            name: string;
-            phone: string;
-        }
-    };
-    lastMessage?: string;
-    lastMessageTimestamp: number;
+    participantNames: { [userId: string]: string };
+    participantPhones: { [userId: string]: string };
+    lastMessage?: ChatMessage;
+    lastActivity: number;
     isActive: boolean;
     createdAt: number;
-    updatedAt: number;
+    typingIndicator?: { [userId: string]: number }; // userId -> timestamp of last keystroke
 }
 
 export interface ChatParticipant {
