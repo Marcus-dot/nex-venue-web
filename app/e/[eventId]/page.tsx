@@ -26,6 +26,7 @@ interface EventData {
     time: string;
     location: string;
     imageUrl?: string;
+    currentAgendaItem?: string | null;
 }
 
 interface AgendaItem {
@@ -420,11 +421,12 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
         return () => clearInterval(t);
     }, []);
 
-    // Load event
+    // Load event + subscribe for currentAgendaItem changes
     useEffect(() => {
-        getDoc(doc(db, "events", eventId)).then((snap) => {
+        const unsub = onSnapshot(doc(db, "events", eventId), (snap) => {
             if (snap.exists()) setEvent(snap.data() as EventData);
         });
+        return () => unsub();
     }, [eventId]);
 
     // Load agenda
@@ -509,10 +511,11 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
     const nowMinutes = now.getHours() * 60 + now.getMinutes();
     const days = groupByDate(agenda);
 
-    // Find the live session for the hero badge
-    const liveSession = agenda.find(
-        (item) => !item.isBreak && getSessionStatus(item, todayStr, nowMinutes) === "live"
-    );
+    // Manual override takes priority; fall back to time-based detection
+    const manualLiveId = event?.currentAgendaItem ?? null;
+    const liveSession = manualLiveId
+        ? agenda.find((item) => item.id === manualLiveId) ?? null
+        : agenda.find((item) => !item.isBreak && getSessionStatus(item, todayStr, nowMinutes) === "live") ?? null;
     const nextSession = agenda.find(
         (item) => !item.isBreak && item.date === todayStr &&
             timeToMinutes(item.startTime) > nowMinutes
@@ -691,7 +694,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                                     <AgendaCard
                                                         key={item.id}
                                                         item={item}
-                                                        status={getSessionStatus(item, todayStr, nowMinutes)}
+                                                        status={manualLiveId ? (item.id === manualLiveId ? "live" : getSessionStatus(item, todayStr, nowMinutes)) : getSessionStatus(item, todayStr, nowMinutes)}
                                                         eventId={eventId}
                                                         guestId={guestId.current}
                                                     />
