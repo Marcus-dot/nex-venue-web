@@ -12,6 +12,7 @@ import {
     getDocs,
     arrayUnion,
     updateDoc,
+    setDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { AnimatePresence, motion } from "framer-motion";
@@ -139,13 +140,86 @@ function UpvoteIcon({ filled }: { filled: boolean }) {
     );
 }
 
-function AgendaCard({ item, status }: { item: AgendaItem; status: "live" | "past" | "upcoming" | "future-day" }) {
+function StarRating({ agendaItemId, eventId, guestId }: { agendaItemId: string; eventId: string; guestId: string }) {
+    const [saved, setSaved] = useState<number>(0);
+    const [hovered, setHovered] = useState<number>(0);
+    const [saving, setSaving] = useState(false);
+    const accent = "#e85c29";
+
+    // Load existing rating on mount
+    useEffect(() => {
+        if (!guestId) return;
+        getDoc(doc(db, "ratings", `${agendaItemId}_${guestId}`)).then((snap) => {
+            if (snap.exists()) setSaved(snap.data().score ?? 0);
+        });
+    }, [agendaItemId, guestId]);
+
+    async function rate(score: number) {
+        if (saving) return;
+        setSaving(true);
+        setSaved(score);
+        try {
+            await setDoc(doc(db, "ratings", `${agendaItemId}_${guestId}`), {
+                eventId,
+                agendaItemId,
+                userId: guestId,
+                score,
+                createdAt: Date.now(),
+            }, { merge: true });
+        } catch {
+            // silent — optimistic update stays
+        } finally {
+            setSaving(false);
+        }
+    }
+
+    const active = hovered || saved;
+
+    return (
+        <div>
+            <p className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.3)" }}>
+                {saved ? "Your rating" : "Rate this session"}
+            </p>
+            <div className="flex items-center gap-1.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                        key={star}
+                        onClick={() => rate(star)}
+                        onMouseEnter={() => setHovered(star)}
+                        onMouseLeave={() => setHovered(0)}
+                        className="transition-transform active:scale-90"
+                        style={{ transform: hovered === star ? "scale(1.2)" : "scale(1)", transition: "transform 0.12s ease" }}
+                    >
+                        <svg width="28" height="28" viewBox="0 0 24 24"
+                            fill={star <= active ? accent : "none"}
+                            stroke={star <= active ? accent : "rgba(255,255,255,0.2)"}
+                            strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                    </button>
+                ))}
+                {saved > 0 && (
+                    <motion.span
+                        initial={{ opacity: 0, x: -4 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="text-sm font-semibold ml-1"
+                        style={{ color: accent }}
+                    >
+                        {saved}/5
+                    </motion.span>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function AgendaCard({ item, status, eventId, guestId }: { item: AgendaItem; status: "live" | "past" | "upcoming" | "future-day"; eventId: string; guestId: string }) {
     const [expanded, setExpanded] = useState(false);
     const accent = "#e85c29";
     const isLive = status === "live";
     const isPast = status === "past";
     const hasSpeaker = !!item.speaker?.trim();
-    const hasDetails = !!(item.description?.trim() || item.speakerBio?.trim());
+    const hasDetails = !!(item.description?.trim() || item.speakerBio?.trim()) || (isPast && !item.isBreak);
     const speakerPhoto = item.speakerImages?.[0] ?? item.speakerImage ?? null;
     const label = item.category && item.category !== "other" ? CATEGORY_LABELS[item.category] ?? null : null;
 
@@ -287,7 +361,7 @@ function AgendaCard({ item, status }: { item: AgendaItem; status: "live" | "past
                         transition={{ duration: 0.22, ease: "easeInOut" }}
                         className="overflow-hidden"
                     >
-                        <div className="px-4 pb-4 flex flex-col gap-3"
+                        <div className="px-4 pb-4 flex flex-col gap-4"
                             style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12 }}>
                             {item.description?.trim() && (
                                 <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
@@ -303,6 +377,11 @@ function AgendaCard({ item, status }: { item: AgendaItem; status: "live" | "past
                                     <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
                                         {item.speakerBio}
                                     </p>
+                                </div>
+                            )}
+                            {isPast && !item.isBreak && guestId && (
+                                <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12 }}>
+                                    <StarRating agendaItemId={item.id} eventId={eventId} guestId={guestId} />
                                 </div>
                             )}
                         </div>
@@ -613,6 +692,8 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                                         key={item.id}
                                                         item={item}
                                                         status={getSessionStatus(item, todayStr, nowMinutes)}
+                                                        eventId={eventId}
+                                                        guestId={guestId.current}
                                                     />
                                                 ))}
                                             </div>
