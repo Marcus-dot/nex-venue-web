@@ -18,7 +18,6 @@ const PROTECTED_PREFIXES = [
     "/profile",
     "/chat",
     "/notifications",
-    "/manage",
 ];
 
 // Routes that should redirect to /events if already authenticated

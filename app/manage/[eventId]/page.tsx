@@ -1,7 +1,6 @@
 "use client";
 
-import { use, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
 import {
     collection,
     doc,
@@ -13,7 +12,6 @@ import {
     getDocs,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
-import { useAuth } from "@/context/AuthContext";
 import { agendaService } from "@/services/agenda";
 import { AnimatePresence, motion } from "framer-motion";
 import { AgendaItem } from "@/types/agenda";
@@ -55,10 +53,10 @@ function formatTime(ts: number): string {
 
 function StatusBadge({ status }: { status: Question["status"] }) {
     const map = {
-        pending:  { label: "Pending",  bg: "rgba(234,179,8,0.12)",   color: "#eab308" },
-        approved: { label: "Approved", bg: "rgba(34,197,94,0.12)",   color: "#22c55e" },
-        answered: { label: "Answered", bg: "rgba(59,130,246,0.12)",  color: "#3b82f6" },
-        rejected: { label: "Rejected", bg: "rgba(239,68,68,0.12)",   color: "#ef4444" },
+        pending:  { label: "Pending",  bg: "rgba(234,179,8,0.12)",  color: "#eab308" },
+        approved: { label: "Approved", bg: "rgba(34,197,94,0.12)",  color: "#22c55e" },
+        answered: { label: "Answered", bg: "rgba(59,130,246,0.12)", color: "#3b82f6" },
+        rejected: { label: "Rejected", bg: "rgba(239,68,68,0.12)",  color: "#ef4444" },
     };
     const s = map[status];
     return (
@@ -71,11 +69,11 @@ function StatusBadge({ status }: { status: Question["status"] }) {
 
 // ─── Star display ────────────────────────────────────────────────────────────
 
-function Stars({ score, max = 5 }: { score: number; max?: number }) {
+function Stars({ score }: { score: number }) {
     const accent = "#e85c29";
     return (
         <div className="flex items-center gap-0.5">
-            {Array.from({ length: max }).map((_, i) => (
+            {Array.from({ length: 5 }).map((_, i) => (
                 <svg key={i} width="14" height="14" viewBox="0 0 24 24"
                     fill={i < Math.round(score) ? accent : "none"}
                     stroke={i < Math.round(score) ? accent : "rgba(255,255,255,0.15)"}
@@ -91,58 +89,39 @@ function Stars({ score, max = 5 }: { score: number; max?: number }) {
 
 export default function ManageEventPage({ params }: { params: Promise<{ eventId: string }> }) {
     const { eventId } = use(params);
-    const { user, profile, isAdmin } = useAuth();
-    const router = useRouter();
 
     const [event, setEvent] = useState<Event | null>(null);
-    const [authChecked, setAuthChecked] = useState(false);
-    const [authorized, setAuthorized] = useState(false);
     const [tab, setTab] = useState<"qa" | "agenda" | "ratings">("qa");
 
-    // Q&A state
+    // Q&A
     const [questions, setQuestions] = useState<Question[]>([]);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editText, setEditText] = useState("");
     const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
 
-    // Agenda state
+    // Agenda
     const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
     const [liveItemId, setLiveItemId] = useState<string | null>(null);
     const [liveLoading, setLiveLoading] = useState<string | null>(null);
 
-    // Ratings state
+    // Ratings
     const [ratings, setRatings] = useState<RatingSummary[]>([]);
     const [ratingsLoaded, setRatingsLoaded] = useState(false);
 
     const accent = "#e85c29";
 
-    // ── Auth + access check ─────────────────────────────────────────────────
+    // ── Load event ──────────────────────────────────────────────────────────
     useEffect(() => {
-        if (!user) return; // still loading
         getDoc(doc(db, "events", eventId)).then((snap) => {
-            if (!snap.exists()) { router.replace("/events"); return; }
-            const ev = { id: snap.id, ...snap.data() } as Event;
-            setEvent(ev);
-            const canAccess = isAdmin ||
-                ev.organisers?.includes(user.uid) ||
-                ev.creatorId === user.uid;
-            setAuthorized(canAccess);
-            setLiveItemId(ev.currentAgendaItem ?? null);
-            setAuthChecked(true);
-            if (!canAccess) return;
+            if (snap.exists()) {
+                setEvent({ id: snap.id, ...snap.data() } as Event);
+                setLiveItemId(snap.data().currentAgendaItem ?? null);
+            }
         });
-    }, [user, isAdmin, eventId, router]);
-
-    // Redirect if not logged in after auth resolves
-    useEffect(() => {
-        if (authChecked && !user) {
-            router.replace(`/login?redirect=/manage/${eventId}`);
-        }
-    }, [authChecked, user, eventId, router]);
+    }, [eventId]);
 
     // ── Q&A real-time ───────────────────────────────────────────────────────
     useEffect(() => {
-        if (!authorized) return;
         const q = query(collection(db, "questions"), where("eventId", "==", eventId));
         const unsub = onSnapshot(q, (snap) => {
             const qs: Question[] = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Question));
@@ -150,27 +129,25 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
             setQuestions(qs);
         });
         return () => unsub();
-    }, [authorized, eventId]);
+    }, [eventId]);
 
     // ── Agenda real-time ────────────────────────────────────────────────────
     useEffect(() => {
-        if (!authorized) return;
-        const unsub = agendaService.subscribeToAgenda(eventId, (items) => {
+        const agendaUnsub = agendaService.subscribeToAgenda(eventId, (items) => {
             setAgendaItems([...items].sort((a, b) => {
                 if (a.date !== b.date) return (a.date ?? "").localeCompare(b.date ?? "");
                 return timeToMin(a.startTime) - timeToMin(b.startTime);
             }));
         });
-        // Also subscribe to live item changes on the event doc
         const eventUnsub = onSnapshot(doc(db, "events", eventId), (snap) => {
             if (snap.exists()) setLiveItemId(snap.data().currentAgendaItem ?? null);
         });
-        return () => { unsub(); eventUnsub(); };
-    }, [authorized, eventId]);
+        return () => { agendaUnsub(); eventUnsub(); };
+    }, [eventId]);
 
-    // ── Ratings load (on tab switch) ────────────────────────────────────────
+    // ── Ratings ─────────────────────────────────────────────────────────────
     useEffect(() => {
-        if (tab !== "ratings" || !authorized || ratingsLoaded) return;
+        if (tab !== "ratings" || ratingsLoaded) return;
         (async () => {
             const [agSnap, rSnap] = await Promise.all([
                 getDocs(query(collection(db, "agendas"), where("eventId", "==", eventId))),
@@ -199,7 +176,7 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
             setRatings(summaries);
             setRatingsLoaded(true);
         })();
-    }, [tab, authorized, eventId, ratingsLoaded]);
+    }, [tab, eventId, ratingsLoaded]);
 
     // ── Q&A actions ─────────────────────────────────────────────────────────
 
@@ -239,6 +216,12 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
         setLoading(q.id, false);
     }
 
+    async function handleRestoreApprove(q: Question) {
+        setLoading(q.id, true);
+        await updateDoc(doc(db, "questions", q.id), { status: "approved", approvedAt: Date.now() });
+        setLoading(q.id, false);
+    }
+
     // ── Agenda actions ───────────────────────────────────────────────────────
 
     async function handleSetLive(itemId: string) {
@@ -251,29 +234,7 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
         }
     }
 
-    // ── Loading / access guards ──────────────────────────────────────────────
-
-    if (!authChecked || !user) {
-        return (
-            <div className="min-h-screen flex items-center justify-center" style={{ background: "#0f1117" }}>
-                <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: `${accent} transparent transparent transparent` }} />
-            </div>
-        );
-    }
-
-    if (!authorized) {
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: "#0f1117" }}>
-                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: "rgba(239,68,68,0.1)" }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
-                    </svg>
-                </div>
-                <p className="text-white font-semibold">Access denied</p>
-                <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>You are not an organiser for this event.</p>
-            </div>
-        );
-    }
+    // ── Render ───────────────────────────────────────────────────────────────
 
     const pending  = questions.filter(q => q.status === "pending");
     const approved = questions.filter(q => q.status === "approved");
@@ -281,9 +242,9 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
     const rejected = questions.filter(q => q.status === "rejected");
 
     const TABS = [
-        { id: "qa",      label: `Q&A`, badge: pending.length || undefined },
-        { id: "agenda",  label: "Live Agenda" },
-        { id: "ratings", label: "Ratings" },
+        { id: "qa",      label: "Q&A",         badge: pending.length || undefined },
+        { id: "agenda",  label: "Live Agenda",  badge: undefined },
+        { id: "ratings", label: "Ratings",      badge: undefined },
     ] as const;
 
     return (
@@ -293,14 +254,10 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
             <div className="px-5 pt-8 pb-5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
                 <div className="flex items-center gap-2 mb-1">
                     <div className="w-2 h-2 rounded-full" style={{ background: accent }} />
-                    <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: accent, letterSpacing: "0.1em" }}>
-                        Admin
-                    </span>
+                    <span className="text-xs font-semibold uppercase tracking-widest"
+                        style={{ color: accent, letterSpacing: "0.1em" }}>Admin</span>
                 </div>
-                <h1 className="text-white font-black text-2xl">{event?.title ?? "Event"}</h1>
-                <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
-                    {profile?.fullName} · {isAdmin ? "Platform Admin" : "Organiser"}
-                </p>
+                <h1 className="text-white font-black text-2xl">{event?.title ?? "Loading..."}</h1>
             </div>
 
             {/* ── Tabs ── */}
@@ -310,22 +267,24 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                         className="relative flex items-center gap-1.5 px-4 py-3.5 text-sm font-semibold transition-colors"
                         style={{ color: tab === t.id ? "white" : "rgba(255,255,255,0.35)" }}>
                         {t.label}
-                        {"badge" in t && t.badge ? (
+                        {t.badge ? (
                             <span className="text-xs font-black w-5 h-5 rounded-full flex items-center justify-center"
                                 style={{ background: accent, color: "white" }}>
                                 {t.badge}
                             </span>
                         ) : null}
                         {tab === t.id && (
-                            <motion.div layoutId="admin-tab" className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full"
+                            <motion.div layoutId="admin-tab"
+                                className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full"
                                 style={{ background: accent }} />
                         )}
                     </button>
                 ))}
             </div>
 
-            {/* ══ Q&A TAB ══════════════════════════════════════════════════════ */}
             <AnimatePresence mode="wait">
+
+                {/* ══ Q&A ═════════════════════════════════════════════════════ */}
                 {tab === "qa" && (
                     <motion.div key="qa" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         transition={{ duration: 0.15 }} className="px-5 py-6 flex flex-col gap-8">
@@ -351,27 +310,23 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                                     {pending.map(q => (
                                         <div key={q.id} className="rounded-2xl p-4"
                                             style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                                            <div className="flex items-start justify-between gap-3 mb-3">
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.35)" }}>
-                                                        {q.isAnonymous ? "Anonymous" : q.authorName} · {formatTime(q.createdAt)}
-                                                    </p>
-                                                    {editingId === q.id ? (
-                                                        <textarea
-                                                            value={editText}
-                                                            onChange={e => setEditText(e.target.value)}
-                                                            rows={3}
-                                                            autoFocus
-                                                            className="w-full rounded-xl px-3 py-2 text-sm text-white outline-none resize-none"
-                                                            style={{ background: "rgba(255,255,255,0.07)", border: `1px solid ${accent}` }}
-                                                        />
-                                                    ) : (
-                                                        <p className="text-white text-sm leading-snug">{q.text}</p>
-                                                    )}
-                                                </div>
-                                            </div>
+                                            <p className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.35)" }}>
+                                                {q.isAnonymous ? "Anonymous" : q.authorName} · {formatTime(q.createdAt)}
+                                            </p>
 
-                                            {/* Actions */}
+                                            {editingId === q.id ? (
+                                                <textarea
+                                                    value={editText}
+                                                    onChange={e => setEditText(e.target.value)}
+                                                    rows={3}
+                                                    autoFocus
+                                                    className="w-full rounded-xl px-3 py-2 text-sm text-white outline-none resize-none mb-3"
+                                                    style={{ background: "rgba(255,255,255,0.07)", border: `1px solid ${accent}` }}
+                                                />
+                                            ) : (
+                                                <p className="text-white text-sm leading-snug mb-3">{q.text}</p>
+                                            )}
+
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 {editingId === q.id ? (
                                                     <>
@@ -388,8 +343,7 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                                                         </button>
                                                     </>
                                                 ) : (
-                                                    <button
-                                                        onClick={() => { setEditingId(q.id); setEditText(q.text); }}
+                                                    <button onClick={() => { setEditingId(q.id); setEditText(q.text); }}
                                                         className="px-3 py-1.5 rounded-lg text-xs font-semibold"
                                                         style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}>
                                                         Edit
@@ -397,8 +351,8 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                                                 )}
                                                 <button onClick={() => handleApprove(q)}
                                                     disabled={actionLoading[q.id]}
-                                                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-white"
-                                                    style={{ background: "rgba(34,197,94,0.2)", color: "#22c55e" }}>
+                                                    className="px-3 py-1.5 rounded-lg text-xs font-bold"
+                                                    style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e" }}>
                                                     {actionLoading[q.id] ? "..." : "Approve"}
                                                 </button>
                                                 <button onClick={() => handleReject(q.id)}
@@ -443,7 +397,9 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                         {/* Answered */}
                         {answered.length > 0 && (
                             <section>
-                                <h2 className="font-bold text-base mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>Answered</h2>
+                                <h2 className="font-bold text-base mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>
+                                    Answered · {answered.length}
+                                </h2>
                                 <div className="flex flex-col gap-2">
                                     {answered.map(q => (
                                         <div key={q.id} className="rounded-xl px-4 py-3 flex items-start gap-3"
@@ -459,13 +415,18 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                         {/* Rejected */}
                         {rejected.length > 0 && (
                             <section>
-                                <h2 className="font-bold text-base mb-4" style={{ color: "rgba(255,255,255,0.3)" }}>Rejected</h2>
+                                <h2 className="font-bold text-base mb-4" style={{ color: "rgba(255,255,255,0.3)" }}>
+                                    Rejected · {rejected.length}
+                                </h2>
                                 <div className="flex flex-col gap-2">
                                     {rejected.map(q => (
                                         <div key={q.id} className="rounded-xl px-4 py-3 flex items-start gap-3"
                                             style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
-                                            <p className="text-sm flex-1 line-through" style={{ color: "rgba(255,255,255,0.25)" }}>{q.text}</p>
-                                            <button onClick={() => handleApprove(q)}
+                                            <p className="text-sm flex-1 line-through" style={{ color: "rgba(255,255,255,0.25)" }}>
+                                                {q.text}
+                                            </p>
+                                            <button onClick={() => handleRestoreApprove(q)}
+                                                disabled={actionLoading[q.id]}
                                                 className="shrink-0 text-xs px-2 py-1 rounded-lg"
                                                 style={{ color: "#22c55e", background: "rgba(34,197,94,0.1)" }}>
                                                 Restore
@@ -478,13 +439,13 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                     </motion.div>
                 )}
 
-                {/* ══ AGENDA TAB ═══════════════════════════════════════════════ */}
+                {/* ══ LIVE AGENDA ══════════════════════════════════════════════ */}
                 {tab === "agenda" && (
                     <motion.div key="agenda" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         transition={{ duration: 0.15 }} className="px-5 py-6">
 
                         <p className="text-sm mb-5" style={{ color: "rgba(255,255,255,0.4)" }}>
-                            Tap a session to set it as live. This updates the projection screen and the public event page instantly.
+                            Tap a session to mark it live. Updates the public page and projection screen instantly.
                         </p>
 
                         {liveItemId && (
@@ -492,13 +453,14 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                                 style={{ background: "rgba(232,92,41,0.08)", border: "1px solid rgba(232,92,41,0.2)" }}>
                                 <div className="flex items-center gap-2">
                                     <motion.div className="w-2 h-2 rounded-full" style={{ background: accent }}
-                                        animate={{ opacity: [1, 0.3, 1] }} transition={{ repeat: Infinity, duration: 1.4 }} />
-                                    <span className="text-sm font-semibold text-white">
+                                        animate={{ opacity: [1, 0.3, 1] }}
+                                        transition={{ repeat: Infinity, duration: 1.4 }} />
+                                    <span className="text-sm font-semibold text-white truncate">
                                         {agendaItems.find(i => i.id === liveItemId)?.title ?? "Session live"}
                                     </span>
                                 </div>
                                 <button onClick={() => handleSetLive(liveItemId)}
-                                    className="text-xs font-semibold px-3 py-1 rounded-lg"
+                                    className="text-xs font-semibold px-3 py-1 rounded-lg shrink-0 ml-3"
                                     style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.5)" }}>
                                     Clear
                                 </button>
@@ -515,7 +477,7 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                                         className="w-full text-left rounded-xl p-4 transition-all"
                                         style={{
                                             background: isLive ? "rgba(232,92,41,0.1)" : "rgba(255,255,255,0.03)",
-                                            border: isLive ? `1px solid rgba(232,92,41,0.3)` : "1px solid rgba(255,255,255,0.06)",
+                                            border: isLive ? "1px solid rgba(232,92,41,0.3)" : "1px solid rgba(255,255,255,0.06)",
                                         }}>
                                         <div className="flex items-center gap-3">
                                             <div className="shrink-0 text-center w-14">
@@ -528,11 +490,14 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                                                 </span>
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-semibold truncate" style={{ color: isLive ? "white" : "rgba(255,255,255,0.7)" }}>
+                                                <p className="text-sm font-semibold truncate"
+                                                    style={{ color: isLive ? "white" : "rgba(255,255,255,0.7)" }}>
                                                     {item.title}
                                                 </p>
                                                 {item.speaker && (
-                                                    <p className="text-xs truncate" style={{ color: "rgba(255,255,255,0.35)" }}>{item.speaker}</p>
+                                                    <p className="text-xs truncate" style={{ color: "rgba(255,255,255,0.35)" }}>
+                                                        {item.speaker}
+                                                    </p>
                                                 )}
                                             </div>
                                             <div className="shrink-0">
@@ -541,7 +506,8 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                                                         style={{ borderColor: `${accent} transparent transparent transparent` }} />
                                                 ) : isLive ? (
                                                     <motion.div className="w-2.5 h-2.5 rounded-full" style={{ background: accent }}
-                                                        animate={{ opacity: [1, 0.3, 1] }} transition={{ repeat: Infinity, duration: 1.4 }} />
+                                                        animate={{ opacity: [1, 0.3, 1] }}
+                                                        transition={{ repeat: Infinity, duration: 1.4 }} />
                                                 ) : (
                                                     <div className="w-2.5 h-2.5 rounded-full"
                                                         style={{ border: "1.5px solid rgba(255,255,255,0.12)" }} />
@@ -555,7 +521,7 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                     </motion.div>
                 )}
 
-                {/* ══ RATINGS TAB ══════════════════════════════════════════════ */}
+                {/* ══ RATINGS ══════════════════════════════════════════════════ */}
                 {tab === "ratings" && (
                     <motion.div key="ratings" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         transition={{ duration: 0.15 }} className="px-5 py-6">
