@@ -684,7 +684,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
 
             {/* ── Tab Content ── */}
             <AnimatePresence mode="wait">
-                {tab === "agenda" ? (
+                {tab === "agenda" && (
                     <motion.div
                         key="agenda"
                         initial={{ opacity: 0 }}
@@ -748,7 +748,8 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                             </div>
                         )}
                     </motion.div>
-                ) : (
+                )}
+                {tab === "qa" && (
                     <motion.div
                         key="qa"
                         initial={{ opacity: 0 }}
