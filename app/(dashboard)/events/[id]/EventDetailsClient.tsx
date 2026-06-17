@@ -280,8 +280,11 @@ export default function EventDetailsClient() {
                                 {participants.filter(p => p.role === 'speaker').map(speaker => (
                                     <GlassCard key={speaker.id} className="!p-6 flex flex-col gap-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center text-accent font-black text-2xl">
-                                                {speaker.displayName[0]}
+                                            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center text-accent font-black text-2xl overflow-hidden">
+                                                {speaker.photoUrl
+                                                    ? <img src={speaker.photoUrl} alt={speaker.displayName} className="w-full h-full object-cover" />
+                                                    : speaker.displayName[0]
+                                                }
                                             </div>
                                             <div>
                                                 <div className="text-xl font-black text-surface-dark dark:text-white">{speaker.displayName}</div>
