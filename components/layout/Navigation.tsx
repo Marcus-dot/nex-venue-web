@@ -24,7 +24,7 @@ export const Navigation = () => {
     const pathname = usePathname();
     const router = useRouter();
 
-    if (pathname.startsWith("/qa/")) return null;
+    if (pathname.startsWith("/qa/") || pathname.startsWith("/e/")) return null;
     const [unreadCount, setUnreadCount] = useState(0);
 
     useEffect(() => {
