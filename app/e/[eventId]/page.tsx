@@ -19,6 +19,22 @@ import { AnimatePresence, motion } from "framer-motion";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
+interface PollOption {
+    id: string;
+    text: string;
+    votes: string[];
+}
+
+interface Poll {
+    id: string;
+    eventId: string;
+    question: string;
+    options: PollOption[];
+    isActive: boolean;
+    showResults: boolean;
+    createdAt: number;
+}
+
 interface EventData {
     title: string;
     description: string;
@@ -401,7 +417,8 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
     const [event, setEvent] = useState<EventData | null>(null);
     const [agenda, setAgenda] = useState<AgendaItem[]>([]);
     const [questions, setQuestions] = useState<Question[]>([]);
-    const [tab, setTab] = useState<"agenda" | "qa">("agenda");
+    const [polls, setPolls] = useState<Poll[]>([]);
+    const [tab, setTab] = useState<"agenda" | "qa" | "polls">("agenda");
     const [now, setNow] = useState<Date>(new Date());
 
     // Q&A form
@@ -444,6 +461,21 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
             });
             setAgenda(items);
         });
+    }, [eventId]);
+
+    // Real-time active polls
+    useEffect(() => {
+        const q = query(
+            collection(db, "polls"),
+            where("eventId", "==", eventId),
+            where("isActive", "==", true)
+        );
+        const unsub = onSnapshot(q, (snap) => {
+            const ps: Poll[] = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Poll));
+            ps.sort((a, b) => a.createdAt - b.createdAt);
+            setPolls(ps);
+        });
+        return () => unsub();
     }, [eventId]);
 
     // Real-time approved questions
@@ -621,14 +653,24 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
 
             {/* ── Tabs ── */}
             <div className="px-5 flex gap-1 mt-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                {(["agenda", "qa"] as const).map((t) => (
+                {(["agenda", "qa", "polls"] as const).map((t) => (
                     <button
                         key={t}
                         onClick={() => setTab(t)}
                         className="relative px-4 py-3 text-sm font-semibold transition-colors"
                         style={{ color: tab === t ? "white" : "rgba(255,255,255,0.35)" }}
                     >
-                        {t === "agenda" ? "Agenda" : "Q&A"}
+                        {t === "agenda" ? "Agenda" : t === "qa" ? "Q&A" : (
+                            <span className="flex items-center gap-1.5">
+                                Polls
+                                {polls.length > 0 && (
+                                    <span className="text-xs font-black w-4 h-4 rounded-full flex items-center justify-center"
+                                        style={{ background: accent, color: "white", fontSize: 10 }}>
+                                        {polls.length}
+                                    </span>
+                                )}
+                            </span>
+                        )}
                         {tab === t && (
                             <motion.div
                                 layoutId="tab-indicator"
@@ -868,6 +910,102 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                             <p className="text-center py-4 text-sm" style={{ color: "rgba(255,255,255,0.2)" }}>
                                 No questions approved yet
                             </p>
+                        )}
+                    </motion.div>
+                )}
+
+                {/* ── Polls tab ── */}
+                {tab === "polls" && (
+                    <motion.div
+                        key="polls"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        className="px-5 py-5 flex flex-col gap-5"
+                    >
+                        {polls.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-16 gap-3">
+                                <div className="w-14 h-14 rounded-full flex items-center justify-center"
+                                    style={{ background: "rgba(232,92,41,0.08)", border: "1px solid rgba(232,92,41,0.15)" }}>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e85c29" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect x="2" y="3" width="6" height="18" rx="1" /><rect x="9" y="8" width="6" height="13" rx="1" /><rect x="16" y="13" width="6" height="8" rx="1" />
+                                    </svg>
+                                </div>
+                                <p className="text-white font-semibold">No active polls yet</p>
+                                <p className="text-xs text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
+                                    Polls will appear here when the organiser launches one
+                                </p>
+                            </div>
+                        ) : (
+                            polls.map((poll) => {
+                                const gid = guestId.current;
+                                const totalVotes = poll.options.reduce((s, o) => s + (o.votes?.length ?? 0), 0);
+                                const myVoteId = poll.options.find((o) => o.votes?.includes(gid))?.id ?? null;
+
+                                async function vote(optionId: string) {
+                                    if (myVoteId) return; // already voted
+                                    const updated = poll.options.map((o) =>
+                                        o.id === optionId
+                                            ? { ...o, votes: [...(o.votes ?? []), gid] }
+                                            : o
+                                    );
+                                    try {
+                                        await updateDoc(doc(db, "polls", poll.id), { options: updated });
+                                    } catch { /* silent */ }
+                                }
+
+                                return (
+                                    <div key={poll.id} className="rounded-2xl p-5"
+                                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                                        <p className="text-white font-semibold text-base leading-snug mb-4">{poll.question}</p>
+                                        <div className="flex flex-col gap-2">
+                                            {poll.options.map((opt) => {
+                                                const isMyVote = opt.id === myVoteId;
+                                                const pct = totalVotes > 0 ? Math.round((opt.votes?.length ?? 0) / totalVotes * 100) : 0;
+                                                const showBar = poll.showResults || !!myVoteId;
+                                                return (
+                                                    <button
+                                                        key={opt.id}
+                                                        onClick={() => vote(opt.id)}
+                                                        disabled={!!myVoteId}
+                                                        className="w-full text-left rounded-xl px-4 py-3 relative overflow-hidden transition-all"
+                                                        style={{
+                                                            background: isMyVote ? "rgba(232,92,41,0.15)" : "rgba(255,255,255,0.04)",
+                                                            border: isMyVote ? "1px solid rgba(232,92,41,0.4)" : "1px solid rgba(255,255,255,0.08)",
+                                                        }}
+                                                    >
+                                                        {showBar && (
+                                                            <div className="absolute inset-0 rounded-xl"
+                                                                style={{
+                                                                    background: isMyVote ? "rgba(232,92,41,0.12)" : "rgba(255,255,255,0.03)",
+                                                                    width: `${pct}%`,
+                                                                    transition: "width 0.4s ease",
+                                                                }} />
+                                                        )}
+                                                        <div className="relative flex items-center justify-between gap-3">
+                                                            <span className="text-sm font-medium" style={{ color: isMyVote ? "#e85c29" : "rgba(255,255,255,0.8)" }}>
+                                                                {opt.text}
+                                                            </span>
+                                                            {showBar && (
+                                                                <span className="text-xs font-bold tabular-nums shrink-0"
+                                                                    style={{ color: isMyVote ? "#e85c29" : "rgba(255,255,255,0.35)" }}>
+                                                                    {pct}%
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        {myVoteId && (
+                                            <p className="text-xs mt-3 text-center" style={{ color: "rgba(255,255,255,0.25)" }}>
+                                                {totalVotes} vote{totalVotes !== 1 ? "s" : ""} · Your response recorded
+                                            </p>
+                                        )}
+                                    </div>
+                                );
+                            })
                         )}
                     </motion.div>
                 )}
