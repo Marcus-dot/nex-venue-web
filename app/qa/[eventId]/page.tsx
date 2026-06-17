@@ -46,7 +46,7 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
         const q = query(
             collection(db, "questions"),
             where("eventId", "==", eventId),
-            where("status", "in", ["approved", "answered"])
+            where("status", "==", "approved")
         );
 
         const unsub = onSnapshot(q, (snap) => {
