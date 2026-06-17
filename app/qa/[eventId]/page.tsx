@@ -11,6 +11,7 @@ interface Question {
     text: string;
     authorName: string;
     isAnonymous: boolean;
+    directedTo?: string | null;
     status: "pending" | "approved" | "rejected" | "answered";
     upvotes: string[];
     createdAt: number;
@@ -190,13 +191,21 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                                     </p>
 
                                     {/* Meta row */}
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-4 flex-wrap">
                                         <span
                                             className="text-sm font-medium"
                                             style={{ color: "rgba(255,255,255,0.5)" }}
                                         >
                                             {spotlight.isAnonymous ? "Anonymous" : spotlight.authorName}
                                         </span>
+                                        {spotlight.directedTo && (
+                                            <span
+                                                className="text-sm font-semibold px-3 py-0.5 rounded-full"
+                                                style={{ background: "rgba(232,92,41,0.15)", color: "#e85c29" }}
+                                            >
+                                                → {spotlight.directedTo}
+                                            </span>
+                                        )}
                                         {(spotlight.upvotes?.length ?? 0) > 0 && (
                                             <span
                                                 className="flex items-center gap-1.5 text-sm font-semibold"
@@ -282,6 +291,14 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                                                     >
                                                         {q.isAnonymous ? "Anonymous" : q.authorName}
                                                     </span>
+                                                    {q.directedTo && (
+                                                        <span
+                                                            className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                                                            style={{ background: "rgba(232,92,41,0.12)", color: "#e85c29" }}
+                                                        >
+                                                            → {q.directedTo}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </motion.div>
                                         ))}
