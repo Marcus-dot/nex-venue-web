@@ -299,7 +299,7 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                 style={{ borderColor: "rgba(255,255,255,0.05)" }}
             >
                 <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 12 }}>
-                    Submit questions via the NexVenue app
+                    Scan the QR code to submit questions
                 </span>
                 <span style={{ color: "rgba(255,255,255,0.1)", fontSize: 12, fontWeight: 600, letterSpacing: "0.05em" }}>
                     NEXVENUE

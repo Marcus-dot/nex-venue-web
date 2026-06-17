@@ -67,28 +67,37 @@ function getGuestId(): string {
     return id;
 }
 
-function formatDate(dateStr: string): string {
+function toISODate(d: Date): string {
+    return d.toISOString().split("T")[0];
+}
+
+function timeToMinutes(t: string): number {
+    const [h, m] = t.split(":").map(Number);
+    return (h || 0) * 60 + (m || 0);
+}
+
+function formatDayHeading(dateStr: string): { weekday: string; dateLabel: string } {
     try {
-        return new Date(dateStr).toLocaleDateString("en-GB", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-        });
+        // Parse as local date to avoid timezone shifts
+        const [y, mo, d] = dateStr.split("-").map(Number);
+        const date = new Date(y, mo - 1, d);
+        return {
+            weekday: date.toLocaleDateString("en-GB", { weekday: "long" }),
+            dateLabel: date.toLocaleDateString("en-GB", { day: "numeric", month: "long" }),
+        };
     } catch {
-        return dateStr;
+        return { weekday: dateStr, dateLabel: "" };
     }
 }
 
-function formatDayHeading(dateStr: string): { weekday: string; date: string } {
+function formatEventDate(dateStr: string): string {
     try {
-        const d = new Date(dateStr);
-        return {
-            weekday: d.toLocaleDateString("en-GB", { weekday: "long" }),
-            date: d.toLocaleDateString("en-GB", { day: "numeric", month: "long" }),
-        };
+        const [y, mo, d] = dateStr.split("-").map(Number);
+        return new Date(y, mo - 1, d).toLocaleDateString("en-GB", {
+            weekday: "long", day: "numeric", month: "long", year: "numeric",
+        });
     } catch {
-        return { weekday: dateStr, date: "" };
+        return dateStr;
     }
 }
 
@@ -102,17 +111,20 @@ function groupByDate(items: AgendaItem[]): [string, AgendaItem[]][] {
     return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
 }
 
+function getSessionStatus(item: AgendaItem, todayStr: string, nowMinutes: number): "live" | "past" | "upcoming" | "future-day" {
+    if (item.date > todayStr) return "future-day";
+    if (item.date < todayStr) return "past";
+    const start = timeToMinutes(item.startTime);
+    const end = timeToMinutes(item.endTime || item.startTime) + (item.endTime ? 0 : 60);
+    if (nowMinutes >= start && nowMinutes < end) return "live";
+    if (nowMinutes >= end) return "past";
+    return "upcoming";
+}
+
 const CATEGORY_LABELS: Record<string, string> = {
-    keynote: "Keynote",
-    panel: "Panel",
-    workshop: "Workshop",
-    presentation: "Presentation",
-    networking: "Networking",
-    fireside: "Fireside",
-    demo: "Demo",
-    case_study: "Case Study",
-    remarks: "Remarks",
-    break: "Break",
+    keynote: "Keynote", panel: "Panel", workshop: "Workshop",
+    presentation: "Presentation", networking: "Networking", fireside: "Fireside",
+    demo: "Demo", case_study: "Case Study", remarks: "Remarks", break: "Break",
 };
 
 // ─── Sub-components ─────────────────────────────────────────────────────────
@@ -127,40 +139,74 @@ function UpvoteIcon({ filled }: { filled: boolean }) {
     );
 }
 
-function AgendaCard({ item }: { item: AgendaItem }) {
+function AgendaCard({ item, status }: { item: AgendaItem; status: "live" | "past" | "upcoming" | "future-day" }) {
     const [expanded, setExpanded] = useState(false);
     const accent = "#e85c29";
+    const isLive = status === "live";
+    const isPast = status === "past";
     const hasSpeaker = !!item.speaker?.trim();
     const hasDetails = !!(item.description?.trim() || item.speakerBio?.trim());
     const speakerPhoto = item.speakerImages?.[0] ?? item.speakerImage ?? null;
-    const label = item.category && item.category !== "other" ? CATEGORY_LABELS[item.category] ?? item.category : null;
+    const label = item.category && item.category !== "other" ? CATEGORY_LABELS[item.category] ?? null : null;
 
+    // Breaks — minimal styling
     if (item.isBreak) {
         return (
-            <div className="flex items-center gap-3 py-2 px-4 rounded-xl"
-                style={{ background: "rgba(255,255,255,0.02)" }}>
-                <span className="text-xs font-bold tabular-nums w-[52px] shrink-0" style={{ color: "rgba(255,255,255,0.25)" }}>
+            <div className="flex items-center gap-3 py-2.5 px-4 rounded-xl"
+                style={{ background: "rgba(255,255,255,0.015)" }}>
+                <span className="text-xs font-bold tabular-nums w-[52px] shrink-0"
+                    style={{ color: isPast ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.3)" }}>
                     {item.startTime}
                 </span>
-                <span className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>{item.title}</span>
+                <span className="text-sm" style={{ color: isPast ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.35)" }}>
+                    {item.title}
+                </span>
             </div>
         );
     }
 
     return (
-        <div className="rounded-xl overflow-hidden"
-            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-            {/* Main row */}
+        <div
+            className="rounded-xl overflow-hidden transition-all"
+            style={{
+                background: isLive
+                    ? "rgba(232,92,41,0.08)"
+                    : isPast
+                        ? "rgba(255,255,255,0.02)"
+                        : "rgba(255,255,255,0.04)",
+                border: isLive
+                    ? "1px solid rgba(232,92,41,0.3)"
+                    : isPast
+                        ? "1px solid rgba(255,255,255,0.04)"
+                        : "1px solid rgba(255,255,255,0.07)",
+            }}
+        >
             <div
                 className={hasDetails ? "cursor-pointer" : ""}
                 onClick={() => hasDetails && setExpanded(!expanded)}
             >
                 <div className="flex items-start gap-3 p-4">
-                    {/* Time */}
+                    {/* Live pulse / time */}
                     <div className="shrink-0 w-[52px] pt-0.5">
-                        <span className="text-xs font-bold tabular-nums" style={{ color: accent }}>{item.startTime}</span>
+                        {isLive ? (
+                            <div className="flex items-center gap-1.5 mb-1">
+                                <motion.div
+                                    className="w-2 h-2 rounded-full shrink-0"
+                                    style={{ background: accent }}
+                                    animate={{ opacity: [1, 0.3, 1] }}
+                                    transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut" }}
+                                />
+                                <span className="text-xs font-black uppercase" style={{ color: accent, letterSpacing: "0.04em" }}>Live</span>
+                            </div>
+                        ) : null}
+                        <span className="text-xs font-bold tabular-nums block"
+                            style={{ color: isLive ? accent : isPast ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.5)" }}>
+                            {item.startTime}
+                        </span>
                         {item.endTime && (
-                            <span className="block text-xs tabular-nums" style={{ color: "rgba(255,255,255,0.2)" }}>{item.endTime}</span>
+                            <span className="text-xs tabular-nums" style={{ color: "rgba(255,255,255,0.15)" }}>
+                                {item.endTime}
+                            </span>
                         )}
                     </div>
 
@@ -168,30 +214,44 @@ function AgendaCard({ item }: { item: AgendaItem }) {
                     <div className="flex-1 min-w-0">
                         {label && (
                             <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5"
-                                style={{ background: "rgba(232,92,41,0.12)", color: accent }}>
+                                style={{
+                                    background: isLive ? "rgba(232,92,41,0.2)" : "rgba(232,92,41,0.1)",
+                                    color: isLive ? accent : "rgba(232,92,41,0.7)",
+                                }}>
                                 {label}
                             </span>
                         )}
-                        <p className="font-semibold text-sm text-white leading-snug">{item.title}</p>
+                        <p className="font-semibold text-sm leading-snug"
+                            style={{ color: isPast ? "rgba(255,255,255,0.4)" : "white" }}>
+                            {item.title}
+                        </p>
 
                         {hasSpeaker && (
                             <div className="flex items-center gap-2 mt-2">
                                 {speakerPhoto ? (
                                     <img src={speakerPhoto} alt={item.speaker}
                                         className="w-7 h-7 rounded-full object-cover shrink-0"
-                                        style={{ border: "1px solid rgba(255,255,255,0.1)" }} />
+                                        style={{
+                                            border: "1px solid rgba(255,255,255,0.1)",
+                                            opacity: isPast ? 0.5 : 1,
+                                        }} />
                                 ) : (
                                     <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                                        style={{ background: "rgba(232,92,41,0.15)", color: accent }}>
+                                        style={{
+                                            background: isPast ? "rgba(255,255,255,0.06)" : "rgba(232,92,41,0.15)",
+                                            color: isPast ? "rgba(255,255,255,0.3)" : accent,
+                                        }}>
                                         {item.speaker!.trim()[0]}
                                     </div>
                                 )}
                                 <div className="min-w-0">
-                                    <p className="text-xs font-medium truncate" style={{ color: "rgba(255,255,255,0.6)" }}>
+                                    <p className="text-xs font-medium truncate"
+                                        style={{ color: isPast ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.6)" }}>
                                         {item.speaker}
                                     </p>
                                     {item.speakerTitle && (
-                                        <p className="text-xs truncate" style={{ color: "rgba(255,255,255,0.3)" }}>
+                                        <p className="text-xs truncate"
+                                            style={{ color: isPast ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.3)" }}>
                                             {item.speakerTitle}
                                         </p>
                                     )}
@@ -202,11 +262,17 @@ function AgendaCard({ item }: { item: AgendaItem }) {
 
                     {/* Expand chevron */}
                     {hasDetails && (
-                        <div className="shrink-0 mt-1 transition-transform" style={{ transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <motion.div
+                            animate={{ rotate: expanded ? 180 : 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="shrink-0 mt-1"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                stroke={isPast ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.25)"}
+                                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="6 9 12 15 18 9" />
                             </svg>
-                        </div>
+                        </motion.div>
                     )}
                 </div>
             </div>
@@ -221,8 +287,8 @@ function AgendaCard({ item }: { item: AgendaItem }) {
                         transition={{ duration: 0.22, ease: "easeInOut" }}
                         className="overflow-hidden"
                     >
-                        <div className="px-4 pb-4 pt-0 flex flex-col gap-2"
-                            style={{ borderTop: "1px solid rgba(255,255,255,0.05)", marginTop: 0, paddingTop: 12 }}>
+                        <div className="px-4 pb-4 flex flex-col gap-3"
+                            style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12 }}>
                             {item.description?.trim() && (
                                 <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
                                     {item.description}
@@ -230,7 +296,7 @@ function AgendaCard({ item }: { item: AgendaItem }) {
                             )}
                             {item.speakerBio?.trim() && (
                                 <div>
-                                    <p className="text-xs font-semibold uppercase tracking-wider mb-1"
+                                    <p className="text-xs font-semibold uppercase tracking-wider mb-1.5"
                                         style={{ color: "rgba(255,255,255,0.2)", letterSpacing: "0.08em" }}>
                                         About the speaker
                                     </p>
@@ -256,6 +322,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
     const [agenda, setAgenda] = useState<AgendaItem[]>([]);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [tab, setTab] = useState<"agenda" | "qa">("agenda");
+    const [now, setNow] = useState<Date>(new Date());
 
     // Q&A form
     const [name, setName] = useState("");
@@ -269,6 +336,9 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
 
     useEffect(() => {
         guestId.current = getGuestId();
+        // Tick the clock every minute so Live/Past indicators update
+        const t = setInterval(() => setNow(new Date()), 60_000);
+        return () => clearInterval(t);
     }, []);
 
     // Load event
@@ -289,11 +359,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
             }));
             items.sort((a, b) => {
                 if (a.date !== b.date) return (a.date ?? "").localeCompare(b.date ?? "");
-                const toMin = (t: string) => {
-                    const [h, m] = t.split(":").map(Number);
-                    return (h || 0) * 60 + (m || 0);
-                };
-                return toMin(a.startTime) - toMin(b.startTime) || a.order - b.order;
+                return timeToMinutes(a.startTime) - timeToMinutes(b.startTime) || a.order - b.order;
             });
             setAgenda(items);
         });
@@ -340,7 +406,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
             });
             setText("");
             setSubmitted(true);
-            setTimeout(() => setSubmitted(false), 4000);
+            setTimeout(() => setSubmitted(false), 5000);
         } catch {
             setSubmitError("Something went wrong. Please try again.");
         } finally {
@@ -360,7 +426,18 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
     }
 
     const accent = "#e85c29";
+    const todayStr = toISODate(now);
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
     const days = groupByDate(agenda);
+
+    // Find the live session for the hero badge
+    const liveSession = agenda.find(
+        (item) => !item.isBreak && getSessionStatus(item, todayStr, nowMinutes) === "live"
+    );
+    const nextSession = agenda.find(
+        (item) => !item.isBreak && item.date === todayStr &&
+            timeToMinutes(item.startTime) > nowMinutes
+    );
 
     return (
         <div className="min-h-screen" style={{ background: "#0f1117", fontFamily: "var(--font-rubik), sans-serif" }}>
@@ -387,6 +464,45 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                             <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" />
                         </div>
                     )}
+
+                    {/* Live now / Up next strip */}
+                    {(liveSession || nextSession) && (
+                        <div className="rounded-xl px-4 py-3 mb-4 flex items-center gap-3"
+                            style={{
+                                background: liveSession ? "rgba(232,92,41,0.1)" : "rgba(255,255,255,0.04)",
+                                border: liveSession ? "1px solid rgba(232,92,41,0.25)" : "1px solid rgba(255,255,255,0.07)",
+                            }}>
+                            {liveSession ? (
+                                <>
+                                    <motion.div
+                                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                                        style={{ background: accent }}
+                                        animate={{ opacity: [1, 0.3, 1] }}
+                                        transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut" }}
+                                    />
+                                    <div className="min-w-0">
+                                        <p className="text-xs font-semibold uppercase" style={{ color: accent, letterSpacing: "0.06em" }}>Happening now</p>
+                                        <p className="text-sm font-semibold text-white truncate">{liveSession.title}</p>
+                                        {liveSession.speaker && (
+                                            <p className="text-xs truncate" style={{ color: "rgba(255,255,255,0.4)" }}>{liveSession.speaker}</p>
+                                        )}
+                                    </div>
+                                </>
+                            ) : nextSession ? (
+                                <>
+                                    <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: "rgba(255,255,255,0.2)" }} />
+                                    <div className="min-w-0">
+                                        <p className="text-xs font-semibold uppercase" style={{ color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em" }}>Up next · {nextSession.startTime}</p>
+                                        <p className="text-sm font-semibold text-white truncate">{nextSession.title}</p>
+                                        {nextSession.speaker && (
+                                            <p className="text-xs truncate" style={{ color: "rgba(255,255,255,0.4)" }}>{nextSession.speaker}</p>
+                                        )}
+                                    </div>
+                                </>
+                            ) : null}
+                        </div>
+                    )}
+
                     <h1 className="text-white font-black mb-3" style={{ fontSize: "clamp(1.4rem, 5vw, 2rem)", lineHeight: 1.2 }}>
                         {event.title}
                     </h1>
@@ -396,7 +512,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
                             </svg>
                             <span className="text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>
-                                {formatDate(event.date)}{event.time ? ` · ${event.time}` : ""}
+                                {formatEventDate(event.date)}{event.time ? ` · ${event.time}` : ""}
                             </span>
                         </div>
                         {event.location && (
@@ -409,7 +525,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                         )}
                     </div>
                     {event.description && (
-                        <p className="text-sm leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>
+                        <p className="text-sm leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>
                             {event.description}
                         </p>
                     )}
@@ -460,17 +576,44 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                         ) : (
                             <div className="flex flex-col gap-8">
                                 {days.map(([date, items]) => {
-                                    const { weekday, date: dateLabel } = formatDayHeading(date);
+                                    const { weekday, dateLabel } = formatDayHeading(date);
+                                    const isToday = date === todayStr;
+                                    const isPastDay = date < todayStr;
+
                                     return (
                                         <div key={date}>
                                             {/* Day heading */}
-                                            <div className="flex items-baseline gap-2 mb-4">
-                                                <h2 className="text-white font-black text-lg">{weekday}</h2>
-                                                <span className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>{dateLabel}</span>
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className="flex items-baseline gap-2">
+                                                    <h2 className="font-black text-lg"
+                                                        style={{ color: isPastDay ? "rgba(255,255,255,0.3)" : "white" }}>
+                                                        {weekday}
+                                                    </h2>
+                                                    <span className="text-sm"
+                                                        style={{ color: isPastDay ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.35)" }}>
+                                                        {dateLabel}
+                                                    </span>
+                                                </div>
+                                                {isToday && (
+                                                    <span className="text-xs font-bold px-2 py-0.5 rounded-full"
+                                                        style={{ background: "rgba(232,92,41,0.15)", color: accent }}>
+                                                        Today
+                                                    </span>
+                                                )}
+                                                {isPastDay && (
+                                                    <span className="text-xs font-medium px-2 py-0.5 rounded-full"
+                                                        style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.25)" }}>
+                                                        Completed
+                                                    </span>
+                                                )}
                                             </div>
                                             <div className="flex flex-col gap-2">
                                                 {items.map((item) => (
-                                                    <AgendaCard key={item.id} item={item} />
+                                                    <AgendaCard
+                                                        key={item.id}
+                                                        item={item}
+                                                        status={getSessionStatus(item, todayStr, nowMinutes)}
+                                                    />
                                                 ))}
                                             </div>
                                         </div>
@@ -486,8 +629,19 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.15 }}
-                        className="px-5 py-5 flex flex-col gap-6"
+                        className="px-5 py-5 flex flex-col gap-5"
                     >
+                        {/* Context note */}
+                        <div className="rounded-xl px-4 py-3 flex items-start gap-3"
+                            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mt-0.5">
+                                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                            </svg>
+                            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.4)" }}>
+                                Submit your question below. A moderator will review and approve it before it appears on screen. Speakers address questions during dedicated Q&A segments.
+                            </p>
+                        </div>
+
                         {/* Submit form */}
                         <div className="rounded-2xl p-5"
                             style={{ background: "rgba(232,92,41,0.06)", border: "1px solid rgba(232,92,41,0.15)" }}>
@@ -510,7 +664,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                         </div>
                                         <p className="text-white font-semibold text-sm">Question submitted</p>
                                         <p className="text-xs text-center" style={{ color: "rgba(255,255,255,0.4)" }}>
-                                            It will appear once a moderator approves it
+                                            A moderator will review it shortly
                                         </p>
                                     </motion.div>
                                 ) : (
@@ -610,7 +764,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                                     <button
                                                         onClick={() => handleUpvote(q.id)}
                                                         disabled={hasUpvoted}
-                                                        className="flex flex-col items-center gap-0.5 shrink-0 pt-0.5 transition-opacity"
+                                                        className="flex flex-col items-center gap-0.5 shrink-0 pt-0.5"
                                                         style={{ color: hasUpvoted ? accent : "rgba(255,255,255,0.25)", opacity: hasUpvoted ? 1 : 0.6 }}
                                                     >
                                                         <UpvoteIcon filled={hasUpvoted} />
@@ -626,9 +780,9 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                             </div>
                         )}
 
-                        {questions.length === 0 && (
-                            <p className="text-center py-6 text-sm" style={{ color: "rgba(255,255,255,0.25)" }}>
-                                No questions approved yet — be the first
+                        {questions.length === 0 && !submitted && (
+                            <p className="text-center py-4 text-sm" style={{ color: "rgba(255,255,255,0.2)" }}>
+                                No questions approved yet
                             </p>
                         )}
                     </motion.div>
@@ -636,7 +790,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
             </AnimatePresence>
 
             <div className="px-5 py-6 text-center">
-                <span className="text-xs font-semibold tracking-widest" style={{ color: "rgba(255,255,255,0.1)", letterSpacing: "0.15em" }}>
+                <span className="text-xs font-semibold tracking-widest" style={{ color: "rgba(255,255,255,0.08)", letterSpacing: "0.15em" }}>
                     NEXVENUE
                 </span>
             </div>
