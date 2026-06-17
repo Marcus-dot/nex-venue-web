@@ -24,6 +24,7 @@ interface Question {
     text: string;
     authorName: string;
     isAnonymous: boolean;
+    directedTo?: string | null;
     status: "pending" | "approved" | "answered" | "rejected";
     upvotes: string[];
     createdAt: number;
@@ -310,9 +311,17 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                                     {pending.map(q => (
                                         <div key={q.id} className="rounded-2xl p-4"
                                             style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                                            <p className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.35)" }}>
-                                                {q.isAnonymous ? "Anonymous" : q.authorName} · {formatTime(q.createdAt)}
-                                            </p>
+                                            <div className="flex items-center gap-2 flex-wrap mb-2">
+                                                <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+                                                    {q.isAnonymous ? "Anonymous" : q.authorName} · {formatTime(q.createdAt)}
+                                                </span>
+                                                {q.directedTo && (
+                                                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                                                        style={{ background: "rgba(232,92,41,0.15)", color: "#e85c29" }}>
+                                                        → {q.directedTo}
+                                                    </span>
+                                                )}
+                                            </div>
 
                                             {editingId === q.id ? (
                                                 <textarea
@@ -377,9 +386,17 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                                         <div key={q.id} className="rounded-2xl p-4 flex items-start gap-3"
                                             style={{ background: "rgba(34,197,94,0.04)", border: "1px solid rgba(34,197,94,0.12)" }}>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.35)" }}>
-                                                    {q.isAnonymous ? "Anonymous" : q.authorName}
-                                                </p>
+                                                <div className="flex items-center gap-2 flex-wrap mb-1">
+                                                    <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+                                                        {q.isAnonymous ? "Anonymous" : q.authorName}
+                                                    </span>
+                                                    {q.directedTo && (
+                                                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                                                            style={{ background: "rgba(232,92,41,0.15)", color: "#e85c29" }}>
+                                                            → {q.directedTo}
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <p className="text-white text-sm leading-snug">{q.text}</p>
                                             </div>
                                             <button onClick={() => handleAnswered(q.id)}

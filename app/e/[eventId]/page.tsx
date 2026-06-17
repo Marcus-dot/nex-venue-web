@@ -425,6 +425,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
     const [name, setName] = useState("");
     const [anonymous, setAnonymous] = useState(false);
     const [text, setText] = useState("");
+    const [directedTo, setDirectedTo] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [submitError, setSubmitError] = useState("");
@@ -513,11 +514,13 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                 text: text.trim(),
                 authorName: anonymous ? "Anonymous" : name.trim(),
                 isAnonymous: anonymous,
+                directedTo: directedTo.trim() || null,
                 status: "pending",
                 upvotes: [],
                 createdAt: Date.now(),
             });
             setText("");
+            setDirectedTo("");
             setSubmitted(true);
             setTimeout(() => setSubmitted(false), 5000);
         } catch {
@@ -820,6 +823,16 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                             onChange={(e) => setText(e.target.value)}
                                             rows={3}
                                             className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none resize-none transition-all"
+                                            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+                                            onFocus={(e) => (e.target.style.borderColor = "rgba(232,92,41,0.5)")}
+                                            onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Directed to (optional — e.g. Mr Tosh, Panel)"
+                                            value={directedTo}
+                                            onChange={(e) => setDirectedTo(e.target.value)}
+                                            className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none transition-all"
                                             style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
                                             onFocus={(e) => (e.target.style.borderColor = "rgba(232,92,41,0.5)")}
                                             onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
