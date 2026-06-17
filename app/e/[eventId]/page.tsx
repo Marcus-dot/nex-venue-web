@@ -7,7 +7,6 @@ import {
     onSnapshot,
     query,
     where,
-    orderBy,
     doc,
     getDoc,
     getDocs,
@@ -31,12 +30,18 @@ interface EventData {
 interface AgendaItem {
     id: string;
     title: string;
+    description?: string;
     startTime: string;
     endTime: string;
+    date: string;
     speaker?: string;
+    speakerTitle?: string;
+    speakerBio?: string;
+    speakerImage?: string;
     speakerImages?: string[];
     category?: string;
     isBreak?: boolean;
+    location?: string;
     order: number;
 }
 
@@ -75,35 +80,170 @@ function formatDate(dateStr: string): string {
     }
 }
 
+function formatDayHeading(dateStr: string): { weekday: string; date: string } {
+    try {
+        const d = new Date(dateStr);
+        return {
+            weekday: d.toLocaleDateString("en-GB", { weekday: "long" }),
+            date: d.toLocaleDateString("en-GB", { day: "numeric", month: "long" }),
+        };
+    } catch {
+        return { weekday: dateStr, date: "" };
+    }
+}
+
+function groupByDate(items: AgendaItem[]): [string, AgendaItem[]][] {
+    const map = new Map<string, AgendaItem[]>();
+    for (const item of items) {
+        const key = item.date ?? "unknown";
+        if (!map.has(key)) map.set(key, []);
+        map.get(key)!.push(item);
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+    keynote: "Keynote",
+    panel: "Panel",
+    workshop: "Workshop",
+    presentation: "Presentation",
+    networking: "Networking",
+    fireside: "Fireside",
+    demo: "Demo",
+    case_study: "Case Study",
+    remarks: "Remarks",
+    break: "Break",
+};
+
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
 function UpvoteIcon({ filled }: { filled: boolean }) {
     return (
-        <svg width="14" height="14" viewBox="0 0 16 16" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth={filled ? 0 : 1.5}>
+        <svg width="14" height="14" viewBox="0 0 16 16"
+            fill={filled ? "currentColor" : "none"}
+            stroke="currentColor" strokeWidth={filled ? 0 : 1.5}>
             <path d="M8 2L14 9H10V14H6V9H2L8 2Z" />
         </svg>
     );
 }
 
-function CategoryBadge({ category }: { category?: string }) {
-    if (!category || category === "other") return null;
-    const labels: Record<string, string> = {
-        keynote: "Keynote",
-        panel: "Panel",
-        workshop: "Workshop",
-        presentation: "Presentation",
-        networking: "Networking",
-        fireside: "Fireside",
-        demo: "Demo",
-        case_study: "Case Study",
-        remarks: "Remarks",
-        break: "Break",
-    };
+function AgendaCard({ item }: { item: AgendaItem }) {
+    const [expanded, setExpanded] = useState(false);
+    const accent = "#e85c29";
+    const hasSpeaker = !!item.speaker?.trim();
+    const hasDetails = !!(item.description?.trim() || item.speakerBio?.trim());
+    const speakerPhoto = item.speakerImages?.[0] ?? item.speakerImage ?? null;
+    const label = item.category && item.category !== "other" ? CATEGORY_LABELS[item.category] ?? item.category : null;
+
+    if (item.isBreak) {
+        return (
+            <div className="flex items-center gap-3 py-2 px-4 rounded-xl"
+                style={{ background: "rgba(255,255,255,0.02)" }}>
+                <span className="text-xs font-bold tabular-nums w-[52px] shrink-0" style={{ color: "rgba(255,255,255,0.25)" }}>
+                    {item.startTime}
+                </span>
+                <span className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>{item.title}</span>
+            </div>
+        );
+    }
+
     return (
-        <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
-            style={{ background: "rgba(232,92,41,0.12)", color: "#e85c29" }}>
-            {labels[category] ?? category}
-        </span>
+        <div className="rounded-xl overflow-hidden"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+            {/* Main row */}
+            <div
+                className={hasDetails ? "cursor-pointer" : ""}
+                onClick={() => hasDetails && setExpanded(!expanded)}
+            >
+                <div className="flex items-start gap-3 p-4">
+                    {/* Time */}
+                    <div className="shrink-0 w-[52px] pt-0.5">
+                        <span className="text-xs font-bold tabular-nums" style={{ color: accent }}>{item.startTime}</span>
+                        {item.endTime && (
+                            <span className="block text-xs tabular-nums" style={{ color: "rgba(255,255,255,0.2)" }}>{item.endTime}</span>
+                        )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                        {label && (
+                            <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5"
+                                style={{ background: "rgba(232,92,41,0.12)", color: accent }}>
+                                {label}
+                            </span>
+                        )}
+                        <p className="font-semibold text-sm text-white leading-snug">{item.title}</p>
+
+                        {hasSpeaker && (
+                            <div className="flex items-center gap-2 mt-2">
+                                {speakerPhoto ? (
+                                    <img src={speakerPhoto} alt={item.speaker}
+                                        className="w-7 h-7 rounded-full object-cover shrink-0"
+                                        style={{ border: "1px solid rgba(255,255,255,0.1)" }} />
+                                ) : (
+                                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                                        style={{ background: "rgba(232,92,41,0.15)", color: accent }}>
+                                        {item.speaker!.trim()[0]}
+                                    </div>
+                                )}
+                                <div className="min-w-0">
+                                    <p className="text-xs font-medium truncate" style={{ color: "rgba(255,255,255,0.6)" }}>
+                                        {item.speaker}
+                                    </p>
+                                    {item.speakerTitle && (
+                                        <p className="text-xs truncate" style={{ color: "rgba(255,255,255,0.3)" }}>
+                                            {item.speakerTitle}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Expand chevron */}
+                    {hasDetails && (
+                        <div className="shrink-0 mt-1 transition-transform" style={{ transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Expanded details */}
+            <AnimatePresence initial={false}>
+                {expanded && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.22, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                    >
+                        <div className="px-4 pb-4 pt-0 flex flex-col gap-2"
+                            style={{ borderTop: "1px solid rgba(255,255,255,0.05)", marginTop: 0, paddingTop: 12 }}>
+                            {item.description?.trim() && (
+                                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+                                    {item.description}
+                                </p>
+                            )}
+                            {item.speakerBio?.trim() && (
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-wider mb-1"
+                                        style={{ color: "rgba(255,255,255,0.2)", letterSpacing: "0.08em" }}>
+                                        About the speaker
+                                    </p>
+                                    <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
+                                        {item.speakerBio}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
     );
 }
 
@@ -148,6 +288,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                 ...(d.data() as Omit<AgendaItem, "id">),
             }));
             items.sort((a, b) => {
+                if (a.date !== b.date) return (a.date ?? "").localeCompare(b.date ?? "");
                 const toMin = (t: string) => {
                     const [h, m] = t.split(":").map(Number);
                     return (h || 0) * 60 + (m || 0);
@@ -178,7 +319,6 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
         return () => unsub();
     }, [eventId]);
 
-    // Submit question
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (!text.trim()) return;
@@ -208,7 +348,6 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
         }
     }
 
-    // Upvote question
     async function handleUpvote(questionId: string) {
         const id = guestId.current;
         const q = questions.find((q) => q.id === questionId);
@@ -217,12 +356,11 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
             await updateDoc(doc(db, "questions", questionId), {
                 upvotes: arrayUnion(id),
             });
-        } catch {
-            // silent
-        }
+        } catch { /* silent */ }
     }
 
     const accent = "#e85c29";
+    const days = groupByDate(agenda);
 
     return (
         <div className="min-h-screen" style={{ background: "#0f1117", fontFamily: "var(--font-rubik), sans-serif" }}>
@@ -243,7 +381,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
 
             {/* ── Event Hero ── */}
             {event ? (
-                <div className="px-5 pt-6 pb-5">
+                <div className="px-5 pt-6 pb-2">
                     {event.imageUrl && (
                         <div className="w-full rounded-2xl overflow-hidden mb-5" style={{ aspectRatio: "16/7" }}>
                             <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" />
@@ -252,7 +390,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                     <h1 className="text-white font-black mb-3" style={{ fontSize: "clamp(1.4rem, 5vw, 2rem)", lineHeight: 1.2 }}>
                         {event.title}
                     </h1>
-                    <div className="flex flex-col gap-1.5 mb-4">
+                    <div className="flex flex-col gap-1.5 mb-3">
                         <div className="flex items-center gap-2">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
@@ -270,16 +408,21 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                             </div>
                         )}
                     </div>
+                    {event.description && (
+                        <p className="text-sm leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>
+                            {event.description}
+                        </p>
+                    )}
                 </div>
             ) : (
-                <div className="px-5 pt-8 pb-5">
+                <div className="px-5 pt-8 pb-4">
                     <div className="h-7 rounded-lg w-3/4 mb-3 animate-pulse" style={{ background: "rgba(255,255,255,0.06)" }} />
                     <div className="h-4 rounded w-1/2 animate-pulse" style={{ background: "rgba(255,255,255,0.04)" }} />
                 </div>
             )}
 
             {/* ── Tabs ── */}
-            <div className="px-5 flex gap-1 mb-1" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            <div className="px-5 flex gap-1 mt-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                 {(["agenda", "qa"] as const).map((t) => (
                     <button
                         key={t}
@@ -310,64 +453,29 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                         transition={{ duration: 0.15 }}
                         className="px-5 py-5"
                     >
-                        {agenda.length === 0 ? (
+                        {days.length === 0 ? (
                             <p className="text-center py-10 text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
                                 No agenda items yet
                             </p>
                         ) : (
-                            <div className="flex flex-col gap-3">
-                                {agenda.map((item) => (
-                                    <div
-                                        key={item.id}
-                                        className="rounded-xl p-4"
-                                        style={{
-                                            background: item.isBreak
-                                                ? "rgba(255,255,255,0.02)"
-                                                : "rgba(255,255,255,0.04)",
-                                            border: `1px solid ${item.isBreak ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.07)"}`,
-                                        }}
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            {/* Time */}
-                                            <div className="shrink-0 pt-0.5 w-[52px]">
-                                                <span className="text-xs font-bold tabular-nums" style={{ color: accent }}>
-                                                    {item.startTime}
-                                                </span>
+                            <div className="flex flex-col gap-8">
+                                {days.map(([date, items]) => {
+                                    const { weekday, date: dateLabel } = formatDayHeading(date);
+                                    return (
+                                        <div key={date}>
+                                            {/* Day heading */}
+                                            <div className="flex items-baseline gap-2 mb-4">
+                                                <h2 className="text-white font-black text-lg">{weekday}</h2>
+                                                <span className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>{dateLabel}</span>
                                             </div>
-
-                                            {/* Content */}
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 flex-wrap mb-1">
-                                                    <CategoryBadge category={item.category} />
-                                                </div>
-                                                <p className="font-semibold text-sm leading-snug"
-                                                    style={{ color: item.isBreak ? "rgba(255,255,255,0.4)" : "white" }}>
-                                                    {item.title}
-                                                </p>
-                                                {item.speaker && !item.isBreak && (
-                                                    <div className="flex items-center gap-2 mt-2">
-                                                        {item.speakerImages?.[0] && (
-                                                            <img
-                                                                src={item.speakerImages[0]}
-                                                                alt={item.speaker}
-                                                                className="w-6 h-6 rounded-full object-cover shrink-0"
-                                                                style={{ border: "1px solid rgba(255,255,255,0.1)" }}
-                                                            />
-                                                        )}
-                                                        <span className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>
-                                                            {item.speaker}
-                                                        </span>
-                                                    </div>
-                                                )}
+                                            <div className="flex flex-col gap-2">
+                                                {items.map((item) => (
+                                                    <AgendaCard key={item.id} item={item} />
+                                                ))}
                                             </div>
-
-                                            {/* End time */}
-                                            <span className="text-xs tabular-nums shrink-0" style={{ color: "rgba(255,255,255,0.2)" }}>
-                                                {item.endTime}
-                                            </span>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </motion.div>
@@ -413,7 +521,6 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                         onSubmit={handleSubmit}
                                         className="flex flex-col gap-3"
                                     >
-                                        {/* Name */}
                                         {!anonymous && (
                                             <input
                                                 type="text"
@@ -421,31 +528,21 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                                 value={name}
                                                 onChange={(e) => setName(e.target.value)}
                                                 className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none transition-all"
-                                                style={{
-                                                    background: "rgba(255,255,255,0.05)",
-                                                    border: "1px solid rgba(255,255,255,0.1)",
-                                                }}
+                                                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
                                                 onFocus={(e) => (e.target.style.borderColor = "rgba(232,92,41,0.5)")}
                                                 onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
                                             />
                                         )}
-
-                                        {/* Question text */}
                                         <textarea
                                             placeholder="Type your question..."
                                             value={text}
                                             onChange={(e) => setText(e.target.value)}
                                             rows={3}
                                             className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none resize-none transition-all"
-                                            style={{
-                                                background: "rgba(255,255,255,0.05)",
-                                                border: "1px solid rgba(255,255,255,0.1)",
-                                            }}
+                                            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
                                             onFocus={(e) => (e.target.style.borderColor = "rgba(232,92,41,0.5)")}
                                             onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
                                         />
-
-                                        {/* Anonymous toggle */}
                                         <label className="flex items-center gap-2.5 cursor-pointer select-none w-fit">
                                             <div
                                                 onClick={() => setAnonymous(!anonymous)}
@@ -457,23 +554,16 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                                     style={{ transform: anonymous ? "translateX(17px)" : "translateX(2px)" }}
                                                 />
                                             </div>
-                                            <span className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-                                                Submit anonymously
-                                            </span>
+                                            <span className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>Submit anonymously</span>
                                         </label>
-
                                         {submitError && (
                                             <p className="text-xs" style={{ color: "#f87171" }}>{submitError}</p>
                                         )}
-
                                         <button
                                             type="submit"
                                             disabled={submitting || !text.trim()}
                                             className="w-full py-3 rounded-xl text-sm font-bold text-white transition-opacity"
-                                            style={{
-                                                background: accent,
-                                                opacity: submitting || !text.trim() ? 0.5 : 1,
-                                            }}
+                                            style={{ background: accent, opacity: submitting || !text.trim() ? 0.5 : 1 }}
                                         >
                                             {submitting ? "Submitting..." : "Submit question"}
                                         </button>
@@ -501,10 +591,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                                     exit={{ opacity: 0 }}
                                                     transition={{ duration: 0.25, ease: "easeOut" }}
                                                     className="rounded-xl p-4 flex items-start gap-3"
-                                                    style={{
-                                                        background: "rgba(255,255,255,0.03)",
-                                                        border: "1px solid rgba(255,255,255,0.06)",
-                                                    }}
+                                                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
                                                 >
                                                     <div className="flex-1 min-w-0">
                                                         <p className="text-white text-sm leading-snug mb-2">{q.text}</p>
@@ -520,22 +607,15 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                                             )}
                                                         </div>
                                                     </div>
-
-                                                    {/* Upvote */}
                                                     <button
                                                         onClick={() => handleUpvote(q.id)}
                                                         disabled={hasUpvoted}
                                                         className="flex flex-col items-center gap-0.5 shrink-0 pt-0.5 transition-opacity"
-                                                        style={{
-                                                            color: hasUpvoted ? accent : "rgba(255,255,255,0.25)",
-                                                            opacity: hasUpvoted ? 1 : 0.6,
-                                                        }}
+                                                        style={{ color: hasUpvoted ? accent : "rgba(255,255,255,0.25)", opacity: hasUpvoted ? 1 : 0.6 }}
                                                     >
                                                         <UpvoteIcon filled={hasUpvoted} />
                                                         {(q.upvotes?.length ?? 0) > 0 && (
-                                                            <span className="text-xs font-bold tabular-nums">
-                                                                {q.upvotes.length}
-                                                            </span>
+                                                            <span className="text-xs font-bold tabular-nums">{q.upvotes.length}</span>
                                                         )}
                                                     </button>
                                                 </motion.div>
@@ -555,7 +635,6 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                 )}
             </AnimatePresence>
 
-            {/* ── Footer ── */}
             <div className="px-5 py-6 text-center">
                 <span className="text-xs font-semibold tracking-widest" style={{ color: "rgba(255,255,255,0.1)", letterSpacing: "0.15em" }}>
                     NEXVENUE
