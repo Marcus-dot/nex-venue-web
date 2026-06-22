@@ -106,7 +106,10 @@ export default function PublicProfilePage() {
     }
 
     const networking = profile.networkingAvailability ? NETWORKING_CONFIG[profile.networkingAvailability] : null;
-    const hasSocial = profile.linkedinUrl || profile.twitterHandle || profile.websiteUrl;
+    const showLinkedin = !!profile.linkedinUrl && profile.linkedinVisible !== false;
+    const showTwitter  = !!profile.twitterHandle && profile.twitterVisible !== false;
+    const showWebsite  = !!profile.websiteUrl && profile.websiteVisible !== false;
+    const hasSocial = showLinkedin || showTwitter || showWebsite;
 
     return (
         <div className="min-h-screen bg-background dark:bg-[#0f101e] pt-20 pb-24">
@@ -147,19 +150,19 @@ export default function PublicProfilePage() {
                         <div className="flex items-center justify-end gap-2 mb-4">
                             {hasSocial && (
                                 <div className="flex items-center gap-1.5">
-                                    {profile.linkedinUrl && (
+                                    {showLinkedin && (
                                         <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer"
                                            className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-[#0077b5]/10 flex items-center justify-center text-surface-dark/40 dark:text-white/40 hover:text-[#0077b5] transition-all">
                                             <Linkedin size={14} />
                                         </a>
                                     )}
-                                    {profile.twitterHandle && (
+                                    {showTwitter && (
                                         <a href={`https://twitter.com/${profile.twitterHandle}`} target="_blank" rel="noopener noreferrer"
                                            className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-[#1DA1F2]/10 flex items-center justify-center text-surface-dark/40 dark:text-white/40 hover:text-[#1DA1F2] transition-all">
                                             <Twitter size={14} />
                                         </a>
                                     )}
-                                    {profile.websiteUrl && (
+                                    {showWebsite && (
                                         <a href={profile.websiteUrl} target="_blank" rel="noopener noreferrer"
                                            className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-accent/10 flex items-center justify-center text-surface-dark/40 dark:text-white/40 hover:text-accent transition-all">
                                             <Globe size={14} />

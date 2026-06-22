@@ -32,6 +32,13 @@ export type UserProfile = {
     twitterHandle?: string; // without @
     websiteUrl?: string;
 
+    // --- Privacy controls (default: visible when undefined) ---
+    phoneNumberVisible?: boolean;
+    emailVisible?: boolean;
+    linkedinVisible?: boolean;
+    twitterVisible?: boolean;
+    websiteVisible?: boolean;
+
     // --- System fields ---
     role: UserRole;
     createdAt: number;
