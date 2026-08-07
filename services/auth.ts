@@ -1,31 +1,9 @@
 import { auth, db } from "@/lib/firebase/config";
-import {
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut as firebaseSignOut,
-    updateProfile,
-} from "firebase/auth";
+import { signOut as firebaseSignOut } from "firebase/auth";
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { UserProfile } from "@/types/auth";
 
 export const authService = {
-    // ── Email / Password ────────────────────────────────────────────────────
-
-    signInWithEmail: async (email: string, password: string) => {
-        return signInWithEmailAndPassword(auth, email, password);
-    },
-
-    registerWithEmail: async (
-        email: string,
-        password: string,
-        fullName: string
-    ) => {
-        const { user } = await createUserWithEmailAndPassword(auth, email, password);
-        // Set Firebase displayName too (optional but useful)
-        await updateProfile(user, { displayName: fullName });
-        return user;
-    },
-
     // ── Firestore Profile ────────────────────────────────────────────────────
 
     /**

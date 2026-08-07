@@ -6,6 +6,11 @@ import {
     User as FirebaseUser,
     RecaptchaVerifier,
     signInWithPhoneNumber,
+    signInWithPopup,
+    GoogleAuthProvider,
+    linkWithPopup,
+    linkWithPhoneNumber,
+    unlink,
     ConfirmationResult,
 } from "firebase/auth";
 import { auth, db } from "@/lib/firebase/config";
@@ -26,6 +31,15 @@ interface AuthContextType {
     confirmationResult: ConfirmationResult | null;
     setConfirmationResult: (result: ConfirmationResult | null) => void;
     sendOtp: (phoneNumber: string, recaptchaContainerId: string) => Promise<void>;
+
+    // Google
+    signInWithGoogle: () => Promise<FirebaseUser>;
+
+    // Account linking (both directions)
+    linkGoogle: () => Promise<void>;
+    unlinkGoogle: () => Promise<void>;
+    linkPhone: (phoneNumber: string, recaptchaContainerId: string) => Promise<ConfirmationResult>;
+    unlinkPhone: () => Promise<void>;
 
     // Profile management
     fetchUserProfile: (uid: string) => Promise<UserProfile | null>;
@@ -75,6 +89,11 @@ const AuthContext = createContext<AuthContextType>({
     confirmationResult: null,
     setConfirmationResult: () => { },
     sendOtp: async () => { },
+    signInWithGoogle: async () => ({} as FirebaseUser),
+    linkGoogle: async () => { },
+    unlinkGoogle: async () => { },
+    linkPhone: async () => ({} as ConfirmationResult),
+    unlinkPhone: async () => { },
     fetchUserProfile: async () => null,
     updateUserProfile: async () => { },
     createUserProfile: async () => ({} as UserProfile),
@@ -189,6 +208,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setConfirmationResult(result);
     };
 
+    // ── Google ────────────────────────────────────────────────────────────────
+    const signInWithGoogle = async (): Promise<FirebaseUser> => {
+        const result = await signInWithPopup(auth, new GoogleAuthProvider());
+        return result.user;
+    };
+
+    // ── Account linking (both directions) ─────────────────────────────────────
+    const linkGoogle = async (): Promise<void> => {
+        if (!auth.currentUser) throw new Error("No authenticated user.");
+        await linkWithPopup(auth.currentUser, new GoogleAuthProvider());
+    };
+
+    const unlinkGoogle = async (): Promise<void> => {
+        if (!auth.currentUser) throw new Error("No authenticated user.");
+        await unlink(auth.currentUser, GoogleAuthProvider.PROVIDER_ID);
+    };
+
+    const linkPhone = async (
+        phoneNumber: string,
+        recaptchaContainerId: string
+    ): Promise<ConfirmationResult> => {
+        if (!auth.currentUser) throw new Error("No authenticated user.");
+        const verifier = new RecaptchaVerifier(auth, recaptchaContainerId, { size: "invisible" });
+        return linkWithPhoneNumber(auth.currentUser, phoneNumber, verifier);
+    };
+
+    const unlinkPhone = async (): Promise<void> => {
+        if (!auth.currentUser) throw new Error("No authenticated user.");
+        await unlink(auth.currentUser, "phone");
+    };
+
     // ── Auth state listener ───────────────────────────────────────────────────
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -206,7 +256,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
 
         return () => unsubscribe();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <AuthContext.Provider
@@ -219,6 +269,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 confirmationResult,
                 setConfirmationResult,
                 sendOtp,
+                signInWithGoogle,
+                linkGoogle,
+                unlinkGoogle,
+                linkPhone,
+                unlinkPhone,
                 fetchUserProfile,
                 updateUserProfile,
                 createUserProfile,

@@ -4,19 +4,121 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { GlassCard, Button, Switch } from "@/components/ui";
-import { Loader2, Bell, Moon, Shield, ArrowLeft, Smartphone, Mail, Trash2 } from "lucide-react";
+import { Loader2, Bell, Moon, Shield, ArrowLeft, Smartphone, Mail, Trash2, KeyRound, Check, Phone } from "lucide-react";
 import Link from "next/link";
-import { authService } from "@/services/auth";
 import { useToast } from "@/context/ToastContext";
 import { useTheme } from "@/context/ThemeContext";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
+import { auth } from "@/lib/firebase/config";
+import { ConfirmationResult } from "firebase/auth";
+import { Input } from "@/components/ui/Input";
 
 export default function SettingsPage() {
-    const { user, profile, updateUserProfile, loading: authLoading } = useAuth();
+    const { user, profile, updateUserProfile, loading: authLoading, linkGoogle, unlinkGoogle, linkPhone, unlinkPhone } = useAuth();
     const { showToast } = useToast();
     const { setTheme } = useTheme();
     const router = useRouter();
 
-    const [loading, setLoading] = useState(false);
+    // ── Sign-in methods (linking) ──
+    const [googleLinked, setGoogleLinked] = useState(false);
+    const [phoneLinked, setPhoneLinked] = useState(false);
+    const [linkedPhone, setLinkedPhone] = useState<string | null>(null);
+    const [linkingGoogle, setLinkingGoogle] = useState(false);
+    const [linkingPhone, setLinkingPhone] = useState(false);
+    const [showPhoneLink, setShowPhoneLink] = useState(false);
+    const [phoneLinkStep, setPhoneLinkStep] = useState<"input" | "verify">("input");
+    const [linkPhoneNumber, setLinkPhoneNumber] = useState("");
+    const [linkOtp, setLinkOtp] = useState("");
+    const [phoneConfirmation, setPhoneConfirmation] = useState<ConfirmationResult | null>(null);
+
+    const refreshProviders = async () => {
+        const current = auth.currentUser;
+        if (!current) return;
+        try { await current.reload(); } catch { /* ignore */ }
+        const providers = auth.currentUser?.providerData ?? [];
+        setGoogleLinked(providers.some(p => p.providerId === "google.com"));
+        const phone = providers.find(p => p.providerId === "phone");
+        setPhoneLinked(!!phone);
+        setLinkedPhone(phone?.phoneNumber ?? auth.currentUser?.phoneNumber ?? null);
+    };
+
+    useEffect(() => {
+        if (user) refreshProviders();
+    }, [user]);
+
+    const handleLinkGoogle = async () => {
+        setLinkingGoogle(true);
+        try {
+            await linkGoogle();
+            await refreshProviders();
+            showToast("Google linked to your account.", "success");
+        } catch (err) {
+            if ((err as { code?: string })?.code === "auth/popup-closed-by-user" || (err as { code?: string })?.code === "auth/cancelled-popup-request") return;
+            if ((err as { code?: string })?.code === "auth/credential-already-in-use") showToast("This Google account is already linked to another account.", "error");
+            else showToast("Could not link Google. Please try again.", "error");
+        } finally {
+            setLinkingGoogle(false);
+        }
+    };
+
+    const handleUnlinkGoogle = async () => {
+        if (!phoneLinked) { showToast("Add a phone number first — you need at least one sign-in method.", "error"); return; }
+        setLinkingGoogle(true);
+        try {
+            await unlinkGoogle();
+            await refreshProviders();
+            showToast("Google sign-in removed.", "success");
+        } catch { showToast("Could not remove Google. Please try again.", "error"); }
+        finally { setLinkingGoogle(false); }
+    };
+
+    const handleSendPhoneLink = async () => {
+        const normalised = linkPhoneNumber.startsWith("+") ? linkPhoneNumber : `+${linkPhoneNumber}`;
+        setLinkingPhone(true);
+        try {
+            const confirmation = await linkPhone(normalised, "recaptcha-link");
+            setPhoneConfirmation(confirmation);
+            setPhoneLinkStep("verify");
+        } catch (err) {
+            if ((err as { code?: string })?.code === "auth/credential-already-in-use" || (err as { code?: string })?.code === "auth/account-exists-with-different-credential") showToast("This phone number is already used by another account.", "error");
+            else if ((err as { code?: string })?.code === "auth/provider-already-linked") showToast("A phone number is already linked.", "error");
+            else showToast("Could not send the code. Please try again.", "error");
+        } finally {
+            setLinkingPhone(false);
+        }
+    };
+
+    const handleVerifyPhoneLink = async () => {
+        if (!phoneConfirmation) return;
+        setLinkingPhone(true);
+        try {
+            await phoneConfirmation.confirm(linkOtp);
+            await refreshProviders();
+            setShowPhoneLink(false);
+            setPhoneLinkStep("input");
+            setLinkPhoneNumber("");
+            setLinkOtp("");
+            setPhoneConfirmation(null);
+            showToast("Phone number linked to your account.", "success");
+        } catch (err) {
+            if ((err as { code?: string })?.code === "auth/credential-already-in-use") showToast("This phone number is already used by another account.", "error");
+            else if ((err as { code?: string })?.code === "auth/invalid-verification-code") showToast("The code you entered is incorrect.", "error");
+            else showToast("Could not link the number. Please try again.", "error");
+        } finally {
+            setLinkingPhone(false);
+        }
+    };
+
+    const handleUnlinkPhone = async () => {
+        if (!googleLinked) { showToast("Link Google first — you need at least one sign-in method.", "error"); return; }
+        setLinkingPhone(true);
+        try {
+            await unlinkPhone();
+            await refreshProviders();
+            showToast("Phone number removed.", "success");
+        } catch { showToast("Could not remove your phone number. Please try again.", "error"); }
+        finally { setLinkingPhone(false); }
+    };
 
     const [settings, setSettings] = useState({
         emailNotifications: true,
@@ -76,6 +178,8 @@ export default function SettingsPage() {
 
     return (
         <div className="min-h-screen bg-background dark:bg-[#0f101e] px-8 py-12 pt-24">
+            {/* Invisible reCAPTCHA anchor — required by Firebase phone auth on web */}
+            <div id="recaptcha-link" />
             <div className="max-w-2xl mx-auto space-y-8">
                 <div className="flex items-center justify-between">
                     <Link href="/profile" className="flex items-center gap-2 text-surface-dark/60 dark:text-white/60 hover:text-accent font-medium">
@@ -149,6 +253,68 @@ export default function SettingsPage() {
                                     <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50 mt-1">Hide your profile from the public attendee directory.</p>
                                 </div>
                                 <Switch checked={settings.privateProfile} onCheckedChange={() => handleToggle('privateProfile')} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sign-in Methods */}
+                    <div className="pt-4">
+                        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-surface-dark/10 dark:border-white/10">
+                            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
+                                <KeyRound size={20} />
+                            </div>
+                            <h2 className="text-xl font-black text-surface-dark dark:text-white">Sign-in Methods</h2>
+                        </div>
+                        <div className="space-y-4 pl-2">
+                            {/* Phone */}
+                            <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center text-accent"><Phone size={18} /></div>
+                                    <div>
+                                        <h4 className="font-bold text-surface-dark dark:text-white">Phone Number</h4>
+                                        <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50">{phoneLinked ? (linkedPhone ?? "Linked") : "Add your phone number as a sign-in option"}</p>
+                                    </div>
+                                </div>
+                                {phoneLinked ? (
+                                    <Button variant="ghost" disabled={linkingPhone} onClick={handleUnlinkPhone} className="text-red-600 font-bold bg-white dark:bg-white/5">Remove</Button>
+                                ) : (
+                                    <Button variant="ghost" disabled={linkingPhone} onClick={() => setShowPhoneLink(v => !v)} className="text-accent font-bold bg-white dark:bg-white/5">{showPhoneLink ? "Cancel" : "Add"}</Button>
+                                )}
+                            </div>
+
+                            {/* Phone link inline form */}
+                            {!phoneLinked && showPhoneLink && (
+                                <div className="rounded-xl border border-surface-dark/10 dark:border-white/10 p-4 space-y-3">
+                                    {phoneLinkStep === "input" ? (
+                                        <>
+                                            <Input type="tel" placeholder="+27 71 234 5678" value={linkPhoneNumber} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLinkPhoneNumber(e.target.value)} />
+                                            <p className="text-xs text-surface-dark/40 dark:text-white/40">Include the country code. We&apos;ll text a 6-digit code.</p>
+                                            <Button className="w-full" disabled={linkingPhone} onClick={handleSendPhoneLink}>{linkingPhone ? <Loader2 className="animate-spin mx-auto" size={20} /> : "Send Code"}</Button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Input type="text" inputMode="numeric" maxLength={6} placeholder="123456" value={linkOtp} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLinkOtp(e.target.value)} />
+                                            <Button className="w-full" disabled={linkingPhone} onClick={handleVerifyPhoneLink}>{linkingPhone ? <Loader2 className="animate-spin mx-auto" size={20} /> : "Verify & Link"}</Button>
+                                            <button type="button" onClick={() => { setPhoneLinkStep("input"); setLinkOtp(""); }} className="w-full text-sm text-surface-dark/40 dark:text-white/40 hover:text-accent font-bold">← Change number</button>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Google */}
+                            <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center"><GoogleIcon size={18} /></div>
+                                    <div>
+                                        <h4 className="font-bold text-surface-dark dark:text-white flex items-center gap-2">Google {googleLinked && <Check size={14} className="text-green-500" />}</h4>
+                                        <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50">{googleLinked ? "Linked" : "Add Google as a sign-in option"}</p>
+                                    </div>
+                                </div>
+                                {googleLinked ? (
+                                    <Button variant="ghost" disabled={linkingGoogle} onClick={handleUnlinkGoogle} className="text-red-600 font-bold bg-white dark:bg-white/5">Remove</Button>
+                                ) : (
+                                    <Button variant="ghost" disabled={linkingGoogle} onClick={handleLinkGoogle} className="text-accent font-bold bg-white dark:bg-white/5">{linkingGoogle ? <Loader2 className="animate-spin" size={18} /> : "Add"}</Button>
+                                )}
                             </div>
                         </div>
                     </div>
