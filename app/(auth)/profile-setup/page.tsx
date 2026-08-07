@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Camera, Loader2, Check } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import Image from "next/image";
 
 const GENDER_OPTIONS = [
     { value: "male",              label: "Male" },
@@ -70,14 +71,14 @@ export default function ProfileSetupPage() {
 
                 {/* Brand mark */}
                 <div className="flex items-center justify-center gap-2 mb-10">
-                    <div className="w-9 h-9 bg-accent rounded-xl flex items-center justify-center text-white font-black text-lg">N</div>
+                    <Image src="/nexvenue-logo.png" alt="NexVenue" width={36} height={36} className="rounded-xl" />
                     <span className="text-xl font-black tracking-tighter text-surface-dark dark:text-white">NexVenue</span>
                 </div>
 
                 {/* Heading */}
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-black text-surface-dark dark:text-white tracking-tight mb-2">
-                        Welcome — let's set up<br />your profile
+                        Welcome — let&apos;s set up<br />your profile
                     </h1>
                     <p className="text-sm text-surface-dark/50 dark:text-white/50 font-medium">
                         Takes less than a minute. You can fill in more details later.

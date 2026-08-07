@@ -55,7 +55,7 @@ export default function CreateEventPage() {
                 ...formData,
                 imageUrl,
                 creatorId: user.uid,
-                creatorName: profile?.fullName || user.email?.split('@')[0] || "Organizer",
+                creatorName: profile?.fullName || user.email?.split('@')[0] || "Organiser",
             });
 
             // If we uploaded an image with a temp path, it's fine for now. 

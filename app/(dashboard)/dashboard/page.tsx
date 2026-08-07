@@ -64,7 +64,7 @@ export default function DashboardPage() {
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                     <div>
-                        <h1 className="text-5xl font-black text-surface-dark dark:text-white tracking-tighter mb-4">Organizer Portal</h1>
+                        <h1 className="text-5xl font-black text-surface-dark dark:text-white tracking-tighter mb-4">Organiser Portal</h1>
                         <p className="text-surface-dark/60 dark:text-white/60 text-lg font-medium">Simplify your event management experience.</p>
                     </div>
 
@@ -125,7 +125,7 @@ export default function DashboardPage() {
                                     <Calendar size={64} className="mx-auto" />
                                 </div>
                                 <h4 className="text-xl font-black text-surface-dark dark:text-white mb-2">No events created yet</h4>
-                                <p className="text-surface-dark/60 dark:text-white/60 mb-8 max-w-xs mx-auto">Click "Create Event" to launch your first experience on NexVenue.</p>
+                                <p className="text-surface-dark/60 dark:text-white/60 mb-8 max-w-xs mx-auto">Click &quot;Create Event&quot; to launch your first experience on NexVenue.</p>
                             </GlassCard>
                         ) : (
                             events.map((event) => (

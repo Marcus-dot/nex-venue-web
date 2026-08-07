@@ -130,7 +130,7 @@ export default function SpecialAccessPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-bold text-surface-dark dark:text-white ml-1">Company / Organization</label>
+                                <label className="text-sm font-bold text-surface-dark dark:text-white ml-1">Company / Organisation</label>
                                 <Input 
                                     placeholder="e.g. NexVenue Inc."
                                     value={formData.company}

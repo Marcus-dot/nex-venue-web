@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { Suspense, useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -60,7 +61,7 @@ function ChatPageInner() {
             ) : (
                 <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-gray-950 opacity-20">
                     <div className="w-24 h-24 bg-surface-dark/10 dark:bg-white/10 rounded-full flex items-center justify-center mb-6">
-                        <div className="text-4xl font-black dark:text-white">N</div>
+                        <Image src="/nexvenue-logo.png" alt="NexVenue" width={48} height={48} className="rounded-2xl" />
                     </div>
                     <h2 className="text-2xl font-black text-surface-dark dark:text-white">NexVenue Messenger</h2>
                     <p className="font-bold">Select a conversation to start chatting</p>

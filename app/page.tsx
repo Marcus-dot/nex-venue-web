@@ -2,16 +2,18 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { GlassCard } from "@/components/ui/GlassCard";
 import {
   Calendar,
   MessageSquare,
-  Zap,
+  Sparkles,
   ArrowRight,
-  TrendingUp,
-  Award,
-  Users
+  Users,
+  BarChart3,
+  QrCode,
+  Radio,
 } from "lucide-react";
 import HeroScene from "@/components/ui/HeroScene";
 import gsap from "gsap";
@@ -25,39 +27,31 @@ export default function LandingPage() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Hero Animations
       gsap.from(".hero-content > *", {
         opacity: 0,
         y: 50,
         duration: 1,
         stagger: 0.2,
-        ease: "power4.out"
+        ease: "power4.out",
       });
 
-      // Scroll Animations for sections
       gsap.from(".feature-card", {
-        scrollTrigger: {
-          trigger: ".features-grid",
-          start: "top 80%",
-        },
+        scrollTrigger: { trigger: ".features-grid", start: "top 80%" },
         opacity: 0,
         scale: 0.9,
         y: 30,
         duration: 0.8,
         stagger: 0.15,
-        ease: "back.out(1.7)"
+        ease: "back.out(1.7)",
       });
 
       gsap.from(".stats-item", {
-        scrollTrigger: {
-          trigger: ".stats-section",
-          start: "top 80%",
-        },
+        scrollTrigger: { trigger: ".stats-section", start: "top 80%" },
         opacity: 0,
         y: 20,
         duration: 0.8,
         stagger: 0.1,
-        ease: "power2.out"
+        ease: "power2.out",
       });
     }, containerRef);
 
@@ -66,16 +60,15 @@ export default function LandingPage() {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-background dark:bg-[#0f101e] overflow-hidden">
-      {/* Immersive Background */}
       <HeroScene />
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 w-full z-50 bg-background/50 dark:bg-[#0f101e]/80 backdrop-blur-xl border-b border-white/10 dark:border-white/5 px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2 group cursor-pointer">
-            <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-white font-black text-xl transition-transform group-hover:scale-110">N</div>
+          <Link href="/" className="flex items-center gap-2 group cursor-pointer">
+            <Image src="/nexvenue-logo.png" alt="NexVenue" width={40} height={40} className="rounded-xl transition-transform group-hover:scale-110" />
             <span className="text-2xl font-black tracking-tighter text-surface-dark dark:text-white">NexVenue</span>
-          </div>
+          </Link>
 
           <div className="hidden md:flex items-center gap-8">
             <Link href="#features" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent transition-colors">Features</Link>
@@ -92,22 +85,21 @@ export default function LandingPage() {
       </nav>
 
       <main>
-        {/* Hero Section */}
+        {/* Hero */}
         <section ref={heroRef} className="relative pt-40 pb-32 px-8 min-h-screen flex items-center">
           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="hero-content space-y-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent font-black text-sm uppercase tracking-widest">
-                <Zap size={16} /> The Future of Events
+                <Sparkles size={16} /> For Conferences &amp; Professional Events
               </div>
 
-              <h1 className="text-7xl md:text-8xl font-black text-surface-dark dark:text-white tracking-tighter leading-[0.9]">
-                Elevate Your <br />
-                <span className="text-transparent bg-clip-text bg-premium-gradient">Experience</span>
+              <h1 className="text-6xl md:text-7xl font-black text-surface-dark dark:text-white tracking-tighter leading-[0.95]">
+                Bring your event <br />
+                <span className="text-transparent bg-clip-text bg-premium-gradient">to life</span>
               </h1>
 
               <p className="text-xl text-surface-dark/60 dark:text-white/60 font-medium max-w-lg leading-relaxed">
-                Experience conferences, expos, and gatherings like never before.
-                Real-time interaction, dynamic agendas, and meaningful connections.
+                One app for your whole event — register and check in with a QR pass, follow the live agenda, run moderated Q&amp;A and live polls, and let attendees connect and chat.
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -123,80 +115,89 @@ export default function LandingPage() {
                 </Link>
               </div>
 
-              <div className="flex items-center gap-6 pt-8">
-                <div className="flex -space-x-3">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="w-10 h-10 rounded-full bg-surface-dark/10 dark:bg-white/10 border-2 border-white dark:border-gray-900 flex items-center justify-center text-[10px] font-black dark:text-white">U{i}</div>
-                  ))}
-                </div>
-                <p className="text-sm font-bold text-surface-dark/40 dark:text-white/40">
-                  Joined by <span className="text-surface-dark dark:text-white font-black">10,000+</span> attendees
-                </p>
+              {/* Honest capability pills — no fabricated numbers */}
+              <div className="flex flex-wrap gap-2 pt-4">
+                {["Live agenda", "Q&A & polls", "Networking", "QR check-in"].map((cap) => (
+                  <span key={cap} className="px-3 py-1.5 rounded-full text-xs font-bold bg-surface-dark/5 dark:bg-white/5 text-surface-dark/60 dark:text-white/60 border border-surface-dark/10 dark:border-white/10">
+                    {cap}
+                  </span>
+                ))}
               </div>
             </div>
 
+            {/* Product preview — honest feature snapshot */}
             <div className="hidden lg:block relative">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-accent/20 blur-[120px] rounded-full" />
-              <GlassCard className="transition-transform hover:rotate-3 duration-500 hover:scale-105">
-                <div className="aspect-[4/3] bg-surface-dark/5 rounded-2xl flex items-center justify-center">
-                  <TrendingUp size={120} className="text-accent/20" />
+              <GlassCard className="transition-transform hover:rotate-3 duration-500 hover:scale-105 !p-8">
+                <div className="flex items-center gap-2 mb-6">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
                 </div>
-                <div className="mt-6 space-y-2">
-                  <div className="h-4 w-32 bg-accent/20 rounded-full" />
-                  <div className="h-4 w-full bg-surface-dark/10 rounded-full" />
-                  <div className="h-4 w-2/3 bg-surface-dark/10 rounded-full" />
+                <div className="space-y-3">
+                  {[
+                    { icon: Radio, label: "Now live — Keynote", tint: "text-red-500" },
+                    { icon: MessageSquare, label: "Audience Q&A — 12 approved", tint: "text-accent" },
+                    { icon: BarChart3, label: "Live poll — 84% voted", tint: "text-blue-500" },
+                    { icon: QrCode, label: "Check-in — scan to enter", tint: "text-green-500" },
+                  ].map((row) => (
+                    <div key={row.label} className="flex items-center gap-3 p-3 rounded-xl bg-surface-dark/5 dark:bg-white/5">
+                      <row.icon size={18} className={row.tint} />
+                      <span className="text-sm font-bold text-surface-dark/80 dark:text-white/80">{row.label}</span>
+                    </div>
+                  ))}
                 </div>
               </GlassCard>
             </div>
           </div>
         </section>
 
-        {/* Stats Section */}
+        {/* Capability strip — honest, no invented metrics */}
         <section className="stats-section py-20 bg-surface-dark text-white relative">
           <div className="max-w-7xl mx-auto px-8 grid grid-cols-2 md:grid-cols-4 gap-12">
             {[
-              { label: "Active Events", value: "250+", icon: Calendar },
-              { label: "Total Users", value: "15k+", icon: Users },
-              { label: "Daily Messages", value: "80k+", icon: MessageSquare },
-              { label: "Happy Hosts", value: "500+", icon: Award }
-            ].map((stat, i) => (
+              { label: "Live Agenda", icon: Calendar },
+              { label: "Moderated Q&A", icon: MessageSquare },
+              { label: "Polls & Ratings", icon: BarChart3 },
+              { label: "QR Check-in", icon: QrCode },
+            ].map((item, i) => (
               <div key={i} className="stats-item text-center space-y-2">
                 <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center mx-auto text-accent mb-4">
-                  <stat.icon size={24} />
+                  <item.icon size={24} />
                 </div>
-                <div className="text-4xl font-black tracking-tight">{stat.value}</div>
-                <div className="text-sm font-bold text-white/40 uppercase tracking-widest">{stat.label}</div>
+                <div className="text-lg font-black tracking-tight">{item.label}</div>
+                <div className="text-sm font-bold text-white/40 uppercase tracking-widest">Built in</div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Features Section */}
+        {/* Features */}
         <section id="features" className="py-32 px-8">
           <div className="max-w-7xl mx-auto text-center mb-20">
-            <h2 className="text-5xl font-black text-surface-dark dark:text-white tracking-tighter mb-6">Built for Modern Events</h2>
+            <h2 className="text-5xl font-black text-surface-dark dark:text-white tracking-tighter mb-6">Built for modern events</h2>
             <p className="text-lg text-surface-dark/60 dark:text-white/60 font-medium max-w-2xl mx-auto">
-              Everything you need to run, attend, or discover amazing event experiences in one powerful platform.
+              Everything you need to run a conference, engage your audience, and help people connect — in one platform.
             </p>
           </div>
 
           <div className="features-grid max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                title: "Dynamic Agendas",
-                desc: "Live, interactive schedules that keep everyone updated in real-time.",
-                icon: Calendar
+                title: "Live agenda & sessions",
+                desc: "A real-time schedule attendees can follow — see what's on now, plan around parallel tracks, and get notified the moment a session goes live.",
+                icon: Calendar,
               },
               {
-                title: "Smart Networking",
-                desc: "Connect with attendees through intelligent matching and instant chat.",
-                icon: Users
+                title: "Audience engagement",
+                desc: "Moderated Q&A, live polls, and session ratings that turn a passive audience into an active one — with a big-screen projection view for the room.",
+                icon: BarChart3,
               },
               {
-                title: "Global Reach",
-                desc: "From local meetups to global expos, NexVenue scales with your needs.",
-                icon: Zap
-              }
+                title: "Register, network & check in",
+                desc: "Attendees register in-app, get a QR pass, and check in at the door. Then connect, exchange details, and chat with other attendees.",
+                icon: Users,
+              },
             ].map((feature, i) => (
               <GlassCard key={i} className="feature-card !p-10 group hover:border-accent/40 transition-colors">
                 <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center text-accent mb-8 group-hover:scale-110 transition-transform">
@@ -213,16 +214,18 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="bg-white/80 dark:bg-gray-950/80 border-t border-surface-dark/5 dark:border-white/5 py-12 px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-white font-black">N</div>
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/nexvenue-logo.png" alt="NexVenue" width={32} height={32} className="rounded-lg" />
             <span className="text-xl font-black tracking-tight text-surface-dark dark:text-white">NexVenue</span>
-          </div>
+          </Link>
           <div className="flex gap-8">
-            <Link href="#" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Privacy</Link>
-            <Link href="#" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Terms</Link>
-            <Link href="#" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Contact</Link>
+            <Link href="/privacy" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Privacy</Link>
+            <Link href="/terms" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Terms</Link>
+            <a href="mailto:info@gralix.co" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Contact</a>
           </div>
-          <p className="text-sm font-bold text-surface-dark/20 dark:text-white/20 uppercase tracking-widest">© 2026 NexVenue Inc.</p>
+          <p className="text-sm font-bold text-surface-dark/40 dark:text-white/40">
+            © 2026 <span className="text-surface-dark/60 dark:text-white/60">Gralix Technologies</span>
+          </p>
         </div>
       </footer>
     </div>

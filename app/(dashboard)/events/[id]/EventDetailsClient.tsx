@@ -328,7 +328,7 @@ export default function EventDetailsClient() {
                     )}
                 </div>
 
-                {/* Right Column: CTA & Organizers */}
+                {/* Right Column: CTA & Organisers */}
                 <div className="space-y-8 animate-up">
                     <GlassCard className="sticky top-28 !p-8 border-2 border-accent/20">
                         <div className="mb-6">
@@ -378,7 +378,7 @@ export default function EventDetailsClient() {
                         </div>
 
                         <div className="pt-8 border-t border-surface-dark/10 dark:border-white/10">
-                            <h4 className="font-black text-surface-dark dark:text-white mb-4">Organized by</h4>
+                            <h4 className="font-black text-surface-dark dark:text-white mb-4">Organised by</h4>
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent font-black">
                                     {event.creatorName?.[0]}
