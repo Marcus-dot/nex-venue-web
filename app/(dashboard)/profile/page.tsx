@@ -7,8 +7,9 @@ import {
     Loader2, LogOut, Settings, Calendar, MessageSquare,
     Shield, Clock, HelpCircle, Heart, Users, ChevronRight,
     Linkedin, Twitter, Globe, MapPin, Edit3, Shirt,
-    Utensils, Zap, ExternalLink, User
+    Utensils, Zap, ExternalLink, User, UserPlus, Check, X
 } from "lucide-react";
+import Link from "next/link";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { AvatarDisplay } from "@/components/ui/AvatarDisplay";
@@ -17,6 +18,9 @@ import { signOut } from "firebase/auth";
 import { eventService } from "@/services/events";
 import { Event } from "@/types/events";
 import { cn } from "@/lib/utils/cn";
+import { connectionService } from "@/services/connections";
+import type { ConnectionRequest } from "@/types/connections";
+import { useToast } from "@/context/ToastContext";
 
 const NETWORKING_CONFIG: Record<string, { label: string; dot: string; bg: string; text: string }> = {
     open:          { label: "Open to Networking", dot: "bg-green-500",  bg: "bg-green-500/10",  text: "text-green-600 dark:text-green-400" },
@@ -32,6 +36,28 @@ export default function ProfilePage() {
     const [createdEvents, setCreatedEvents]   = useState<Event[]>([]);
     const [attendingEvents, setAttendingEvents] = useState<Event[]>([]);
     const [loading, setLoading]   = useState(true);
+    const [incomingRequests, setIncomingRequests] = useState<ConnectionRequest[]>([]);
+    const [respondingId, setRespondingId] = useState<string | null>(null);
+    const { showToast } = useToast();
+
+    useEffect(() => {
+        if (!user) return;
+        const unsub = connectionService.subscribeToIncomingRequests(user.uid, setIncomingRequests);
+        return () => unsub();
+    }, [user]);
+
+    const respondToRequest = async (req: ConnectionRequest, accept: boolean) => {
+        if (!user || respondingId) return;
+        setRespondingId(req.id);
+        try {
+            if (accept) { await connectionService.acceptRequest(req.id, user.uid); showToast(`Connected with ${req.fromName}.`, "success"); }
+            else { await connectionService.declineRequest(req.id, user.uid); }
+        } catch {
+            showToast("Something went wrong. Please try again.", "error");
+        } finally {
+            setRespondingId(null);
+        }
+    };
 
     useEffect(() => {
         if (!authLoading && !user) router.push("/login?redirect=/profile");
@@ -219,6 +245,28 @@ export default function ProfilePage() {
                         </GlassCard>
                     ))}
                 </div>
+
+                {/* ── Connection requests ──────────────────────────────────── */}
+                {incomingRequests.length > 0 && (
+                    <GlassCard className="!p-6 space-y-3">
+                        <h3 className="text-xs font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest flex items-center gap-2">
+                            <UserPlus size={14} /> Connection Requests ({incomingRequests.length})
+                        </h3>
+                        <div className="space-y-2">
+                            {incomingRequests.map((req) => (
+                                <div key={req.id} className="flex items-center gap-3 p-3 rounded-xl bg-surface-dark/5 dark:bg-white/5">
+                                    <AvatarDisplay avatarUrl={req.fromAvatar} fullName={req.fromName} size={40} />
+                                    <div className="flex-1 min-w-0">
+                                        <Link href={`/profile/${req.fromId}`} className="font-bold text-surface-dark dark:text-white hover:text-accent truncate block">{req.fromName}</Link>
+                                        <p className="text-xs font-medium text-surface-dark/50 dark:text-white/50">wants to connect with you</p>
+                                    </div>
+                                    <button onClick={() => respondToRequest(req, false)} disabled={!!respondingId} className="w-9 h-9 rounded-full flex items-center justify-center border border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/60 hover:border-red-500/40 hover:text-red-500 disabled:opacity-50 transition-all"><X size={16} /></button>
+                                    <button onClick={() => respondToRequest(req, true)} disabled={!!respondingId} className="w-9 h-9 rounded-full flex items-center justify-center bg-accent text-white hover:opacity-90 disabled:opacity-50 transition-all">{respondingId === req.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}</button>
+                                </div>
+                            ))}
+                        </div>
+                    </GlassCard>
+                )}
 
                 {/* ── Main content ──────────────────────────────────────────── */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

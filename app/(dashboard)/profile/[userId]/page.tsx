@@ -11,10 +11,16 @@ import { Event } from "@/types/events";
 import { eventService } from "@/services/events";
 import {
     ArrowLeft, Loader2, Briefcase,
-    Linkedin, Twitter, Globe, Tag, MessageSquare, Calendar, ExternalLink
+    Linkedin, Twitter, Globe, Tag, MessageSquare, Calendar, ExternalLink,
+    UserPlus, Check, Clock, X
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import { connectionService } from "@/services/connections";
+import { chatService } from "@/services/chat";
+import { useToast } from "@/context/ToastContext";
+import type { ConnectionRequest } from "@/types/connections";
 
 const NETWORKING_CONFIG: Record<string, { label: string; dot: string; bg: string; text: string }> = {
     open:          { label: "Open to Networking", dot: "bg-green-500",  bg: "bg-green-500/10",  text: "text-green-600 dark:text-green-400" },
@@ -35,10 +41,71 @@ async function getUserProfile(uid: string): Promise<UserProfile | null> {
 export default function PublicProfilePage() {
     const { userId } = useParams<{ userId: string }>();
     const router = useRouter();
+    const { user: me, profile: myProfile } = useAuth();
+    const { showToast } = useToast();
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
+    const [connStatus, setConnStatus] = useState<{ request: ConnectionRequest; direction: "outgoing" | "incoming" } | null | undefined>(undefined);
+    const [connBusy, setConnBusy] = useState(false);
+
+    const isMe = !!me && me.uid === userId;
+
+    // Live connection status between me and this profile
+    useEffect(() => {
+        if (!me || !userId || isMe) { setConnStatus(null); return; }
+        const unsub = connectionService.subscribeToConnectionStatus(me.uid, userId, setConnStatus);
+        return () => unsub();
+    }, [me, userId, isMe]);
+
+    const isConnected = connStatus?.request.status === "accepted";
+    const isPendingOut = connStatus?.direction === "outgoing" && connStatus.request.status === "pending";
+    const isPendingIn = connStatus?.direction === "incoming" && connStatus.request.status === "pending";
+
+    const handleConnect = async () => {
+        if (!me || !profile || connBusy) return;
+        setConnBusy(true);
+        try {
+            await connectionService.sendRequest(me.uid, myProfile?.fullName || "Someone", myProfile?.avatar || null, userId, profile.fullName || "User");
+            showToast("Connection request sent.", "success");
+        } catch (err) {
+            const code = (err as { code?: string })?.code;
+            if (code === "already_connected") showToast("You're already connected.", "info");
+            else if (code === "already_pending") showToast("A request already exists.", "info");
+            else showToast("Could not send request. Please try again.", "error");
+        } finally { setConnBusy(false); }
+    };
+
+    const handleCancel = async () => {
+        if (!me || !connStatus || connBusy) return;
+        setConnBusy(true);
+        try { await connectionService.cancelRequest(connStatus.request.id, me.uid); }
+        catch { showToast("Could not cancel. Please try again.", "error"); }
+        finally { setConnBusy(false); }
+    };
+
+    const handleAccept = async () => {
+        if (!me || !connStatus || connBusy) return;
+        setConnBusy(true);
+        try { await connectionService.acceptRequest(connStatus.request.id, me.uid); showToast("Connected!", "success"); }
+        catch { showToast("Could not accept. Please try again.", "error"); }
+        finally { setConnBusy(false); }
+    };
+
+    const handleDecline = async () => {
+        if (!me || !connStatus || connBusy) return;
+        setConnBusy(true);
+        try { await connectionService.declineRequest(connStatus.request.id, me.uid); }
+        catch { showToast("Could not decline. Please try again.", "error"); }
+        finally { setConnBusy(false); }
+    };
+
+    const handleMessage = () => {
+        if (!me || !profile) return;
+        const convId = chatService.generateConversationId(me.uid, userId);
+        router.push(`/chat?id=${convId}&type=direct&name=${encodeURIComponent(profile.fullName || "User")}`);
+    };
     const [userEvents, setUserEvents] = useState<{ event: Event; role: string; roleStyle: { bg: string; text: string } }[]>([]);
 
     useEffect(() => {
@@ -170,10 +237,25 @@ export default function PublicProfilePage() {
                                     )}
                                 </div>
                             )}
-                            <Link href="/chat"
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/60 hover:border-accent/40 hover:text-accent text-xs font-bold transition-all">
-                                <MessageSquare size={12} /> Message
-                            </Link>
+                            {!isMe && (
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    {isConnected ? (
+                                        <>
+                                            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-bold"><Check size={12} /> Connected</span>
+                                            <button onClick={handleMessage} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-white text-xs font-bold hover:opacity-90 transition-all"><MessageSquare size={12} /> Message</button>
+                                        </>
+                                    ) : isPendingIn ? (
+                                        <>
+                                            <button onClick={handleAccept} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-white text-xs font-bold disabled:opacity-50"><Check size={12} /> Accept</button>
+                                            <button onClick={handleDecline} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/60 text-xs font-bold disabled:opacity-50"><X size={12} /> Decline</button>
+                                        </>
+                                    ) : isPendingOut ? (
+                                        <button onClick={handleCancel} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/60 text-xs font-bold disabled:opacity-50"><Clock size={12} /> Requested · Cancel</button>
+                                    ) : connStatus === null ? (
+                                        <button onClick={handleConnect} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-white text-xs font-bold hover:opacity-90 disabled:opacity-50 transition-all"><UserPlus size={12} /> Connect</button>
+                                    ) : null}
+                                </div>
+                            )}
                         </div>
 
                         {/* Name + meta */}
