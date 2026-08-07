@@ -11,8 +11,31 @@
 
 :root {
   --foreground-rgb: 31, 41, 55;
-  --background-start-rgb: 250, 250, 248;
-  --background-end-rgb: 250, 250, 248;
+  --background-start-rgb: 216, 217, 212; /* #D8D9D4 brand warm-gray */
+  --background-end-rgb: 216, 217, 212;
+}
+
+/* Reusable deep, layered shadow — tactile depth without glassmorphism */
+@layer utilities {
+  .deep-shadow {
+    box-shadow:
+      0px 0px 0px 1px rgba(0, 0, 0, 0.06),
+      0px 1px 1px -0.5px rgba(0, 0, 0, 0.06),
+      0px 3px 3px -1.5px rgba(0, 0, 0, 0.06),
+      0px 6px 6px -3px rgba(0, 0, 0, 0.06),
+      0px 12px 12px -6px rgba(0, 0, 0, 0.06),
+      0px 24px 24px -12px rgba(0, 0, 0, 0.06);
+  }
+
+  .dark .deep-shadow {
+    box-shadow:
+      0px 0px 0px 1px rgba(255, 255, 255, 0.06),
+      0px 1px 1px -0.5px rgba(0, 0, 0, 0.35),
+      0px 3px 3px -1.5px rgba(0, 0, 0, 0.35),
+      0px 6px 6px -3px rgba(0, 0, 0, 0.35),
+      0px 12px 12px -6px rgba(0, 0, 0, 0.35),
+      0px 24px 24px -12px rgba(0, 0, 0, 0.35);
+  }
 }
 
 body {
@@ -58,31 +81,39 @@ body {
   background: rgba(232, 92, 41, 0.6);
 }
 
-/* Glass Card — Light */
+/* Surface card — solid with a deep, layered shadow (replaces glassmorphism).
+   Named .glass-card for compatibility; it is no longer glass. */
 .glass-card {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  background: #ffffff;
+  border: 1px solid rgba(17, 24, 39, 0.04);
+  box-shadow:
+    0px 0px 0px 1px rgba(0, 0, 0, 0.04),
+    0px 1px 1px -0.5px rgba(0, 0, 0, 0.06),
+    0px 3px 3px -1.5px rgba(0, 0, 0, 0.06),
+    0px 6px 6px -3px rgba(0, 0, 0, 0.06),
+    0px 12px 12px -6px rgba(0, 0, 0, 0.06),
+    0px 24px 24px -12px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .glass-card:hover {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0px 0px 0px 1px rgba(0, 0, 0, 0.05),
+    0px 2px 2px -1px rgba(0, 0, 0, 0.07),
+    0px 5px 5px -2.5px rgba(0, 0, 0, 0.07),
+    0px 10px 10px -5px rgba(0, 0, 0, 0.07),
+    0px 20px 20px -10px rgba(0, 0, 0, 0.07),
+    0px 32px 32px -16px rgba(0, 0, 0, 0.07);
 }
 
-/* Glass Card — Dark */
 .dark .glass-card {
-  background: rgba(30, 32, 60, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4);
-}
-
-.dark .glass-card:hover {
-  background: rgba(40, 43, 75, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #171a2e;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0px 0px 0px 1px rgba(255, 255, 255, 0.05),
+    0px 2px 4px -1px rgba(0, 0, 0, 0.4),
+    0px 8px 16px -4px rgba(0, 0, 0, 0.45),
+    0px 24px 32px -12px rgba(0, 0, 0, 0.5);
 }
 
 .bg-premium-gradient {
@@ -106,4 +137,39 @@ body {
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+/* ── Ink-in-water background ─────────────────────────────────────── */
+@keyframes ink-drift-1 {
+  0%   { transform: translate(-8%, -6%) scale(1.05) rotate(0deg); }
+  50%  { transform: translate(6%, 4%) scale(1.18) rotate(9deg); }
+  100% { transform: translate(-8%, -6%) scale(1.05) rotate(0deg); }
+}
+@keyframes ink-drift-2 {
+  0%   { transform: translate(6%, 8%) scale(1.1) rotate(0deg); }
+  50%  { transform: translate(-6%, -4%) scale(1.0) rotate(-11deg); }
+  100% { transform: translate(6%, 8%) scale(1.1) rotate(0deg); }
+}
+@keyframes ink-drift-3 {
+  0%   { transform: translate(2%, -4%) scale(1.0) rotate(0deg); }
+  50%  { transform: translate(-5%, 6%) scale(1.14) rotate(7deg); }
+  100% { transform: translate(2%, -4%) scale(1.0) rotate(0deg); }
+}
+
+.ink-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: url(#ink-turb) blur(56px);
+  will-change: transform;
+}
+.ink-blob-1 { width: 58vw; height: 58vw; top: -12%; left: -10%; background: radial-gradient(circle at 40% 40%, rgba(232,92,41,0.32), transparent 68%); animation: ink-drift-1 34s ease-in-out infinite; }
+.ink-blob-2 { width: 50vw; height: 50vw; top: 18%; right: -12%; background: radial-gradient(circle at 50% 50%, rgba(34,37,81,0.20), transparent 66%); animation: ink-drift-2 44s ease-in-out infinite; }
+.ink-blob-3 { width: 44vw; height: 44vw; bottom: -14%; left: 22%; background: radial-gradient(circle at 50% 50%, rgba(232,92,41,0.16), transparent 66%); animation: ink-drift-3 52s ease-in-out infinite; }
+
+.dark .ink-blob-1 { background: radial-gradient(circle at 40% 40%, rgba(232,92,41,0.30), transparent 68%); }
+.dark .ink-blob-2 { background: radial-gradient(circle at 50% 50%, rgba(62,68,145,0.34), transparent 66%); }
+.dark .ink-blob-3 { background: radial-gradient(circle at 50% 50%, rgba(232,92,41,0.15), transparent 66%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ink-blob { animation: none !important; }
 }

@@ -12,6 +12,7 @@ import Link from "next/link";
 import { ArrowLeft, Loader2, ChevronRight } from "lucide-react";
 import { getCleanErrorMessage } from "@/lib/utils/firebaseErrors";
 import { GoogleIcon } from "@/components/ui/GoogleIcon";
+import InkBackground from "@/components/ui/InkBackground";
 
 type PhoneStep = "input" | "verify";
 
@@ -100,9 +101,7 @@ export default function LoginPage() {
 
     return (
         <main className="min-h-screen relative flex items-center justify-center bg-background dark:bg-[#0f101e] px-4">
-            {/* Background Decor */}
-            <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-accent/10 rounded-full blur-[120px]" />
-            <div className="absolute bottom-0 left-0 w-[30%] h-[30%] bg-blue-500/10 rounded-full blur-[100px]" />
+            <InkBackground />
 
             {/* Invisible reCAPTCHA anchor — required by Firebase phone auth */}
             <div id="recaptcha-container" ref={recaptchaRef} />

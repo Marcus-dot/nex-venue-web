@@ -15,7 +15,7 @@ import {
   QrCode,
   Radio,
 } from "lucide-react";
-import HeroScene from "@/components/ui/HeroScene";
+import InkBackground from "@/components/ui/InkBackground";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -60,7 +60,7 @@ export default function LandingPage() {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-background dark:bg-[#0f101e] overflow-hidden">
-      <HeroScene />
+      <InkBackground />
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 w-full z-50 bg-background/50 dark:bg-[#0f101e]/80 backdrop-blur-xl border-b border-white/10 dark:border-white/5 px-8 py-4">
@@ -95,11 +95,11 @@ export default function LandingPage() {
 
               <h1 className="text-6xl md:text-7xl font-black text-surface-dark dark:text-white tracking-tighter leading-[0.95]">
                 Bring your event <br />
-                <span className="text-transparent bg-clip-text bg-premium-gradient">to life</span>
+                <span className="text-accent">to life</span>
               </h1>
 
               <p className="text-xl text-surface-dark/60 dark:text-white/60 font-medium max-w-lg leading-relaxed">
-                One app for your whole event — register and check in with a QR pass, follow the live agenda, run moderated Q&amp;A and live polls, and let attendees connect and chat.
+                One app for your whole event: register and check in with a QR pass, follow the live agenda, run moderated Q&amp;A and live polls, and let attendees connect and chat.
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -115,7 +115,7 @@ export default function LandingPage() {
                 </Link>
               </div>
 
-              {/* Honest capability pills — no fabricated numbers */}
+              {/* Honest capability pills · no fabricated numbers */}
               <div className="flex flex-wrap gap-2 pt-4">
                 {["Live agenda", "Q&A & polls", "Networking", "QR check-in"].map((cap) => (
                   <span key={cap} className="px-3 py-1.5 rounded-full text-xs font-bold bg-surface-dark/5 dark:bg-white/5 text-surface-dark/60 dark:text-white/60 border border-surface-dark/10 dark:border-white/10">
@@ -125,7 +125,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Product preview — honest feature snapshot */}
+            {/* Product preview · honest feature snapshot */}
             <div className="hidden lg:block relative">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-accent/20 blur-[120px] rounded-full" />
               <GlassCard className="transition-transform hover:rotate-3 duration-500 hover:scale-105 !p-8">
@@ -136,10 +136,10 @@ export default function LandingPage() {
                 </div>
                 <div className="space-y-3">
                   {[
-                    { icon: Radio, label: "Now live — Keynote", tint: "text-red-500" },
-                    { icon: MessageSquare, label: "Audience Q&A — 12 approved", tint: "text-accent" },
-                    { icon: BarChart3, label: "Live poll — 84% voted", tint: "text-blue-500" },
-                    { icon: QrCode, label: "Check-in — scan to enter", tint: "text-green-500" },
+                    { icon: Radio, label: "Now live · Keynote", tint: "text-red-500" },
+                    { icon: MessageSquare, label: "Audience Q&A · 12 approved", tint: "text-accent" },
+                    { icon: BarChart3, label: "Live poll · 84% voted", tint: "text-blue-500" },
+                    { icon: QrCode, label: "Check-in · scan to enter", tint: "text-green-500" },
                   ].map((row) => (
                     <div key={row.label} className="flex items-center gap-3 p-3 rounded-xl bg-surface-dark/5 dark:bg-white/5">
                       <row.icon size={18} className={row.tint} />
@@ -152,7 +152,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Capability strip — honest, no invented metrics */}
+        {/* Capability strip · honest, no invented metrics */}
         <section className="stats-section py-20 bg-surface-dark text-white relative">
           <div className="max-w-7xl mx-auto px-8 grid grid-cols-2 md:grid-cols-4 gap-12">
             {[
@@ -177,7 +177,7 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto text-center mb-20">
             <h2 className="text-5xl font-black text-surface-dark dark:text-white tracking-tighter mb-6">Built for modern events</h2>
             <p className="text-lg text-surface-dark/60 dark:text-white/60 font-medium max-w-2xl mx-auto">
-              Everything you need to run a conference, engage your audience, and help people connect — in one platform.
+              Everything you need to run a conference, engage your audience, and help people connect, in one platform.
             </p>
           </div>
 
@@ -185,12 +185,12 @@ export default function LandingPage() {
             {[
               {
                 title: "Live agenda & sessions",
-                desc: "A real-time schedule attendees can follow — see what's on now, plan around parallel tracks, and get notified the moment a session goes live.",
+                desc: "A real-time schedule attendees can follow: what's on now, how to plan around parallel tracks, and a notification the moment a session goes live.",
                 icon: Calendar,
               },
               {
                 title: "Audience engagement",
-                desc: "Moderated Q&A, live polls, and session ratings that turn a passive audience into an active one — with a big-screen projection view for the room.",
+                desc: "Moderated Q&A, live polls, and session ratings that turn a passive audience into an active one, with a big-screen projection view for the room.",
                 icon: BarChart3,
               },
               {
