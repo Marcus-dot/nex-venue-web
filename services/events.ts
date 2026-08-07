@@ -148,6 +148,14 @@ export const eventService = {
     joinEvent: async (eventId: string, userId: string): Promise<void> => {
         try {
             const eventRef = doc(db, "events", eventId);
+            // Enforce capacity cap (if set) — can't exceed maxAttendees
+            const snap = await getDoc(eventRef);
+            const data = snap.data();
+            const attendees: string[] = data?.attendees ?? [];
+            const max: number | undefined = data?.maxAttendees;
+            if (max && attendees.length >= max && !attendees.includes(userId)) {
+                throw Object.assign(new Error("This event is at full capacity."), { code: "event_full" });
+            }
             await updateDoc(eventRef, {
                 attendees: arrayUnion(userId)
             });

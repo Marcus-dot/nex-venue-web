@@ -8,6 +8,7 @@ export interface Event {
     creatorId: string;
     creatorName: string;
     attendees: string[];
+    maxAttendees?: number; // optional capacity cap; undefined/0 = unlimited
     createdAt: number;
     currentAgendaItem?: string; // For live agenda tracking
     agendaLastUpdated?: number; // When the agenda was last updated

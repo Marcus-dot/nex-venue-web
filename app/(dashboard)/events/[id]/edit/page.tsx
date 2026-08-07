@@ -39,6 +39,7 @@ export default function EditEventPage() {
 
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [maxAttendees, setMaxAttendees] = useState("");
 
     // Initial state for a new agenda item
     const newAgendaState = {
@@ -80,6 +81,7 @@ export default function EditEventPage() {
                     time: data.time,
                     location: data.location,
                 });
+                setMaxAttendees(data.maxAttendees ? String(data.maxAttendees) : "");
                 setAgendaForm(prev => ({ ...prev, date: data.date })); // Default agenda date to event date
                 
                 if (data.imageUrl) {
@@ -129,9 +131,11 @@ export default function EditEventPage() {
                 // }
             }
 
+            const cap = parseInt(maxAttendees, 10);
             await eventService.updateEvent(event.id, {
                 ...formData,
                 imageUrl,
+                ...(!isNaN(cap) && cap > 0 ? { maxAttendees: cap } : {}),
             });
             
             router.push(`/events/${event.id}`);
@@ -333,6 +337,17 @@ export default function EditEventPage() {
                                 value={formData.location}
                                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                                 required
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-surface-dark dark:text-white ml-1">Capacity</label>
+                            <Input
+                                type="number"
+                                min={1}
+                                placeholder="Max attendees (leave blank for unlimited)"
+                                value={maxAttendees}
+                                onChange={(e) => setMaxAttendees(e.target.value.replace(/[^0-9]/g, ""))}
                             />
                         </div>
 

@@ -28,6 +28,7 @@ export default function CreateEventPage() {
 
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [maxAttendees, setMaxAttendees] = useState("");
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -51,11 +52,13 @@ export default function CreateEventPage() {
                 imageUrl = await imageUploadService.uploadImage(imagePath, imageFile);
             }
 
+            const cap = parseInt(maxAttendees, 10);
             const docId = await eventService.createEvent({
                 ...formData,
                 imageUrl,
                 creatorId: user.uid,
                 creatorName: profile?.fullName || user.email?.split('@')[0] || "Organiser",
+                ...(!isNaN(cap) && cap > 0 ? { maxAttendees: cap } : {}),
             });
 
             // If we uploaded an image with a temp path, it's fine for now. 
@@ -149,6 +152,17 @@ export default function CreateEventPage() {
                                 value={formData.location}
                                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                                 required
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-surface-dark dark:text-white ml-1">Capacity</label>
+                            <Input
+                                type="number"
+                                min={1}
+                                placeholder="Max attendees (leave blank for unlimited)"
+                                value={maxAttendees}
+                                onChange={(e) => setMaxAttendees(e.target.value.replace(/[^0-9]/g, ""))}
                             />
                         </div>
 

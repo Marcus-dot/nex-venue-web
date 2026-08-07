@@ -123,6 +123,8 @@ export default function EventDetailsClient() {
     if (!event) return null;
 
     const isAttending = user && event.attendees?.includes(user.uid);
+    const atCapacity = !!event.maxAttendees && (event.attendees?.length || 0) >= event.maxAttendees;
+    const isFull = atCapacity && !isAttending;
 
     const handleRSVP = async () => {
         if (!user) {
@@ -139,6 +141,8 @@ export default function EventDetailsClient() {
             }
         } catch (error) {
             console.error("Error updating RSVP:", error);
+            if ((error as { code?: string })?.code === "event_full") showToast("This event is at full capacity.", "error");
+            else showToast("Something went wrong. Please try again.", "error");
         } finally {
             setRsvpLoading(false);
         }
@@ -244,7 +248,11 @@ export default function EventDetailsClient() {
                             </div>
                             <div className="flex items-center gap-2">
                                 <Users size={20} className="text-accent" />
-                                <span className="font-bold text-lg">{event.attendees?.length || 0} Attending</span>
+                                <span className="font-bold text-lg">
+                                    {event.maxAttendees
+                                        ? `${event.attendees?.length || 0} / ${event.maxAttendees} Attending${(event.attendees?.length || 0) >= event.maxAttendees ? " · Full" : ""}`
+                                        : `${event.attendees?.length || 0} Attending`}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -333,18 +341,20 @@ export default function EventDetailsClient() {
                     <GlassCard className="sticky top-28 !p-8 border-2 border-accent/20">
                         <div className="mb-6">
                             <div className="text-sm font-bold text-surface-dark/40 dark:text-white/40 uppercase tracking-widest mb-1">Status</div>
-                            <div className="text-3xl font-black text-surface-dark dark:text-white">Registration Open</div>
+                            <div className="text-3xl font-black text-surface-dark dark:text-white">{isFull ? "Registration Full" : "Registration Open"}</div>
                         </div>
 
                         <div className="space-y-4 mb-8">
                             <Button
                                 className="w-full text-lg !py-5"
                                 onClick={handleRSVP}
-                                disabled={rsvpLoading}
+                                disabled={rsvpLoading || isFull}
                                 variant={isAttending ? "secondary" : "primary"}
                             >
                                 {rsvpLoading ? (
                                     <Loader2 className="animate-spin" size={24} />
+                                ) : isFull ? (
+                                    "Event Full"
                                 ) : isAttending ? (
                                     "Leave Event"
                                 ) : (
