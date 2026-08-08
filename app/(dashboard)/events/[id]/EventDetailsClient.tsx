@@ -5,7 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { eventService } from "@/services/events";
 import { agendaService } from "@/services/agenda";
-import { Event, EventParticipant } from "@/types/events";
+import { attendanceRequestService } from "@/services/attendanceRequests";
+import { Event, EventParticipant, AttendanceRequest } from "@/types/events";
 import { AgendaItem } from "@/types/agenda";
 import { Button } from "@/components/ui/Button";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -61,6 +62,10 @@ export default function EventDetailsClient() {
     const [rsvpLoading, setRsvpLoading] = useState(false);
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
     const [requestLoading, setRequestLoading] = useState(false);
+    // Attendance request state for closed (approval-required) events.
+    // undefined = not yet loaded, null = no request on record.
+    const [attendanceReq, setAttendanceReq] = useState<AttendanceRequest | null | undefined>(undefined);
+    const [attendanceLoading, setAttendanceLoading] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -113,6 +118,18 @@ export default function EventDetailsClient() {
         }
     }, [loading, event]);
 
+    // For closed (approval-required) events, load this user's request status.
+    useEffect(() => {
+        if (!user || !event) return;
+        const closed = event.isOpen === false;
+        const attending = event.attendees?.includes(user.uid);
+        if (!closed || attending) { setAttendanceReq(null); return; }
+        let active = true;
+        attendanceRequestService.getUserRequest(event.id, user.uid)
+            .then((req) => { if (active) setAttendanceReq(req); });
+        return () => { active = false; };
+    }, [user, event]);
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background dark:bg-[#0f101e]">
@@ -125,6 +142,32 @@ export default function EventDetailsClient() {
     const isAttending = user && event.attendees?.includes(user.uid);
     const atCapacity = !!event.maxAttendees && (event.attendees?.length || 0) >= event.maxAttendees;
     const isFull = atCapacity && !isAttending;
+    const isClosed = event.isOpen === false;
+    const hasPendingReq = attendanceReq?.status === "pending";
+    // A closed event that this non-attending user still needs approval to join.
+    const needsApproval = isClosed && !isAttending;
+
+    const handleRequestAttendance = async () => {
+        if (!user) {
+            router.push(`/login?redirect=/events/${event.id}`);
+            return;
+        }
+        setAttendanceLoading(true);
+        try {
+            await attendanceRequestService.createRequest(
+                event.id,
+                user.uid,
+                profile?.fullName || user.email?.split("@")[0] || "Someone",
+                user.phoneNumber || profile?.phoneNumber || "",
+            );
+            setAttendanceReq({ id: "pending", eventId: event.id, userId: user.uid, userName: profile?.fullName || "", status: "pending", timestamp: Date.now() });
+            showToast("Request sent. The organisers will review it.", "success");
+        } catch (err) {
+            showToast((err as Error)?.message || "Could not send request. Please try again.", "error");
+        } finally {
+            setAttendanceLoading(false);
+        }
+    };
 
     const handleRSVP = async () => {
         if (!user) {
@@ -341,26 +384,56 @@ export default function EventDetailsClient() {
                     <GlassCard className="sticky top-28 !p-8 border-2 border-accent/20">
                         <div className="mb-6">
                             <div className="text-sm font-bold text-surface-dark/40 dark:text-white/40 uppercase tracking-widest mb-1">Status</div>
-                            <div className="text-3xl font-black text-surface-dark dark:text-white">{isFull ? "Registration Full" : "Registration Open"}</div>
+                            <div className="text-3xl font-black text-surface-dark dark:text-white">
+                                {isAttending
+                                    ? "You're Attending"
+                                    : needsApproval
+                                        ? (hasPendingReq ? "Approval Pending" : "Approval Required")
+                                        : isFull
+                                            ? "Registration Full"
+                                            : "Registration Open"}
+                            </div>
+                            {needsApproval && !hasPendingReq && (
+                                <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50 mt-2">
+                                    This event requires organiser approval to attend.
+                                </p>
+                            )}
                         </div>
 
                         <div className="space-y-4 mb-8">
-                            <Button
-                                className="w-full text-lg !py-5"
-                                onClick={handleRSVP}
-                                disabled={rsvpLoading || isFull}
-                                variant={isAttending ? "secondary" : "primary"}
-                            >
-                                {rsvpLoading ? (
-                                    <Loader2 className="animate-spin" size={24} />
-                                ) : isFull ? (
-                                    "Event Full"
-                                ) : isAttending ? (
-                                    "Leave Event"
-                                ) : (
-                                    "Join Event"
-                                )}
-                            </Button>
+                            {needsApproval && !isFull ? (
+                                <Button
+                                    className="w-full text-lg !py-5"
+                                    onClick={handleRequestAttendance}
+                                    disabled={attendanceLoading || attendanceReq === undefined || hasPendingReq}
+                                    variant={hasPendingReq ? "secondary" : "primary"}
+                                >
+                                    {attendanceLoading || attendanceReq === undefined ? (
+                                        <Loader2 className="animate-spin" size={24} />
+                                    ) : hasPendingReq ? (
+                                        "Request Pending"
+                                    ) : (
+                                        "Request to Attend"
+                                    )}
+                                </Button>
+                            ) : (
+                                <Button
+                                    className="w-full text-lg !py-5"
+                                    onClick={handleRSVP}
+                                    disabled={rsvpLoading || isFull}
+                                    variant={isAttending ? "secondary" : "primary"}
+                                >
+                                    {rsvpLoading ? (
+                                        <Loader2 className="animate-spin" size={24} />
+                                    ) : isFull ? (
+                                        "Event Full"
+                                    ) : isAttending ? (
+                                        "Leave Event"
+                                    ) : (
+                                        "Join Event"
+                                    )}
+                                </Button>
+                            )}
                             
                             {isAttending && !isStaff && (
                                 <Button 

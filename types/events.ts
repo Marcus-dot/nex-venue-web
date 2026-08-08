@@ -9,6 +9,7 @@ export interface Event {
     creatorName: string;
     attendees: string[];
     maxAttendees?: number; // optional capacity cap; undefined/0 = unlimited
+    isOpen?: boolean; // true/undefined = anyone can attend; false = requires organiser approval
     createdAt: number;
     currentAgendaItem?: string; // For live agenda tracking
     agendaLastUpdated?: number; // When the agenda was last updated
@@ -43,6 +44,17 @@ export interface RoleRequest {
     userEmail?: string;
     userPhone?: string;
     requestedRole: EventRole;
+    status: 'pending' | 'approved' | 'rejected';
+    timestamp: number;
+}
+
+// Mirrors the mobile `attendanceRequests` collection schema exactly (shared Firestore).
+export interface AttendanceRequest {
+    id: string;
+    eventId: string;
+    userId: string;
+    userName: string;
+    userPhone?: string;
     status: 'pending' | 'approved' | 'rejected';
     timestamp: number;
 }

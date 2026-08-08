@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { ArrowLeft, Calendar, Loader2, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Calendar, Loader2, Image as ImageIcon, Unlock, Lock } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
 import { addDoc } from "firebase/firestore";
 import { eventService } from "@/services/events";
 import { imageUploadService } from "@/services/imageUpload";
@@ -29,6 +30,7 @@ export default function CreateEventPage() {
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [maxAttendees, setMaxAttendees] = useState("");
+    const [isOpen, setIsOpen] = useState(true); // true = anyone can attend; false = approval required
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -58,6 +60,7 @@ export default function CreateEventPage() {
                 imageUrl,
                 creatorId: user.uid,
                 creatorName: profile?.fullName || user.email?.split('@')[0] || "Organiser",
+                isOpen,
                 ...(!isNaN(cap) && cap > 0 ? { maxAttendees: cap } : {}),
             });
 
@@ -164,6 +167,36 @@ export default function CreateEventPage() {
                                 value={maxAttendees}
                                 onChange={(e) => setMaxAttendees(e.target.value.replace(/[^0-9]/g, ""))}
                             />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-surface-dark dark:text-white ml-1">Access</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsOpen(true)}
+                                    className={cn(
+                                        "flex flex-col items-center gap-1 p-4 rounded-xl border-2 transition-all text-center",
+                                        isOpen ? "border-accent bg-accent/5 text-accent" : "border-surface-dark/10 dark:border-white/10 text-surface-dark/50 dark:text-white/50 hover:border-surface-dark/20 dark:hover:border-white/20"
+                                    )}
+                                >
+                                    <Unlock size={18} />
+                                    <span className="font-black text-sm">Open</span>
+                                    <span className="text-xs font-medium opacity-80">Anyone can attend</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsOpen(false)}
+                                    className={cn(
+                                        "flex flex-col items-center gap-1 p-4 rounded-xl border-2 transition-all text-center",
+                                        !isOpen ? "border-accent bg-accent/5 text-accent" : "border-surface-dark/10 dark:border-white/10 text-surface-dark/50 dark:text-white/50 hover:border-surface-dark/20 dark:hover:border-white/20"
+                                    )}
+                                >
+                                    <Lock size={18} />
+                                    <span className="font-black text-sm">Approval</span>
+                                    <span className="text-xs font-medium opacity-80">You approve each request</span>
+                                </button>
+                            </div>
                         </div>
 
                         <div className="pt-4">

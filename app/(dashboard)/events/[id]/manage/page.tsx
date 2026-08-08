@@ -7,7 +7,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { eventService } from "@/services/events";
 import { agendaService } from "@/services/agenda";
-import { Event, RoleRequest, EventParticipant, EventRole } from "@/types/events";
+import { Event, RoleRequest, EventParticipant, EventRole, AttendanceRequest } from "@/types/events";
+import { attendanceRequestService } from "@/services/attendanceRequests";
 import { AgendaItem } from "@/types/agenda";
 import { UserProfile } from "@/types/auth";
 import { useAuth } from "@/context/AuthContext";
@@ -59,7 +60,9 @@ import {
     Presentation,
     MessageSquare,
     ChevronRight,
-    Download
+    Download,
+    Unlock,
+    Lock
 } from "lucide-react";
 import Link from "next/link";
 import { fetchAttendeeRows, buildAttendeeCSV, downloadCSV } from "@/lib/exportAttendees";
@@ -82,6 +85,7 @@ export default function EventManagePage() {
     const [requestProfiles, setRequestProfiles] = useState<Record<string, UserProfile | null>>({});
     const [participants, setParticipants] = useState<EventParticipant[]>([]);
     const [participantProfiles, setParticipantProfiles] = useState<Record<string, UserProfile | null>>({});
+    const [attendanceReqs, setAttendanceReqs] = useState<AttendanceRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [saveLoading, setSaveLoading] = useState(false);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -93,6 +97,7 @@ export default function EventManagePage() {
         date: "",
         time: "",
         location: "",
+        isOpen: true,
     });
 
     const [newAgendaItem, setNewAgendaItem] = useState({
@@ -141,6 +146,7 @@ export default function EventManagePage() {
                 date: data.date,
                 time: data.time,
                 location: data.location,
+                isOpen: data.isOpen !== false,
             });
 
             // Load current staff participants
@@ -197,6 +203,37 @@ export default function EventManagePage() {
             border: config.border,
             label: config.label
         };
+    };
+
+    // Live pending attendance requests (closed events).
+    useEffect(() => {
+        if (!id) return;
+        return attendanceRequestService.subscribeToEventRequests(id as string, setAttendanceReqs);
+    }, [id]);
+
+    const handleApproveAttendance = async (request: AttendanceRequest) => {
+        setActionLoading(request.id);
+        try {
+            await attendanceRequestService.approveRequest(request);
+            showToast(`${request.userName} approved.`, "success");
+        } catch (error) {
+            if ((error as { code?: string })?.code === "event_full") showToast("This event is at full capacity.", "error");
+            else showToast("Could not approve request. Please try again.", "error");
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
+    const handleRejectAttendance = async (request: AttendanceRequest) => {
+        setActionLoading(request.id);
+        try {
+            await attendanceRequestService.rejectRequest(request.id);
+            showToast(`${request.userName}'s request declined.`, "info");
+        } catch {
+            showToast("Could not decline request. Please try again.", "error");
+        } finally {
+            setActionLoading(null);
+        }
     };
 
     const [exporting, setExporting] = useState(false);
@@ -444,6 +481,35 @@ export default function EventManagePage() {
                                             onChange={(e) => setSettingsForm({ ...settingsForm, location: e.target.value })}
                                             required
                                         />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-surface-dark dark:text-white ml-1 italic opacity-50">Access</label>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => setSettingsForm({ ...settingsForm, isOpen: true })}
+                                                className={cn(
+                                                    "flex flex-col items-center gap-1 p-4 rounded-xl border-2 transition-all text-center",
+                                                    settingsForm.isOpen ? "border-accent bg-accent/5 text-accent" : "border-surface-dark/10 dark:border-white/10 text-surface-dark/50 dark:text-white/50 hover:border-surface-dark/20 dark:hover:border-white/20"
+                                                )}
+                                            >
+                                                <Unlock size={18} />
+                                                <span className="font-black text-sm">Open</span>
+                                                <span className="text-xs font-medium opacity-80">Anyone can attend</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setSettingsForm({ ...settingsForm, isOpen: false })}
+                                                className={cn(
+                                                    "flex flex-col items-center gap-1 p-4 rounded-xl border-2 transition-all text-center",
+                                                    !settingsForm.isOpen ? "border-accent bg-accent/5 text-accent" : "border-surface-dark/10 dark:border-white/10 text-surface-dark/50 dark:text-white/50 hover:border-surface-dark/20 dark:hover:border-white/20"
+                                                )}
+                                            >
+                                                <Lock size={18} />
+                                                <span className="font-black text-sm">Approval</span>
+                                                <span className="text-xs font-medium opacity-80">You approve each request</span>
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="pt-4">
                                         <Button type="submit" className="w-full py-4 text-lg font-black" disabled={saveLoading}>
@@ -828,6 +894,51 @@ export default function EventManagePage() {
 
                         {activeTab === "staff" && (
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+                                {/* Attendance requests (closed events) */}
+                                {attendanceReqs.length > 0 && (
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h3 className="text-xl font-black text-surface-dark dark:text-white">Attendance Requests</h3>
+                                                <p className="text-sm text-surface-dark/40 dark:text-white/40 font-medium mt-0.5">People asking to attend this approval-only event</p>
+                                            </div>
+                                            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-black">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                                                {attendanceReqs.length} pending
+                                            </span>
+                                        </div>
+                                        <div className="grid gap-3">
+                                            {attendanceReqs.map((req) => (
+                                                <GlassCard key={req.id} className="!p-5">
+                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="font-black text-surface-dark dark:text-white truncate">{req.userName || "Someone"}</p>
+                                                            {req.userPhone && <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50 truncate">{req.userPhone}</p>}
+                                                        </div>
+                                                        <div className="flex items-center gap-2 shrink-0">
+                                                            <Button
+                                                                onClick={() => handleApproveAttendance(req)}
+                                                                disabled={actionLoading === req.id}
+                                                                className="font-bold"
+                                                            >
+                                                                {actionLoading === req.id ? <Loader2 className="animate-spin" size={16} /> : "Approve"}
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                onClick={() => handleRejectAttendance(req)}
+                                                                disabled={actionLoading === req.id}
+                                                                className="font-bold text-red-600 bg-white dark:bg-white/5"
+                                                            >
+                                                                Decline
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </GlassCard>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Header row */}
                                 <div className="flex items-center justify-between">
