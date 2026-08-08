@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/services/auth";
 import { notificationService } from "@/services/notifications";
@@ -72,9 +73,7 @@ export const Navigation = () => {
         <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-surface-dark/5 dark:border-white/5 px-8 pt-4 pb-2">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
                 <Link href="/events" className="flex items-center gap-2 group">
-                    <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-white font-black transition-transform group-hover:scale-110">
-                        N
-                    </div>
+                    <Image src="/nexvenue-logo.png" alt="NexVenue" width={32} height={32} className="rounded-lg transition-transform group-hover:scale-110" />
                     <span className="text-xl font-black tracking-tighter text-surface-dark dark:text-white">NexVenue</span>
                     {isAdmin && (
                         <span className="hidden sm:flex items-center gap-1 text-[10px] font-black text-accent uppercase tracking-widest bg-accent/10 px-2 py-0.5 rounded-full">

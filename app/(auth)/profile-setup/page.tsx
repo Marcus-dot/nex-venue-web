@@ -78,7 +78,7 @@ export default function ProfileSetupPage() {
                 {/* Heading */}
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-black text-surface-dark dark:text-white tracking-tight mb-2">
-                        Welcome — let&apos;s set up<br />your profile
+                        Welcome, let&apos;s set up<br />your profile
                     </h1>
                     <p className="text-sm text-surface-dark/50 dark:text-white/50 font-medium">
                         Takes less than a minute. You can fill in more details later.

@@ -28,7 +28,7 @@ export const Button = ({
     return (
         <button
             className={cn(
-                "font-semibold transition-all duration-300 transform active:scale-95 disabled:opacity-50",
+                "inline-flex items-center justify-center whitespace-nowrap font-semibold transition-all duration-300 transform active:scale-95 disabled:opacity-50",
                 variants[variant],
                 sizes[size],
                 className

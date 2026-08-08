@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/Input";
 export default function SettingsPage() {
     const { user, profile, updateUserProfile, loading: authLoading, linkGoogle, unlinkGoogle, linkPhone, unlinkPhone } = useAuth();
     const { showToast } = useToast();
-    const { setTheme } = useTheme();
+    const { isDark, setTheme } = useTheme();
     const router = useRouter();
 
     // ── Sign-in methods (linking) ──
@@ -62,7 +62,7 @@ export default function SettingsPage() {
     };
 
     const handleUnlinkGoogle = async () => {
-        if (!phoneLinked) { showToast("Add a phone number first — you need at least one sign-in method.", "error"); return; }
+        if (!phoneLinked) { showToast("Add a phone number first. You need at least one sign-in method.", "error"); return; }
         setLinkingGoogle(true);
         try {
             await unlinkGoogle();
@@ -110,7 +110,7 @@ export default function SettingsPage() {
     };
 
     const handleUnlinkPhone = async () => {
-        if (!googleLinked) { showToast("Link Google first — you need at least one sign-in method.", "error"); return; }
+        if (!googleLinked) { showToast("Link Google first. You need at least one sign-in method.", "error"); return; }
         setLinkingPhone(true);
         try {
             await unlinkPhone();
@@ -145,7 +145,11 @@ export default function SettingsPage() {
     }, [user, profile, authLoading, router]);
 
     const handleToggle = async (key: keyof typeof settings) => {
-        const newSettings = { ...settings, [key]: !settings[key] };
+        // Dark mode is owned by ThemeContext; derive its current value from the
+        // live theme (isDark) so the toggle can never drift out of sync with what
+        // the user is actually seeing.
+        const current = key === 'darkMode' ? isDark : settings[key];
+        const newSettings = { ...settings, [key]: !current };
         setSettings(newSettings);
 
         // Apply dark mode immediately via ThemeContext
@@ -233,7 +237,7 @@ export default function SettingsPage() {
                                     <h4 className="font-bold text-surface-dark dark:text-white">Dark Mode Theme</h4>
                                     <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50 mt-1">Switch to a darker interface for low-light environments.</p>
                                 </div>
-                                <Switch checked={settings.darkMode} onCheckedChange={() => handleToggle('darkMode')} />
+                                <Switch checked={isDark} onCheckedChange={() => handleToggle('darkMode')} />
                             </div>
                         </div>
                     </div>

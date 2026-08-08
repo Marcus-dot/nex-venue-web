@@ -107,12 +107,14 @@ export default function NotificationsPage() {
                     )}
                 </div>
 
-                {/* Simulated Generator Buttons */}
-                <div className="flex flex-wrap gap-2 mb-8 p-4 border border-blue-500/20 bg-blue-500/5 rounded-2xl">
-                    <span className="text-xs font-bold text-blue-800 w-full mb-1">Testing Utilities:</span>
-                    <Button variant="secondary" size="sm" onClick={() => notificationService.createMockNotification(user!.uid, "New schedule available", "The agenda for Web3 Summit has been updated.", "/events")}>Event Update</Button>
-                    <Button variant="secondary" size="sm" onClick={() => notificationService.createMockNotification(user!.uid, "New message from Sarah", "Are we still on for the networking lunch?", "/chat")}>Chat Msg</Button>
-                </div>
+                {/* Simulated Generator Buttons — dev only, never shipped to production */}
+                {process.env.NODE_ENV === "development" && (
+                    <div className="flex flex-wrap gap-2 mb-8 p-4 border border-blue-500/20 bg-blue-500/5 rounded-2xl">
+                        <span className="text-xs font-bold text-blue-800 dark:text-blue-300 w-full mb-1">Testing Utilities:</span>
+                        <Button variant="secondary" size="sm" onClick={() => notificationService.createMockNotification(user!.uid, "New schedule available", "The agenda for Web3 Summit has been updated.", "/events")}>Event Update</Button>
+                        <Button variant="secondary" size="sm" onClick={() => notificationService.createMockNotification(user!.uid, "New message from Sarah", "Are we still on for the networking lunch?", "/chat")}>Chat Msg</Button>
+                    </div>
+                )}
 
                 {/* List */}
                 <div className="space-y-4">
@@ -127,7 +129,7 @@ export default function NotificationsPage() {
                                 key={notification.id}
                                 className={cn(
                                     "!p-0 overflow-hidden cursor-pointer transition-all hover:translate-x-1",
-                                    !notification.read ? "border-l-4 border-l-accent bg-white/80 dark:bg-white/5 border-t border-r border-b border-white dark:border-white/10" : ""
+                                    !notification.read ? "bg-accent/5 dark:bg-accent/10 border border-accent/20" : ""
                                 )}
                                 onClick={() => handleNotificationClick(notification)}
                             >

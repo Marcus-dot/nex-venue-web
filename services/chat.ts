@@ -162,6 +162,7 @@ export const chatService = {
 
         return onSnapshot(q, (snapshot) => {
             const conversations = snapshot.docs.map(doc => ({
+                id: doc.id,
                 ...doc.data()
             })) as DirectConversation[];
             callback(conversations);

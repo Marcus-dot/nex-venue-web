@@ -11,15 +11,17 @@ interface AvatarDisplayProps {
 
 // Deterministic color from name — same name always gets the same color
 function getAvatarColor(name: string): string {
+    // Mirrors the mobile app palette (components/user-avatar.tsx) so a
+    // given person reads with the same avatar colour on both platforms.
     const colors = [
-        "#e85c29", // accent
-        "#3b82f6", // blue
-        "#10b981", // green
-        "#8b5cf6", // purple
-        "#f59e0b", // amber
-        "#ec4899", // pink
-        "#06b6d4", // cyan
         "#6366f1", // indigo
+        "#8b5cf6", // violet
+        "#ec4899", // pink
+        "#14b8a6", // teal
+        "#f59e0b", // amber
+        "#10b981", // emerald
+        "#3b82f6", // blue
+        "#e85c29", // accent orange
     ];
     let hash = 0;
     for (let i = 0; i < name.length; i++) {

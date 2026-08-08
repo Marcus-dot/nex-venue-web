@@ -439,7 +439,7 @@ export default function ProfilePage() {
 
                         {/* Admin panel */}
                         {profile?.role === "admin" && (
-                            <GlassCard className="!p-6 border-l-4 border-l-accent">
+                            <GlassCard className="!p-6">
                                 <div className="flex items-center gap-3 mb-5">
                                     <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
                                         <Shield size={18} />

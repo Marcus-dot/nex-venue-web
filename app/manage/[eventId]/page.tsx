@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import {
     collection,
     doc,
@@ -13,7 +13,8 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { agendaService } from "@/services/agenda";
-import { AnimatePresence, motion } from "framer-motion";
+import { Poll, pollService } from "@/services/polls";
+import { motion } from "framer-motion";
 import { AgendaItem } from "@/types/agenda";
 import { Event } from "@/types/events";
 
@@ -92,7 +93,7 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
     const { eventId } = use(params);
 
     const [event, setEvent] = useState<Event | null>(null);
-    const [tab, setTab] = useState<"qa" | "agenda" | "ratings">("qa");
+    const [tab, setTab] = useState<"qa" | "agenda" | "ratings" | "polls">("qa");
 
     // Q&A
     const [questions, setQuestions] = useState<Question[]>([]);
@@ -108,6 +109,22 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
     // Ratings
     const [ratings, setRatings] = useState<RatingSummary[]>([]);
     const [ratingsLoaded, setRatingsLoaded] = useState(false);
+
+    // Polls
+    const [polls, setPolls] = useState<Poll[]>([]);
+    const [pollLoading, setPollLoading] = useState<Record<string, boolean>>({});
+    // Create form
+    const [showCreatePoll, setShowCreatePoll] = useState(false);
+    const [newQuestion, setNewQuestion] = useState("");
+    const [newOptions, setNewOptions] = useState(["", ""]);
+    const [creating, setCreating] = useState(false);
+    // Edit form
+    const [editingPollId, setEditingPollId] = useState<string | null>(null);
+    const [editPollQuestion, setEditPollQuestion] = useState("");
+    const [editPollOptions, setEditPollOptions] = useState<{ id: string; text: string; votes: string[] }[]>([]);
+    const [savingPoll, setSavingPoll] = useState(false);
+    // Delete confirm
+    const [deletingPollId, setDeletingPollId] = useState<string | null>(null);
 
     const accent = "#e85c29";
 
@@ -223,6 +240,76 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
         setLoading(q.id, false);
     }
 
+    // ── Polls subscription ───────────────────────────────────────────────────
+
+    useEffect(() => {
+        const unsub = pollService.subscribeToEventPolls(eventId, setPolls);
+        return unsub;
+    }, [eventId]);
+
+    // ── Poll actions ─────────────────────────────────────────────────────────
+
+    function setPollLoading_(id: string, v: boolean) {
+        setPollLoading(prev => ({ ...prev, [id]: v }));
+    }
+
+    async function handleCreatePoll() {
+        const q = newQuestion.trim();
+        const opts = newOptions.map(o => o.trim()).filter(Boolean);
+        if (!q || opts.length < 2) return;
+        setCreating(true);
+        try {
+            await pollService.createPoll(eventId, "organiser", q, opts);
+            setNewQuestion("");
+            setNewOptions(["", ""]);
+            setShowCreatePoll(false);
+        } finally {
+            setCreating(false);
+        }
+    }
+
+    async function handleToggleActive(poll: Poll) {
+        setPollLoading_(poll.id, true);
+        try { await pollService.toggleActive(poll.id, !poll.isActive); }
+        finally { setPollLoading_(poll.id, false); }
+    }
+
+    async function handleToggleResults(poll: Poll) {
+        setPollLoading_(poll.id + "_results", true);
+        try { await pollService.toggleShowResults(poll.id, !poll.showResults); }
+        finally { setPollLoading_(poll.id + "_results", false); }
+    }
+
+    function startEditPoll(poll: Poll) {
+        setEditingPollId(poll.id);
+        setEditPollQuestion(poll.question);
+        setEditPollOptions(poll.options.map(o => ({ ...o })));
+    }
+
+    async function handleSavePoll() {
+        if (!editingPollId) return;
+        const q = editPollQuestion.trim();
+        const opts = editPollOptions.filter(o => o.text.trim());
+        if (!q || opts.length < 2) return;
+        setSavingPoll(true);
+        try {
+            await pollService.updatePoll(editingPollId, q, opts.map(o => ({ ...o, text: o.text.trim() })));
+            setEditingPollId(null);
+        } finally {
+            setSavingPoll(false);
+        }
+    }
+
+    async function handleDeletePoll(pollId: string) {
+        setPollLoading_(pollId + "_delete", true);
+        try {
+            await pollService.deletePoll(pollId);
+            setDeletingPollId(null);
+        } finally {
+            setPollLoading_(pollId + "_delete", false);
+        }
+    }
+
     // ── Agenda actions ───────────────────────────────────────────────────────
 
     async function handleSetLive(itemId: string) {
@@ -245,6 +332,7 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
     const TABS = [
         { id: "qa",      label: "Q&A",         badge: pending.length || undefined },
         { id: "agenda",  label: "Live Agenda",  badge: undefined },
+        { id: "polls",   label: "Polls",        badge: polls.length || undefined },
         { id: "ratings", label: "Ratings",      badge: undefined },
     ] as const;
 
@@ -282,8 +370,6 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                     </button>
                 ))}
             </div>
-
-            <AnimatePresence mode="wait">
 
                 {/* ══ Q&A ═════════════════════════════════════════════════════ */}
                 {tab === "qa" && (
@@ -380,7 +466,7 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                         {/* Approved */}
                         {approved.length > 0 && (
                             <section>
-                                <h2 className="text-white font-bold text-base mb-4">Approved — on screen</h2>
+                                <h2 className="text-white font-bold text-base mb-4">Approved Â· on screen</h2>
                                 <div className="flex flex-col gap-3">
                                     {approved.map(q => (
                                         <div key={q.id} className="rounded-2xl p-4 flex items-start gap-3"
@@ -550,7 +636,7 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                             </div>
                         ) : ratings.length === 0 ? (
                             <p className="text-center py-12 text-sm" style={{ color: "rgba(255,255,255,0.25)" }}>
-                                No ratings yet — they appear here as attendees rate sessions
+                                No ratings yet. They appear here as attendees rate sessions
                             </p>
                         ) : (
                             <div className="flex flex-col gap-3">
@@ -579,7 +665,268 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                         )}
                     </motion.div>
                 )}
-            </AnimatePresence>
+                {/* ══ POLLS ════════════════════════════════════════════════════ */}
+                {tab === "polls" && (
+                    <motion.div key="polls" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }} className="px-5 py-6 flex flex-col gap-6">
+
+                        {/* Create button / form */}
+                        {!showCreatePoll ? (
+                            <button onClick={() => setShowCreatePoll(true)}
+                                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold transition-opacity hover:opacity-80"
+                                style={{ background: `${accent}18`, border: `1px dashed ${accent}50`, color: accent }}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                                </svg>
+                                New Poll
+                            </button>
+                        ) : (
+                            <div className="rounded-2xl p-5 flex flex-col gap-4"
+                                style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${accent}40` }}>
+                                <h3 className="text-white font-bold text-sm">New Poll</h3>
+
+                                {/* Question */}
+                                <div>
+                                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: "rgba(255,255,255,0.4)" }}>
+                                        Question
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={newQuestion}
+                                        onChange={e => setNewQuestion(e.target.value)}
+                                        placeholder="What would you like to ask?"
+                                        className="w-full rounded-xl px-3 py-2.5 text-sm text-white outline-none"
+                                        style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}
+                                    />
+                                </div>
+
+                                {/* Options */}
+                                <div>
+                                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: "rgba(255,255,255,0.4)" }}>
+                                        Options
+                                    </label>
+                                    <div className="flex flex-col gap-2">
+                                        {newOptions.map((opt, i) => (
+                                            <div key={i} className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={opt}
+                                                    onChange={e => setNewOptions(prev => prev.map((o, j) => j === i ? e.target.value : o))}
+                                                    placeholder={`Option ${i + 1}`}
+                                                    className="flex-1 rounded-xl px-3 py-2 text-sm text-white outline-none"
+                                                    style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}
+                                                />
+                                                {newOptions.length > 2 && (
+                                                    <button onClick={() => setNewOptions(prev => prev.filter((_, j) => j !== i))}
+                                                        className="w-7 h-7 flex items-center justify-center rounded-lg shrink-0"
+                                                        style={{ color: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.05)" }}>
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                                                            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                                                        </svg>
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                        {newOptions.length < 6 && (
+                                            <button onClick={() => setNewOptions(prev => [...prev, ""])}
+                                                className="text-xs font-semibold py-1.5 rounded-xl transition-opacity hover:opacity-70"
+                                                style={{ color: "rgba(255,255,255,0.35)" }}>
+                                                + Add option
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex gap-2 pt-1">
+                                    <button onClick={handleCreatePoll} disabled={creating || !newQuestion.trim() || newOptions.filter(o => o.trim()).length < 2}
+                                        className="px-4 py-2 rounded-xl text-sm font-bold text-white transition-opacity disabled:opacity-40"
+                                        style={{ background: accent }}>
+                                        {creating ? "Creating..." : "Create Poll"}
+                                    </button>
+                                    <button onClick={() => { setShowCreatePoll(false); setNewQuestion(""); setNewOptions(["", ""]); }}
+                                        className="px-4 py-2 rounded-xl text-sm font-semibold"
+                                        style={{ color: "rgba(255,255,255,0.4)" }}>
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Poll list */}
+                        {polls.length === 0 && !showCreatePoll ? (
+                            <p className="text-center py-10 text-sm" style={{ color: "rgba(255,255,255,0.2)" }}>
+                                No polls yet. Create one above and attendees can vote in real time
+                            </p>
+                        ) : (
+                            <div className="flex flex-col gap-4">
+                                {polls.map(poll => {
+                                    const totalVotes = poll.options.reduce((s, o) => s + o.votes.length, 0);
+                                    const isEditing = editingPollId === poll.id;
+                                    const isDeleting = deletingPollId === poll.id;
+
+                                    return (
+                                        <div key={poll.id} className="rounded-2xl overflow-hidden"
+                                            style={{ border: `1px solid ${poll.isActive ? "rgba(232,92,41,0.2)" : "rgba(255,255,255,0.07)"}`, background: poll.isActive ? "rgba(232,92,41,0.04)" : "rgba(255,255,255,0.03)" }}>
+
+                                            {/* Poll header */}
+                                            <div className="px-4 pt-4 pb-3">
+                                                {isEditing ? (
+                                                    <div className="flex flex-col gap-3">
+                                                        <input
+                                                            type="text"
+                                                            value={editPollQuestion}
+                                                            onChange={e => setEditPollQuestion(e.target.value)}
+                                                            className="w-full rounded-xl px-3 py-2 text-sm text-white outline-none font-semibold"
+                                                            style={{ background: "rgba(255,255,255,0.08)", border: `1px solid ${accent}` }}
+                                                        />
+                                                        <div className="flex flex-col gap-2">
+                                                            {editPollOptions.map((opt, i) => (
+                                                                <div key={opt.id} className="flex items-center gap-2">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={opt.text}
+                                                                        onChange={e => setEditPollOptions(prev => prev.map((o, j) => j === i ? { ...o, text: e.target.value } : o))}
+                                                                        className="flex-1 rounded-xl px-3 py-1.5 text-sm text-white outline-none"
+                                                                        style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}
+                                                                    />
+                                                                    {editPollOptions.length > 2 && (
+                                                                        <button onClick={() => setEditPollOptions(prev => prev.filter((_, j) => j !== i))}
+                                                                            className="w-7 h-7 flex items-center justify-center rounded-lg shrink-0"
+                                                                            style={{ color: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.05)" }}>
+                                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                                                                                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                                                                            </svg>
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            ))}
+                                                            {editPollOptions.length < 6 && (
+                                                                <button onClick={() => setEditPollOptions(prev => [...prev, { id: Math.random().toString(36).slice(2, 10), text: "", votes: [] }])}
+                                                                    className="text-xs font-semibold py-1 transition-opacity hover:opacity-70"
+                                                                    style={{ color: "rgba(255,255,255,0.35)" }}>
+                                                                    + Add option
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            <button onClick={handleSavePoll} disabled={savingPoll}
+                                                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-white"
+                                                                style={{ background: accent }}>
+                                                                {savingPoll ? "Saving..." : "Save"}
+                                                            </button>
+                                                            <button onClick={() => setEditingPollId(null)}
+                                                                className="px-3 py-1.5 rounded-lg text-xs font-semibold"
+                                                                style={{ color: "rgba(255,255,255,0.4)" }}>
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <p className="text-white font-semibold text-sm leading-snug mb-3">{poll.question}</p>
+
+                                                        {/* Options with vote bars */}
+                                                        <div className="flex flex-col gap-2 mb-3">
+                                                            {poll.options.map(opt => {
+                                                                const pct = totalVotes > 0 ? Math.round((opt.votes.length / totalVotes) * 100) : 0;
+                                                                return (
+                                                                    <div key={opt.id}>
+                                                                        <div className="flex items-center justify-between mb-1">
+                                                                            <span className="text-xs text-white" style={{ opacity: 0.75 }}>{opt.text}</span>
+                                                                            <span className="text-xs font-bold tabular-nums"
+                                                                                style={{ color: "rgba(255,255,255,0.4)" }}>
+                                                                                {opt.votes.length} ({pct}%)
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="h-1.5 rounded-full overflow-hidden"
+                                                                            style={{ background: "rgba(255,255,255,0.07)" }}>
+                                                                            <div className="h-full rounded-full transition-all duration-500"
+                                                                                style={{ width: `${pct}%`, background: poll.isActive ? accent : "rgba(255,255,255,0.25)" }} />
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+
+                                                        <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+                                                            {totalVotes} {totalVotes === 1 ? "vote" : "votes"}
+                                                        </p>
+                                                    </>
+                                                )}
+                                            </div>
+
+                                            {/* Poll controls */}
+                                            {!isEditing && (
+                                                <div className="px-4 py-3 flex items-center gap-2 flex-wrap"
+                                                    style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+
+                                                    {/* Active toggle */}
+                                                    <button onClick={() => handleToggleActive(poll)}
+                                                        disabled={pollLoading[poll.id]}
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-opacity hover:opacity-80"
+                                                        style={{
+                                                            background: poll.isActive ? "rgba(232,92,41,0.15)" : "rgba(255,255,255,0.06)",
+                                                            color: poll.isActive ? accent : "rgba(255,255,255,0.4)",
+                                                        }}>
+                                                        <div className={`w-1.5 h-1.5 rounded-full ${poll.isActive ? "" : "opacity-40"}`}
+                                                            style={{ background: poll.isActive ? accent : "currentColor" }} />
+                                                        {pollLoading[poll.id] ? "..." : poll.isActive ? "Open" : "Closed"}
+                                                    </button>
+
+                                                    {/* Show results toggle */}
+                                                    <button onClick={() => handleToggleResults(poll)}
+                                                        disabled={pollLoading[poll.id + "_results"]}
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-opacity hover:opacity-80"
+                                                        style={{
+                                                            background: poll.showResults ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.06)",
+                                                            color: poll.showResults ? "#22c55e" : "rgba(255,255,255,0.4)",
+                                                        }}>
+                                                        {pollLoading[poll.id + "_results"] ? "..." : poll.showResults ? "Results visible" : "Results hidden"}
+                                                    </button>
+
+                                                    <div className="flex-1" />
+
+                                                    {/* Edit */}
+                                                    <button onClick={() => startEditPoll(poll)}
+                                                        className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-opacity hover:opacity-70"
+                                                        style={{ color: "rgba(255,255,255,0.35)", background: "rgba(255,255,255,0.05)" }}>
+                                                        Edit
+                                                    </button>
+
+                                                    {/* Delete */}
+                                                    {isDeleting ? (
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>Delete?</span>
+                                                            <button onClick={() => handleDeletePoll(poll.id)}
+                                                                disabled={pollLoading[poll.id + "_delete"]}
+                                                                className="px-2.5 py-1.5 rounded-lg text-xs font-bold"
+                                                                style={{ background: "rgba(239,68,68,0.15)", color: "#ef4444" }}>
+                                                                {pollLoading[poll.id + "_delete"] ? "..." : "Yes"}
+                                                            </button>
+                                                            <button onClick={() => setDeletingPollId(null)}
+                                                                className="px-2.5 py-1.5 rounded-lg text-xs font-semibold"
+                                                                style={{ color: "rgba(255,255,255,0.3)" }}>
+                                                                No
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <button onClick={() => setDeletingPollId(poll.id)}
+                                                            className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-opacity hover:opacity-70"
+                                                            style={{ color: "rgba(239,68,68,0.5)", background: "rgba(239,68,68,0.07)" }}>
+                                                            Delete
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </motion.div>
+                )}
+
         </div>
     );
 }

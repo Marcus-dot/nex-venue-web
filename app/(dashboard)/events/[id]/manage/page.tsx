@@ -350,7 +350,7 @@ export default function EventManagePage() {
                     <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
                         <div>
                             <h1 className="text-4xl font-black text-surface-dark dark:text-white mb-2 tracking-tight">Event Controls</h1>
-                            <p className="text-surface-dark/60 dark:text-white/60 font-medium">Manage and refine your event experience.</p>
+                            <p className="text-surface-dark/60 dark:text-white/60 font-medium">Manage the agenda, staff, and event details.</p>
                         </div>
 
                         <div className="flex bg-surface-dark/5 dark:bg-white/5 p-1.5 rounded-2xl">

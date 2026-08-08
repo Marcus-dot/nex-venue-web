@@ -87,7 +87,7 @@ export default function CreateEventPage() {
                 </Link>
 
                 <h1 className="text-4xl font-black text-surface-dark dark:text-white mb-4">Host an Event</h1>
-                <p className="text-surface-dark/60 dark:text-white/60 mb-12">Fill in the details to create your amazing event experience.</p>
+                <p className="text-surface-dark/60 dark:text-white/60 mb-12">Add the details below and publish your event.</p>
 
                 <GlassCard>
                     <form onSubmit={handleCreate} className="space-y-6">

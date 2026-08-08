@@ -37,9 +37,9 @@ function isThisWeek(dateStr: string): boolean {
 // ── Featured hero card ─────────────────────────────────────────────────────────
 
 const EVENT_GRADIENTS = [
-    ["#e85c29", "#f59e0b"], ["#6366f1", "#8b5cf6"], ["#10b981", "#06b6d4"],
-    ["#ec4899", "#f43f5e"], ["#3b82f6", "#6366f1"], ["#f59e0b", "#ef4444"],
-    ["#8b5cf6", "#ec4899"], ["#06b6d4", "#3b82f6"],
+    ["#e85c29", "#f59e0b"], ["#d97706", "#fbbf24"], ["#c2410c", "#ea580c"],
+    ["#f59e0b", "#fcd34d"], ["#9a3412", "#c2410c"], ["#b45309", "#f59e0b"],
+    ["#e85c29", "#f59e0b"], ["#a33410", "#e85c29"],
 ];
 function getEventGradient(title: string): string {
     let hash = 0;

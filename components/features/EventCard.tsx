@@ -9,14 +9,14 @@ import gsap from "gsap";
 
 // Deterministic gradient from event title — every event gets a unique persistent identity
 const EVENT_GRADIENTS = [
+    ["#e85c29", "#ff8c5a"],
+    ["#d97706", "#fbbf24"],
+    ["#c2410c", "#ea580c"],
+    ["#f59e0b", "#fcd34d"],
+    ["#9a3412", "#c2410c"],
+    ["#b45309", "#f59e0b"],
     ["#e85c29", "#f59e0b"],
-    ["#6366f1", "#8b5cf6"],
-    ["#10b981", "#06b6d4"],
-    ["#ec4899", "#f43f5e"],
-    ["#3b82f6", "#6366f1"],
-    ["#f59e0b", "#ef4444"],
-    ["#8b5cf6", "#ec4899"],
-    ["#06b6d4", "#3b82f6"],
+    ["#a33410", "#e85c29"],
 ];
 
 function getEventColors(title: string): { gradient: string; accent: string } {

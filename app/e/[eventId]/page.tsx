@@ -829,7 +829,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                         />
                                         <input
                                             type="text"
-                                            placeholder="Directed to (optional — e.g. Mr Tosh, Panel)"
+                                            placeholder="Directed to (optional, e.g. Mr Tosh, Panel)"
                                             value={directedTo}
                                             onChange={(e) => setDirectedTo(e.target.value)}
                                             className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none transition-all"

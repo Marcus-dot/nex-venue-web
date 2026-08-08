@@ -57,6 +57,8 @@ export default function DashboardPage() {
     }
 
     const totalAttendees = events.reduce((acc, curr) => acc + (curr.attendees?.length || 0), 0);
+    const distinctLocations = new Set(events.map((e) => e.location).filter(Boolean)).size;
+    const avgPerEvent = events.length ? Math.round(totalAttendees / events.length) : 0;
 
     return (
         <div className="min-h-screen bg-background dark:bg-[#0f101e] pt-24 pb-20 px-8">
@@ -65,7 +67,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                     <div>
                         <h1 className="text-5xl font-black text-surface-dark dark:text-white tracking-tighter mb-4">Organiser Portal</h1>
-                        <p className="text-surface-dark/60 dark:text-white/60 text-lg font-medium">Simplify your event management experience.</p>
+                        <p className="text-surface-dark/60 dark:text-white/60 text-lg font-medium">Manage your events, agenda, and attendees in one place.</p>
                     </div>
 
                     <Link href="/events/create">
@@ -77,18 +79,22 @@ export default function DashboardPage() {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <GlassCard className="!p-8 border-l-8 border-l-accent">
+                    <GlassCard className="!p-8">
                         <div className="flex items-center justify-between mb-4">
                             <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
                                 <Calendar size={24} />
                             </div>
-                            <div className="text-[10px] font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest">Active Events</div>
+                            <div className="text-[10px] font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest">Events Hosted</div>
                         </div>
                         <div className="text-4xl font-black text-surface-dark dark:text-white">{events.length}</div>
-                        <div className="text-xs font-bold text-surface-dark/40 dark:text-white/40 mt-1">Hosting across 4 locations</div>
+                        <div className="text-xs font-bold text-surface-dark/40 dark:text-white/40 mt-1">
+                            {distinctLocations > 0
+                                ? `Across ${distinctLocations} location${distinctLocations === 1 ? "" : "s"}`
+                                : "No events yet"}
+                        </div>
                     </GlassCard>
 
-                    <GlassCard className="!p-8 border-l-8 border-l-blue-500">
+                    <GlassCard className="!p-8">
                         <div className="flex items-center justify-between mb-4">
                             <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
                                 <Users size={24} />
@@ -96,18 +102,18 @@ export default function DashboardPage() {
                             <div className="text-[10px] font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest">Total Reach</div>
                         </div>
                         <div className="text-4xl font-black text-surface-dark dark:text-white">{totalAttendees}</div>
-                        <div className="text-xs font-bold text-surface-dark/40 dark:text-white/40 mt-1">Attendees registered globally</div>
+                        <div className="text-xs font-bold text-surface-dark/40 dark:text-white/40 mt-1">Attendees across your events</div>
                     </GlassCard>
 
-                    <GlassCard className="!p-8 border-l-8 border-l-green-500">
+                    <GlassCard className="!p-8">
                         <div className="flex items-center justify-between mb-4">
                             <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500">
                                 <TrendingUp size={24} />
                             </div>
-                            <div className="text-[10px] font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest">Engagement</div>
+                            <div className="text-[10px] font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest">Avg. Turnout</div>
                         </div>
-                        <div className="text-4xl font-black text-surface-dark dark:text-white">92%</div>
-                        <div className="text-xs font-bold text-surface-dark/40 dark:text-white/40 mt-1">Avg. attendance rate</div>
+                        <div className="text-4xl font-black text-surface-dark dark:text-white">{avgPerEvent}</div>
+                        <div className="text-xs font-bold text-surface-dark/40 dark:text-white/40 mt-1">Attendees per event</div>
                     </GlassCard>
                 </div>
 
