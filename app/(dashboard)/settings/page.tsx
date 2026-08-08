@@ -4,7 +4,10 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { GlassCard, Button, Switch } from "@/components/ui";
-import { Loader2, Bell, Moon, Shield, ArrowLeft, Smartphone, Mail, Trash2, KeyRound, Check, Phone } from "lucide-react";
+import { Modal } from "@/components/ui/Modal";
+import { AvatarDisplay } from "@/components/ui/AvatarDisplay";
+import { blockService, type BlockedUserSummary } from "@/services/block";
+import { Loader2, Bell, Moon, Shield, ArrowLeft, Smartphone, Mail, Trash2, KeyRound, Check, Phone, Ban } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/context/ToastContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -14,7 +17,7 @@ import { ConfirmationResult } from "firebase/auth";
 import { Input } from "@/components/ui/Input";
 
 export default function SettingsPage() {
-    const { user, profile, updateUserProfile, loading: authLoading, linkGoogle, unlinkGoogle, linkPhone, unlinkPhone } = useAuth();
+    const { user, profile, updateUserProfile, loading: authLoading, linkGoogle, unlinkGoogle, linkPhone, unlinkPhone, deleteAccount } = useAuth();
     const { showToast } = useToast();
     const { isDark, setTheme } = useTheme();
     const router = useRouter();
@@ -127,6 +130,60 @@ export default function SettingsPage() {
         darkMode: false,
         privateProfile: false,
     });
+
+    // ── Blocked users ──
+    const [blocked, setBlocked] = useState<BlockedUserSummary[]>([]);
+    const [blockedLoading, setBlockedLoading] = useState(false);
+    const [unblocking, setUnblocking] = useState<string | null>(null);
+
+    // ── Account deletion ──
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+
+    useEffect(() => {
+        const uids = profile?.blockedUsers ?? [];
+        if (uids.length === 0) { setBlocked([]); return; }
+        let active = true;
+        setBlockedLoading(true);
+        blockService.getBlockedProfiles(uids)
+            .then((list) => { if (active) setBlocked(list); })
+            .finally(() => { if (active) setBlockedLoading(false); });
+        return () => { active = false; };
+    }, [profile?.blockedUsers]);
+
+    const handleUnblock = async (uid: string) => {
+        if (!user) return;
+        setUnblocking(uid);
+        try {
+            await blockService.unblockUser(user.uid, uid);
+            await updateUserProfile({ blockedUsers: (profile?.blockedUsers ?? []).filter((id) => id !== uid) });
+            setBlocked((prev) => prev.filter((b) => b.uid !== uid));
+            showToast("User unblocked.", "success");
+        } catch {
+            showToast("Could not unblock. Please try again.", "error");
+        } finally {
+            setUnblocking(null);
+        }
+    };
+
+    const confirmDelete = async () => {
+        setDeleting(true);
+        try {
+            await deleteAccount();
+            setShowDeleteModal(false);
+            showToast("Your account has been permanently deleted.", "success");
+            router.replace("/");
+        } catch (err) {
+            const code = (err as { code?: string })?.code;
+            if (code === "auth/requires-recent-login") {
+                showToast("For security, log out and back in, then delete again.", "error");
+            } else {
+                showToast("Could not delete account. Please try again.", "error");
+            }
+        } finally {
+            setDeleting(false);
+        }
+    };
 
     useEffect(() => {
         if (authLoading) return;
@@ -258,6 +315,39 @@ export default function SettingsPage() {
                                 </div>
                                 <Switch checked={settings.privateProfile} onCheckedChange={() => handleToggle('privateProfile')} />
                             </div>
+
+                            {/* Blocked users */}
+                            <div className="pt-2">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Ban size={16} className="text-surface-dark/40 dark:text-white/40" />
+                                    <h4 className="font-bold text-surface-dark dark:text-white">Blocked Users</h4>
+                                    {blocked.length > 0 && (
+                                        <span className="text-xs font-black text-surface-dark/40 dark:text-white/40">{blocked.length}</span>
+                                    )}
+                                </div>
+                                {blockedLoading ? (
+                                    <div className="flex items-center gap-2 text-sm text-surface-dark/40 dark:text-white/40"><Loader2 size={14} className="animate-spin" /> Loading…</div>
+                                ) : blocked.length === 0 ? (
+                                    <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50">You haven&apos;t blocked anyone. Blocked users can&apos;t message you or send connection requests.</p>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {blocked.map((b) => (
+                                            <div key={b.uid} className="flex items-center justify-between gap-3 rounded-xl border border-surface-dark/10 dark:border-white/10 p-3">
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <AvatarDisplay avatarUrl={b.avatar} fullName={b.fullName} size={36} />
+                                                    <div className="min-w-0">
+                                                        <p className="font-bold text-surface-dark dark:text-white truncate">{b.fullName}</p>
+                                                        {b.company && <p className="text-xs font-medium text-surface-dark/50 dark:text-white/50 truncate">{b.company}</p>}
+                                                    </div>
+                                                </div>
+                                                <Button variant="ghost" disabled={unblocking === b.uid} onClick={() => handleUnblock(b.uid)} className="text-accent font-bold bg-white dark:bg-white/5 shrink-0">
+                                                    {unblocking === b.uid ? <Loader2 className="animate-spin" size={16} /> : "Unblock"}
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -332,13 +422,33 @@ export default function SettingsPage() {
                             <p className="text-sm font-medium text-surface-dark/70 dark:text-white/70">
                                 Permanently delete your account and all associated data. This action cannot be reversed.
                             </p>
-                            <Button variant="ghost" className="text-red-600 hover:bg-red-500/20 font-bold bg-white dark:bg-white/5" onClick={() => showToast("Contact support to delete your account.", "info")}>
+                            <Button variant="ghost" className="text-red-600 hover:bg-red-500/20 font-bold bg-white dark:bg-white/5" onClick={() => setShowDeleteModal(true)}>
                                 Delete Account
                             </Button>
                         </div>
                     </div>
                 </GlassCard>
             </div>
+
+            {/* Delete account confirmation */}
+            <Modal isOpen={showDeleteModal} onClose={() => !deleting && setShowDeleteModal(false)} title="Delete account">
+                <div className="space-y-5">
+                    <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-600 shrink-0"><Trash2 size={18} /></div>
+                        <p className="text-sm font-medium text-surface-dark/70 dark:text-white/70">
+                            This permanently deletes your account and all associated data. This cannot be undone.
+                        </p>
+                    </div>
+                    <div className="flex gap-3">
+                        <Button variant="ghost" className="flex-1 bg-white dark:bg-white/5 font-bold" disabled={deleting} onClick={() => setShowDeleteModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button className="flex-1 bg-red-600 hover:bg-red-600/90 shadow-red-600/30 font-bold" disabled={deleting} onClick={confirmDelete}>
+                            {deleting ? <Loader2 className="animate-spin" size={18} /> : "Delete Account"}
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }

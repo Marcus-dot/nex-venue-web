@@ -11,10 +11,11 @@ import {
     linkWithPopup,
     linkWithPhoneNumber,
     unlink,
+    deleteUser,
     ConfirmationResult,
 } from "firebase/auth";
 import { auth, db } from "@/lib/firebase/config";
-import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { UserProfile, UserRole } from "@/types/auth";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -45,6 +46,7 @@ interface AuthContextType {
     fetchUserProfile: (uid: string) => Promise<UserProfile | null>;
     updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
     createUserProfile: (uid: string, data: Partial<UserProfile>) => Promise<UserProfile>;
+    deleteAccount: () => Promise<void>;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -97,6 +99,7 @@ const AuthContext = createContext<AuthContextType>({
     fetchUserProfile: async () => null,
     updateUserProfile: async () => { },
     createUserProfile: async () => ({} as UserProfile),
+    deleteAccount: async () => { },
 });
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
@@ -195,6 +198,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
+    // ── Account deletion ─────────────────────────────────────────────────────
+    // Mirrors the mobile flow: remove Firestore data first, clear the local
+    // cache, then delete the Auth account last. Firebase requires a recent
+    // login to delete; callers surface `auth/requires-recent-login`.
+    const deleteAccount = async (): Promise<void> => {
+        const current = auth.currentUser;
+        if (!current) return;
+        await Promise.allSettled([
+            deleteDoc(doc(db, "users", current.uid)),
+            deleteDoc(doc(db, "fcmTokens", current.uid)),
+        ]);
+        try { localStorage.removeItem(PROFILE_CACHE_KEY); } catch { /* ignore */ }
+        await deleteUser(current); // must be last
+    };
+
     // ── Phone OTP ────────────────────────────────────────────────────────────
     const sendOtp = async (
         phoneNumber: string,
@@ -277,6 +295,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 fetchUserProfile,
                 updateUserProfile,
                 createUserProfile,
+                deleteAccount,
             }}
         >
             {children}

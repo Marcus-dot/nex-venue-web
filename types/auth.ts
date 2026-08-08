@@ -39,6 +39,9 @@ export type UserProfile = {
     twitterVisible?: boolean;
     websiteVisible?: boolean;
 
+    // --- Moderation ---
+    blockedUsers?: string[]; // uids this user has blocked
+
     // --- System fields ---
     role: UserRole;
     createdAt: number;

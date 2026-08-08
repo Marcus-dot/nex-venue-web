@@ -58,9 +58,11 @@ import {
     Megaphone,
     Presentation,
     MessageSquare,
-    ChevronRight
+    ChevronRight,
+    Download
 } from "lucide-react";
 import Link from "next/link";
+import { fetchAttendeeRows, buildAttendeeCSV, downloadCSV } from "@/lib/exportAttendees";
 import { cn } from "@/lib/utils/cn";
 import { CATEGORY_CONFIG, CategoryKey } from "@/lib/constants/agenda";
 
@@ -195,6 +197,24 @@ export default function EventManagePage() {
             border: config.border,
             label: config.label
         };
+    };
+
+    const [exporting, setExporting] = useState(false);
+    const handleExportAttendees = async () => {
+        if (!event || exporting) return;
+        setExporting(true);
+        try {
+            const rows = await fetchAttendeeRows(event);
+            if (rows.length === 0) { showToast("No attendees to export yet.", "info"); return; }
+            const safeTitle = event.title.replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").toLowerCase();
+            downloadCSV(`nexvenue-attendees-${safeTitle || "event"}.csv`, buildAttendeeCSV(event.title, rows));
+            showToast(`Exported ${rows.length} ${rows.length === 1 ? "attendee" : "attendees"}.`, "success");
+        } catch (error) {
+            console.error("Error exporting attendees:", error);
+            showToast("Could not export attendees. Please try again.", "error");
+        } finally {
+            setExporting(false);
+        }
     };
 
     const handleUpdateSettings = async (e: React.FormEvent) => {
@@ -351,6 +371,14 @@ export default function EventManagePage() {
                         <div>
                             <h1 className="text-4xl font-black text-surface-dark dark:text-white mb-2 tracking-tight">Event Controls</h1>
                             <p className="text-surface-dark/60 dark:text-white/60 font-medium">Manage the agenda, staff, and event details.</p>
+                            <button
+                                onClick={handleExportAttendees}
+                                disabled={exporting}
+                                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-dark/5 dark:bg-white/5 hover:bg-surface-dark/10 dark:hover:bg-white/10 text-surface-dark dark:text-white text-sm font-bold transition-colors disabled:opacity-50"
+                            >
+                                {exporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                                Export attendees (CSV)
+                            </button>
                         </div>
 
                         <div className="flex bg-surface-dark/5 dark:bg-white/5 p-1.5 rounded-2xl">

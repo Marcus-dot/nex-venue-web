@@ -12,12 +12,13 @@ import { eventService } from "@/services/events";
 import {
     ArrowLeft, Loader2, Briefcase,
     Linkedin, Twitter, Globe, Tag, MessageSquare, Calendar, ExternalLink,
-    UserPlus, Check, Clock, X
+    UserPlus, Check, Clock, X, Ban
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { connectionService } from "@/services/connections";
+import { blockService } from "@/services/block";
 import { chatService } from "@/services/chat";
 import { useToast } from "@/context/ToastContext";
 import type { ConnectionRequest } from "@/types/connections";
@@ -41,7 +42,7 @@ async function getUserProfile(uid: string): Promise<UserProfile | null> {
 export default function PublicProfilePage() {
     const { userId } = useParams<{ userId: string }>();
     const router = useRouter();
-    const { user: me, profile: myProfile } = useAuth();
+    const { user: me, profile: myProfile, updateUserProfile } = useAuth();
     const { showToast } = useToast();
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -105,6 +106,35 @@ export default function PublicProfilePage() {
         if (!me || !profile) return;
         const convId = chatService.generateConversationId(me.uid, userId);
         router.push(`/chat?id=${convId}&type=direct&name=${encodeURIComponent(profile.fullName || "User")}`);
+    };
+
+    const iBlocked = blockService.hasBlocked(myProfile?.blockedUsers, userId);
+    const [blockBusy, setBlockBusy] = useState(false);
+
+    const handleBlock = async () => {
+        if (!me || blockBusy) return;
+        setBlockBusy(true);
+        try {
+            await blockService.blockUser(me.uid, userId);
+            // Tear down any existing connection so a blocked user can't stay connected.
+            if (connStatus) { try { await connectionService.cancelRequest(connStatus.request.id, me.uid); } catch { /* best effort */ } }
+            await updateUserProfile({ blockedUsers: [...(myProfile?.blockedUsers ?? []), userId] });
+            showToast("User blocked. They can no longer message you.", "success");
+        } catch {
+            showToast("Could not block. Please try again.", "error");
+        } finally { setBlockBusy(false); }
+    };
+
+    const handleUnblockUser = async () => {
+        if (!me || blockBusy) return;
+        setBlockBusy(true);
+        try {
+            await blockService.unblockUser(me.uid, userId);
+            await updateUserProfile({ blockedUsers: (myProfile?.blockedUsers ?? []).filter((id) => id !== userId) });
+            showToast("User unblocked.", "success");
+        } catch {
+            showToast("Could not unblock. Please try again.", "error");
+        } finally { setBlockBusy(false); }
     };
     const [userEvents, setUserEvents] = useState<{ event: Event; role: string; roleStyle: { bg: string; text: string } }[]>([]);
 
@@ -239,21 +269,32 @@ export default function PublicProfilePage() {
                             )}
                             {!isMe && (
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    {isConnected ? (
+                                    {iBlocked ? (
+                                        <button onClick={handleUnblockUser} disabled={blockBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-red-500/30 text-red-600 dark:text-red-400 text-xs font-bold disabled:opacity-50">
+                                            {blockBusy ? <Loader2 size={12} className="animate-spin" /> : <Ban size={12} />} Blocked · Unblock
+                                        </button>
+                                    ) : (
                                         <>
-                                            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-bold"><Check size={12} /> Connected</span>
-                                            <button onClick={handleMessage} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-white text-xs font-bold hover:opacity-90 transition-all"><MessageSquare size={12} /> Message</button>
+                                            {isConnected ? (
+                                                <>
+                                                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-bold"><Check size={12} /> Connected</span>
+                                                    <button onClick={handleMessage} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-white text-xs font-bold hover:opacity-90 transition-all"><MessageSquare size={12} /> Message</button>
+                                                </>
+                                            ) : isPendingIn ? (
+                                                <>
+                                                    <button onClick={handleAccept} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-white text-xs font-bold disabled:opacity-50"><Check size={12} /> Accept</button>
+                                                    <button onClick={handleDecline} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/60 text-xs font-bold disabled:opacity-50"><X size={12} /> Decline</button>
+                                                </>
+                                            ) : isPendingOut ? (
+                                                <button onClick={handleCancel} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/60 text-xs font-bold disabled:opacity-50"><Clock size={12} /> Requested · Cancel</button>
+                                            ) : connStatus === null ? (
+                                                <button onClick={handleConnect} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-white text-xs font-bold hover:opacity-90 disabled:opacity-50 transition-all"><UserPlus size={12} /> Connect</button>
+                                            ) : null}
+                                            <button onClick={handleBlock} disabled={blockBusy} title="Block this user" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-surface-dark/10 dark:border-white/10 text-surface-dark/40 dark:text-white/40 hover:text-red-600 hover:border-red-500/30 text-xs font-bold disabled:opacity-50 transition-colors">
+                                                {blockBusy ? <Loader2 size={12} className="animate-spin" /> : <Ban size={12} />} Block
+                                            </button>
                                         </>
-                                    ) : isPendingIn ? (
-                                        <>
-                                            <button onClick={handleAccept} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-white text-xs font-bold disabled:opacity-50"><Check size={12} /> Accept</button>
-                                            <button onClick={handleDecline} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/60 text-xs font-bold disabled:opacity-50"><X size={12} /> Decline</button>
-                                        </>
-                                    ) : isPendingOut ? (
-                                        <button onClick={handleCancel} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/60 text-xs font-bold disabled:opacity-50"><Clock size={12} /> Requested · Cancel</button>
-                                    ) : connStatus === null ? (
-                                        <button onClick={handleConnect} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-white text-xs font-bold hover:opacity-90 disabled:opacity-50 transition-all"><UserPlus size={12} /> Connect</button>
-                                    ) : null}
+                                    )}
                                 </div>
                             )}
                         </div>
