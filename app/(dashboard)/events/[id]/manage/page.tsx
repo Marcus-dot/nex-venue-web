@@ -66,7 +66,8 @@ import {
     Download,
     Unlock,
     Lock,
-    UserCheck
+    UserCheck,
+    BarChart3
 } from "lucide-react";
 import Link from "next/link";
 import { fetchAttendeeRows, buildAttendeeCSV, downloadCSV } from "@/lib/exportAttendees";
@@ -477,14 +478,22 @@ export default function EventManagePage() {
                         <div>
                             <h1 className="text-4xl font-black text-surface-dark dark:text-white mb-2 tracking-tight">Event Controls</h1>
                             <p className="text-surface-dark/60 dark:text-white/60 font-medium">Manage the agenda, staff, and event details.</p>
-                            <button
-                                onClick={handleExportAttendees}
-                                disabled={exporting}
-                                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-dark/5 dark:bg-white/5 hover:bg-surface-dark/10 dark:hover:bg-white/10 text-surface-dark dark:text-white text-sm font-bold transition-colors disabled:opacity-50"
-                            >
-                                {exporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
-                                Export attendees (CSV)
-                            </button>
+                            <div className="mt-4 flex flex-wrap items-center gap-2">
+                                <button
+                                    onClick={handleExportAttendees}
+                                    disabled={exporting}
+                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-dark/5 dark:bg-white/5 hover:bg-surface-dark/10 dark:hover:bg-white/10 text-surface-dark dark:text-white text-sm font-bold transition-colors disabled:opacity-50"
+                                >
+                                    {exporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                                    Export attendees (CSV)
+                                </button>
+                                <Link
+                                    href={`/events/${id}/report`}
+                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/10 hover:bg-accent/20 text-accent text-sm font-bold transition-colors"
+                                >
+                                    <BarChart3 size={16} /> Post-event report
+                                </Link>
+                            </div>
                         </div>
 
                         <div className="flex bg-surface-dark/5 dark:bg-white/5 p-1.5 rounded-2xl">
