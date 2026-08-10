@@ -3,10 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { eventService } from "@/services/events";
 import { agendaService } from "@/services/agenda";
+import { usersService, type UserSummary } from "@/services/users";
 import { Event, RoleRequest, EventParticipant, EventRole, AttendanceRequest } from "@/types/events";
 import { attendanceRequestService } from "@/services/attendanceRequests";
 import { AgendaItem } from "@/types/agenda";
@@ -112,9 +113,14 @@ export default function EventManagePage() {
         maxAttendees: "" as string | number, // use string for input handling
         speakerBio: "",
         simultaneousGroupId: "",
+        speakerIds: [] as string[],
     });
 
     const [isCategoryPickerOpen, setIsCategoryPickerOpen] = useState(false);
+
+    // Linked-speaker picker (candidates = event attendees + speakers).
+    const [speakerCandidates, setSpeakerCandidates] = useState<UserSummary[]>([]);
+    const [speakerSearch, setSpeakerSearch] = useState("");
 
     useEffect(() => {
         if (!id || !user) return;
@@ -153,6 +159,11 @@ export default function EventManagePage() {
             const parts = await eventService.getEventParticipants(id as string);
             setParticipants(parts);
             setLoading(false);
+
+            // Load the linked-speaker candidate pool (attendees + existing speakers).
+            usersService.getUserSummaries([...(data.attendees ?? []), ...(data.speakers ?? [])])
+                .then((map) => setSpeakerCandidates(Object.values(map)))
+                .catch(() => { /* non-fatal */ });
         };
 
         fetchData();
@@ -284,6 +295,17 @@ export default function EventManagePage() {
                 lastEditedBy: user!.uid,
                 order: agenda.length,
             });
+
+            // Promote linked speakers onto the event so they show in the Speakers section.
+            if (newAgendaItem.speakerIds.length > 0) {
+                try {
+                    await updateDoc(doc(db, "events", event.id), {
+                        speakers: arrayUnion(...newAgendaItem.speakerIds),
+                    });
+                } catch (e) {
+                    console.error("Failed to promote speakers:", e);
+                }
+            }
             setNewAgendaItem({
                 title: "",
                 startTime: "",
@@ -296,6 +318,7 @@ export default function EventManagePage() {
                 maxAttendees: "",
                 speakerBio: "",
                 simultaneousGroupId: "",
+                speakerIds: [],
             });
             showToast("Agenda item added!", "success");
         } catch (error) {
@@ -658,9 +681,49 @@ export default function EventManagePage() {
                                                 </div>
                                             </div>
 
+                                            {/* Linked speakers (app accounts) — supports panels */}
+                                            <div className="space-y-3">
+                                                <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/50 dark:text-white/40 ml-1 flex items-center gap-1.5"><Users size={13} /> Speakers on the app</label>
+                                                {newAgendaItem.speakerIds.length > 0 && (
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {newAgendaItem.speakerIds.map((uid) => {
+                                                            const c = speakerCandidates.find((s) => s.uid === uid);
+                                                            return (
+                                                                <span key={uid} className="inline-flex items-center gap-2 pl-2 pr-1 py-1 rounded-full bg-accent/10 text-accent text-xs font-bold">
+                                                                    {c?.fullName || "Speaker"}
+                                                                    <button type="button" onClick={() => setNewAgendaItem({ ...newAgendaItem, speakerIds: newAgendaItem.speakerIds.filter((x) => x !== uid) })} className="w-5 h-5 rounded-full hover:bg-accent/20 flex items-center justify-center"><X size={12} /></button>
+                                                                </span>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+                                                <Input placeholder="Search attendees & speakers to link…" value={speakerSearch} onChange={(e) => setSpeakerSearch(e.target.value)} className="h-12" />
+                                                {speakerSearch.trim() && (() => {
+                                                    const q = speakerSearch.trim().toLowerCase();
+                                                    const matches = speakerCandidates.filter((c) => !newAgendaItem.speakerIds.includes(c.uid) && c.fullName.toLowerCase().includes(q)).slice(0, 20);
+                                                    return (
+                                                        <div className="max-h-56 overflow-y-auto rounded-xl border border-surface-dark/10 dark:border-white/10 divide-y divide-surface-dark/5 dark:divide-white/5">
+                                                            {matches.length === 0 ? (
+                                                                <p className="p-3 text-xs text-surface-dark/40 dark:text-white/40">No matching attendees. Use the guest field for speakers not on the app.</p>
+                                                            ) : matches.map((c) => (
+                                                                <button type="button" key={c.uid} onClick={() => { setNewAgendaItem({ ...newAgendaItem, speakerIds: [...newAgendaItem.speakerIds, c.uid] }); setSpeakerSearch(""); }} className="w-full flex items-center gap-3 p-3 hover:bg-accent/5 text-left transition-colors">
+                                                                    <AvatarDisplay avatarUrl={c.avatar} fullName={c.fullName} size={32} />
+                                                                    <div className="min-w-0">
+                                                                        <p className="font-bold text-sm text-surface-dark dark:text-white truncate">{c.fullName}</p>
+                                                                        {(c.jobTitle || c.company) && <p className="text-xs text-surface-dark/50 dark:text-white/50 truncate">{[c.jobTitle, c.company].filter(Boolean).join(" · ")}</p>}
+                                                                    </div>
+                                                                    <Plus size={16} className="ml-auto text-accent shrink-0" />
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    );
+                                                })()}
+                                                <p className="text-[11px] text-surface-dark/40 dark:text-white/40 ml-1">Linked speakers appear on the agenda with their profile and are added to the event&apos;s Speakers.</p>
+                                            </div>
+
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div className="space-y-2">
-                                                    <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/50 dark:text-white/40 ml-1">Speaker / Host</label>
+                                                    <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/50 dark:text-white/40 ml-1">Guest speaker (not on the app)</label>
                                                     <div className="relative">
                                                         <div className="absolute left-5 top-1/2 -translate-y-1/2 text-accent/50">
                                                             <Mic size={18} />

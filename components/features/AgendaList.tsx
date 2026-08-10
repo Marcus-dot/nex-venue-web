@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Clock, MapPin, ChevronRight, CheckCircle2, Layers } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
 import { useAuth } from "@/context/AuthContext";
 import { agendaService } from "@/services/agenda";
+import { usersService, type UserSummary } from "@/services/users";
 import { AgendaItem } from "@/types/agenda";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { AvatarDisplay } from "@/components/ui/AvatarDisplay";
 import { CATEGORY_CONFIG, CategoryKey } from "@/lib/constants/agenda";
 
 interface AgendaListProps {
@@ -16,6 +19,17 @@ interface AgendaListProps {
 export const AgendaList = ({ items, currentId }: AgendaListProps) => {
     const { user } = useAuth();
     const [selectingId, setSelectingId] = useState<string | null>(null);
+    const [speakerMap, setSpeakerMap] = useState<Record<string, UserSummary>>({});
+
+    // Resolve every linked speaker across the agenda in one batched query.
+    const linkedIdsKey = items.flatMap((i) => i.speakerIds ?? []).sort().join(",");
+    useEffect(() => {
+        const ids = linkedIdsKey ? linkedIdsKey.split(",") : [];
+        if (ids.length === 0) { setSpeakerMap({}); return; }
+        let active = true;
+        usersService.getUserSummaries(ids).then((map) => { if (active) setSpeakerMap(map); });
+        return () => { active = false; };
+    }, [linkedIdsKey]);
 
     const getCategoryStyles = (category?: string) => {
         const config = CATEGORY_CONFIG[category as CategoryKey] || CATEGORY_CONFIG.other;
@@ -92,7 +106,7 @@ export const AgendaList = ({ items, currentId }: AgendaListProps) => {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {groupOrItem.map((item) => (
-                                        <SessionCard 
+                                        <SessionCard
                                             key={item.id}
                                             item={item}
                                             isLive={item.id === currentId}
@@ -101,16 +115,18 @@ export const AgendaList = ({ items, currentId }: AgendaListProps) => {
                                             onSelect={() => handleSelectSession(item)}
                                             isSelecting={selectingId === item.id}
                                             getStyles={getCategoryStyles}
+                                            speakerMap={speakerMap}
                                         />
                                     ))}
                                 </div>
                             </div>
                         ) : (
-                            <SessionCard 
+                            <SessionCard
                                 item={firstItem}
                                 isLive={isLive}
                                 user={user}
                                 getStyles={getCategoryStyles}
+                                speakerMap={speakerMap}
                             />
                         )}
                     </motion.div>
@@ -128,9 +144,12 @@ interface SessionCardProps {
     onSelect?: () => void;
     isSelecting?: boolean;
     getStyles: (cat?: string) => { icon: React.ReactNode, color: string, bg: string, border: string, label: string };
+    speakerMap: Record<string, UserSummary>;
 }
 
-const SessionCard = ({ item, isLive, isGrouped, user, onSelect, isSelecting, getStyles }: SessionCardProps) => {
+const SessionCard = ({ item, isLive, isGrouped, user, onSelect, isSelecting, getStyles, speakerMap }: SessionCardProps) => {
+    // Linked app-account speakers (supports panels); resolved via speakerMap.
+    const linkedSpeakers = (item.speakerIds ?? []).map((uid) => speakerMap[uid]).filter(Boolean) as UserSummary[];
     const styles = getStyles(item.category);
     const isSelected = user && item.attendeeSelections?.includes(user.uid);
     const isBreak = item.category === 'break' || item.isBreak;
@@ -210,14 +229,25 @@ const SessionCard = ({ item, isLive, isGrouped, user, onSelect, isSelecting, get
                     )}
 
                     <div className="flex flex-wrap gap-4 mt-6">
-                        {item.speaker && (
+                        {linkedSpeakers.length > 0 ? (
+                            linkedSpeakers.map((sp) => (
+                                <Link
+                                    key={sp.uid}
+                                    href={`/profile/${sp.uid}`}
+                                    className="flex items-center gap-2 text-xs font-bold text-surface-dark/70 dark:text-white/70 hover:text-accent transition-colors group/speaker"
+                                >
+                                    <AvatarDisplay avatarUrl={sp.avatar} fullName={sp.fullName} size={24} />
+                                    <span className="group-hover/speaker:underline">{sp.fullName}</span>
+                                </Link>
+                            ))
+                        ) : item.speaker ? (
                             <div className="flex items-center gap-2 text-xs font-bold text-surface-dark/70 dark:text-white/70">
                                 <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center text-[10px] text-accent font-black">
                                     {item.speaker[0]}
                                 </div>
                                 {item.speaker}
                             </div>
-                        )}
+                        ) : null}
                         {item.location && (
                             <div className="flex items-center gap-2 text-xs font-bold text-surface-dark/40 dark:text-white/40">
                                 <MapPin size={14} className="text-accent/60" />

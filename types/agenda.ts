@@ -18,6 +18,7 @@ export interface AgendaItem {
     speakerBio?: string;
     speakerImage?: string;
     speakerImages?: string[];
+    speakerIds?: string[]; // uids of linked app users (supports panels); also promoted to event.speakers[]
 
     // NEW FIELDS FOR SIMULTANEOUS EVENTS
     simultaneousGroupId?: string; // Groups simultaneous events (e.g., "side-events-oct3-1545")
