@@ -19,6 +19,9 @@ export interface AgendaItem {
     speakerImage?: string;
     speakerImages?: string[];
     speakerIds?: string[]; // uids of linked app users (supports panels); also promoted to event.speakers[]
+    // Denormalized snapshot of the linked speakers (name + avatar), written at link
+    // time so the unauthenticated public /e page can render them without reading `users`.
+    linkedSpeakers?: { uid: string; fullName: string; avatar: string | null }[];
 
     // NEW FIELDS FOR SIMULTANEOUS EVENTS
     simultaneousGroupId?: string; // Groups simultaneous events (e.g., "side-events-oct3-1545")

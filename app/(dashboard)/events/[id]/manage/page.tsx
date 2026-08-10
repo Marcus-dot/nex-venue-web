@@ -285,8 +285,15 @@ export default function EventManagePage() {
         if (!event || !user) return;
         setSaveLoading(true);
         try {
+            // Denormalize linked speakers (name + avatar) so the public /e page can render them.
+            const linkedSpeakers = newAgendaItem.speakerIds
+                .map((uid) => speakerCandidates.find((c) => c.uid === uid))
+                .filter(Boolean)
+                .map((c) => ({ uid: c!.uid, fullName: c!.fullName, avatar: c!.avatar }));
+
             await agendaService.createAgendaItem({
                 ...newAgendaItem,
+                linkedSpeakers,
                 maxAttendees: newAgendaItem.maxAttendees ? Number(newAgendaItem.maxAttendees) : undefined,
                 eventId: event.id,
                 date: event.date,

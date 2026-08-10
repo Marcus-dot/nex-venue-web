@@ -57,6 +57,7 @@ interface AgendaItem {
     speakerBio?: string;
     speakerImage?: string;
     speakerImages?: string[];
+    linkedSpeakers?: { uid: string; fullName: string; avatar: string | null }[];
     category?: string;
     isBreak?: boolean;
     location?: string;
@@ -238,6 +239,7 @@ function AgendaCard({ item, status, eventId, guestId }: { item: AgendaItem; stat
     const hasSpeaker = !!item.speaker?.trim();
     const hasDetails = !!(item.description?.trim() || item.speakerBio?.trim()) || (isPast && !item.isBreak);
     const speakerPhoto = item.speakerImages?.[0] ?? item.speakerImage ?? null;
+    const linked = item.linkedSpeakers ?? [];
     const label = item.category && item.category !== "other" ? CATEGORY_LABELS[item.category] ?? null : null;
 
     // Breaks — minimal styling
@@ -317,7 +319,31 @@ function AgendaCard({ item, status, eventId, guestId }: { item: AgendaItem; stat
                             {item.title}
                         </p>
 
-                        {hasSpeaker && (
+                        {linked.length > 0 ? (
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+                                {linked.map((sp) => (
+                                    <div key={sp.uid} className="flex items-center gap-2 min-w-0">
+                                        {sp.avatar ? (
+                                            <img src={sp.avatar} alt={sp.fullName}
+                                                className="w-7 h-7 rounded-full object-cover shrink-0"
+                                                style={{ border: "1px solid rgba(255,255,255,0.1)", opacity: isPast ? 0.5 : 1 }} />
+                                        ) : (
+                                            <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                                                style={{
+                                                    background: isPast ? "rgba(255,255,255,0.06)" : "rgba(232,92,41,0.15)",
+                                                    color: isPast ? "rgba(255,255,255,0.3)" : accent,
+                                                }}>
+                                                {sp.fullName.trim()[0]}
+                                            </div>
+                                        )}
+                                        <p className="text-xs font-medium truncate"
+                                            style={{ color: isPast ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.6)" }}>
+                                            {sp.fullName}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : hasSpeaker ? (
                             <div className="flex items-center gap-2 mt-2">
                                 {speakerPhoto ? (
                                     <img src={speakerPhoto} alt={item.speaker}
@@ -348,7 +374,7 @@ function AgendaCard({ item, status, eventId, guestId }: { item: AgendaItem; stat
                                     )}
                                 </div>
                             </div>
-                        )}
+                        ) : null}
                     </div>
 
                     {/* Expand chevron */}
