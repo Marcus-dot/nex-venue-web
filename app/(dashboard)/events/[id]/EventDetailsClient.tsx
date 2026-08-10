@@ -6,12 +6,14 @@ import Link from "next/link";
 import { eventService } from "@/services/events";
 import { agendaService } from "@/services/agenda";
 import { attendanceRequestService } from "@/services/attendanceRequests";
+import { checkInService } from "@/services/checkins";
 import { Event, EventParticipant, AttendanceRequest } from "@/types/events";
 import { AgendaItem } from "@/types/agenda";
 import { Button } from "@/components/ui/Button";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Modal } from "@/components/ui/Modal";
 import { AgendaList } from "@/components/features/AgendaList";
+import { TicketModal } from "@/components/features/TicketModal";
 import {
     Calendar,
     MapPin,
@@ -24,7 +26,8 @@ import {
     Info,
     Shield,
     Mic,
-    Store
+    Store,
+    QrCode
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
@@ -66,6 +69,8 @@ export default function EventDetailsClient() {
     // undefined = not yet loaded, null = no request on record.
     const [attendanceReq, setAttendanceReq] = useState<AttendanceRequest | null | undefined>(undefined);
     const [attendanceLoading, setAttendanceLoading] = useState(false);
+    const [showTicket, setShowTicket] = useState(false);
+    const [checkedIn, setCheckedIn] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -127,6 +132,16 @@ export default function EventDetailsClient() {
         let active = true;
         attendanceRequestService.getUserRequest(event.id, user.uid)
             .then((req) => { if (active) setAttendanceReq(req); });
+        return () => { active = false; };
+    }, [user, event]);
+
+    // Reflect the attendee's check-in status on their ticket.
+    useEffect(() => {
+        if (!user || !event || !event.attendees?.includes(user.uid)) { setCheckedIn(false); return; }
+        let active = true;
+        checkInService.getCheckIn(event.id, user.uid)
+            .then((ci) => { if (active) setCheckedIn(!!ci); })
+            .catch(() => { /* non-fatal */ });
         return () => { active = false; };
     }, [user, event]);
 
@@ -434,10 +449,20 @@ export default function EventDetailsClient() {
                                     )}
                                 </Button>
                             )}
-                            
+
+                            {isAttending && (
+                                <Button
+                                    variant="outline"
+                                    className="w-full text-lg !py-5 gap-2"
+                                    onClick={() => setShowTicket(true)}
+                                >
+                                    <QrCode size={20} /> View Ticket
+                                </Button>
+                            )}
+
                             {isAttending && !isStaff && (
-                                <Button 
-                                    variant="outline" 
+                                <Button
+                                    variant="outline"
                                     className="w-full text-lg !py-5 gap-2"
                                     onClick={() => setIsRequestModalOpen(true)}
                                 >
@@ -529,6 +554,18 @@ export default function EventDetailsClient() {
                     )}
                 </div>
             </Modal>
+
+            {user && (
+                <TicketModal
+                    isOpen={showTicket}
+                    onClose={() => setShowTicket(false)}
+                    eventId={event.id}
+                    eventTitle={event.title}
+                    attendeeName={profile?.fullName || user.email?.split("@")[0] || "Attendee"}
+                    uid={user.uid}
+                    checkedIn={checkedIn}
+                />
+            )}
         </div>
     );
 }

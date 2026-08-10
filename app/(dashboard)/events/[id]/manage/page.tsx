@@ -8,6 +8,8 @@ import { db } from "@/lib/firebase/config";
 import { eventService } from "@/services/events";
 import { agendaService } from "@/services/agenda";
 import { usersService, type UserSummary } from "@/services/users";
+import { checkInService } from "@/services/checkins";
+import type { CheckIn } from "@/types/checkins";
 import { Event, RoleRequest, EventParticipant, EventRole, AttendanceRequest } from "@/types/events";
 import { attendanceRequestService } from "@/services/attendanceRequests";
 import { AgendaItem } from "@/types/agenda";
@@ -63,14 +65,15 @@ import {
     ChevronRight,
     Download,
     Unlock,
-    Lock
+    Lock,
+    UserCheck
 } from "lucide-react";
 import Link from "next/link";
 import { fetchAttendeeRows, buildAttendeeCSV, downloadCSV } from "@/lib/exportAttendees";
 import { cn } from "@/lib/utils/cn";
 import { CATEGORY_CONFIG, CategoryKey } from "@/lib/constants/agenda";
 
-type Tab = "settings" | "agenda" | "staff";
+type Tab = "settings" | "agenda" | "staff" | "checkin";
 
 export default function EventManagePage() {
     const { id } = useParams();
@@ -87,6 +90,9 @@ export default function EventManagePage() {
     const [participants, setParticipants] = useState<EventParticipant[]>([]);
     const [participantProfiles, setParticipantProfiles] = useState<Record<string, UserProfile | null>>({});
     const [attendanceReqs, setAttendanceReqs] = useState<AttendanceRequest[]>([]);
+    const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
+    const [checkInSearch, setCheckInSearch] = useState("");
+    const [checkInBusy, setCheckInBusy] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [saveLoading, setSaveLoading] = useState(false);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -221,6 +227,38 @@ export default function EventManagePage() {
         if (!id) return;
         return attendanceRequestService.subscribeToEventRequests(id as string, setAttendanceReqs);
     }, [id]);
+
+    // Live check-ins for the event.
+    useEffect(() => {
+        if (!id) return;
+        return checkInService.subscribeToCheckIns(id as string, setCheckIns);
+    }, [id]);
+
+    const checkedInUids = new Set(checkIns.map((c) => c.uid));
+
+    const handleCheckIn = async (person: UserSummary) => {
+        if (!event || !user) return;
+        setCheckInBusy(person.uid);
+        try {
+            await checkInService.checkIn(event.id, person.uid, person.fullName, user.uid);
+        } catch {
+            showToast("Could not check in. Please try again.", "error");
+        } finally {
+            setCheckInBusy(null);
+        }
+    };
+
+    const handleUndoCheckIn = async (uid: string) => {
+        if (!event) return;
+        setCheckInBusy(uid);
+        try {
+            await checkInService.undoCheckIn(event.id, uid);
+        } catch {
+            showToast("Could not undo. Please try again.", "error");
+        } finally {
+            setCheckInBusy(null);
+        }
+    };
 
     const handleApproveAttendance = async (request: AttendanceRequest) => {
         setActionLoading(request.id);
@@ -422,6 +460,7 @@ export default function EventManagePage() {
 
     const tabs = [
         { id: "agenda", label: "Agenda", icon: Layout },
+        { id: "checkin", label: "Check-in", icon: UserCheck },
         { id: "staff", label: "Staff", icon: Users },
         { id: "settings", label: "Settings", icon: Settings },
     ];
@@ -959,6 +998,63 @@ export default function EventManagePage() {
                                         )}
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {activeTab === "checkin" && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="flex items-center justify-between flex-wrap gap-3">
+                                    <div>
+                                        <h3 className="text-xl font-black text-surface-dark dark:text-white">Check-in</h3>
+                                        <p className="text-sm text-surface-dark/40 dark:text-white/40 font-medium mt-0.5">Check attendees in at the door. Search a name, or scan their ticket QR in the mobile app.</p>
+                                    </div>
+                                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-black">
+                                        <UserCheck size={14} /> {checkedInUids.size} / {speakerCandidates.length} checked in
+                                    </span>
+                                </div>
+
+                                <Input placeholder="Search attendees…" value={checkInSearch} onChange={(e) => setCheckInSearch(e.target.value)} className="h-12" />
+
+                                {speakerCandidates.length === 0 ? (
+                                    <GlassCard className="!p-16 text-center border-2 border-dashed border-surface-dark/8 dark:border-white/8">
+                                        <p className="font-black text-surface-dark/40 dark:text-white/40">No attendees yet</p>
+                                        <p className="text-sm text-surface-dark/30 dark:text-white/30 mt-1 font-medium">People will appear here once they join.</p>
+                                    </GlassCard>
+                                ) : (
+                                    <div className="grid gap-2">
+                                        {speakerCandidates
+                                            .filter((c) => c.fullName.toLowerCase().includes(checkInSearch.trim().toLowerCase()))
+                                            .sort((a, b) => a.fullName.localeCompare(b.fullName))
+                                            .map((c) => {
+                                                const isIn = checkedInUids.has(c.uid);
+                                                return (
+                                                    <GlassCard key={c.uid} className="!p-4 flex items-center justify-between gap-3">
+                                                        <div className="flex items-center gap-3 min-w-0">
+                                                            <AvatarDisplay avatarUrl={c.avatar} fullName={c.fullName} size={40} />
+                                                            <div className="min-w-0">
+                                                                <p className="font-bold text-surface-dark dark:text-white truncate">{c.fullName}</p>
+                                                                {(c.jobTitle || c.company) && <p className="text-xs font-medium text-surface-dark/50 dark:text-white/50 truncate">{[c.jobTitle, c.company].filter(Boolean).join(" · ")}</p>}
+                                                            </div>
+                                                        </div>
+                                                        {isIn ? (
+                                                            <button
+                                                                onClick={() => handleUndoCheckIn(c.uid)}
+                                                                disabled={checkInBusy === c.uid}
+                                                                className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-bold hover:bg-green-500/20 transition-colors disabled:opacity-50"
+                                                                title="Undo check-in"
+                                                            >
+                                                                {checkInBusy === c.uid ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} Checked in
+                                                            </button>
+                                                        ) : (
+                                                            <Button onClick={() => handleCheckIn(c)} disabled={checkInBusy === c.uid} className="shrink-0 font-bold">
+                                                                {checkInBusy === c.uid ? <Loader2 size={16} className="animate-spin" /> : "Check in"}
+                                                            </Button>
+                                                        )}
+                                                    </GlassCard>
+                                                );
+                                            })}
+                                    </div>
+                                )}
                             </div>
                         )}
 
