@@ -12,8 +12,9 @@ import type { Event } from "@/types/events";
 import type { AgendaItem } from "@/types/agenda";
 import {
     ArrowLeft, Printer, Loader2, Users, UserCheck, CalendarDays,
-    MessageSquare, BarChart3, Star, ThumbsUp,
+    MessageSquare, BarChart3, Star, ThumbsUp, Download,
 } from "lucide-react";
+import { downloadCSV } from "@/lib/exportAttendees";
 
 interface Question {
     id: string;
@@ -138,6 +139,40 @@ export default function EventReportPage() {
     }
     if (!event) return null;
 
+    const handleExportCSV = () => {
+        const esc = (v: string | number) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+        const row = (...cells: (string | number)[]) => cells.map(esc).join(",");
+        const lines: string[] = [
+            esc("NexVenue Post-Event Report"),
+            row(event.title, event.date, event.location || ""),
+            "",
+            row("Metric", "Value"),
+            row("Registered attendees", stats.attendees),
+            row("Checked in", stats.checkedIn),
+            row("Check-in rate %", stats.checkInRate),
+            row("Sessions", stats.sessions),
+            row("Questions asked", stats.qReceived),
+            row("Questions answered", stats.qAnswered),
+            row("Questions rejected", stats.qRejected),
+            row("Polls run", stats.polls),
+            row("Session ratings", stats.ratingsSubmitted),
+            "",
+            esc("Top questions"),
+            row("Rank", "Upvotes", "Question"),
+            ...topQuestions.map((q, i) => row(i + 1, q.upvotes?.length ?? 0, q.text)),
+            "",
+            esc("Poll results"),
+            row("Poll", "Option", "Votes", "Percent", "Weighted avg"),
+            ...pollResults.flatMap((p) => p.options.map((o) => row(p.question, o.text, o.count, o.pct, p.weighted ?? ""))),
+            "",
+            esc("Session ratings"),
+            row("Rank", "Session", "Average", "Ratings"),
+            ...sessionRatings.map((s, i) => row(i + 1, s.title, s.avg.toFixed(2), s.count)),
+        ];
+        const safe = event.title.replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").toLowerCase();
+        downloadCSV(`nexvenue-report-${safe || "event"}.csv`, lines.join("\n"));
+    };
+
     return (
         <div className="report-root min-h-screen bg-[#faf9f7] text-[#1f2937] pt-24 print:pt-0 pb-24 px-6">
             <div className="max-w-4xl mx-auto">
@@ -146,12 +181,20 @@ export default function EventReportPage() {
                     <Link href={`/events/${id}/manage`} className="flex items-center gap-2 text-sm font-bold text-[#6b7280] hover:text-accent transition-colors">
                         <ArrowLeft size={18} /> Back to Event Controls
                     </Link>
-                    <button
-                        onClick={() => window.print()}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white text-sm font-black hover:bg-accent/90 transition-colors shadow-lg shadow-accent/20"
-                    >
-                        <Printer size={16} /> Print / Save as PDF
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleExportCSV}
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-[#e5e3df] text-[#374151] text-sm font-bold hover:bg-[#f5f4f1] transition-colors"
+                        >
+                            <Download size={16} /> Export CSV
+                        </button>
+                        <button
+                            onClick={() => window.print()}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white text-sm font-black hover:bg-accent/90 transition-colors shadow-lg shadow-accent/20"
+                        >
+                            <Printer size={16} /> Print / Save as PDF
+                        </button>
+                    </div>
                 </div>
 
                 {/* Header */}

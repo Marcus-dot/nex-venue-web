@@ -10,8 +10,9 @@ import { useAuth } from "@/context/AuthContext";
 import { GlassCard } from "@/components/ui/GlassCard";
 import {
     Loader2, Users, UserCheck, MessageSquare, Star, BarChart3,
-    CalendarDays, ArrowRight, ArrowLeft,
+    CalendarDays, ArrowRight, ArrowLeft, Download,
 } from "lucide-react";
+import { downloadCSV } from "@/lib/exportAttendees";
 
 interface EventStat {
     id: string;
@@ -84,6 +85,24 @@ export default function AnalyticsPage() {
 
     const maxAttendees = Math.max(1, ...rows.map((r) => r.attendees));
 
+    const handleExportCSV = () => {
+        const esc = (v: string | number) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+        const line = (...cells: (string | number)[]) => cells.map(esc).join(",");
+        const lines = [
+            esc("NexVenue Portfolio Analytics"),
+            "",
+            line("Event", "Date", "Attendees", "Checked in", "Check-in %", "Questions", "Polls", "Avg rating", "Ratings"),
+            ...rows.map((r) => line(
+                r.title, r.date, r.attendees, r.checkedIn,
+                r.attendees ? Math.round((r.checkedIn / r.attendees) * 100) : 0,
+                r.questions, r.polls, r.ratingCount ? r.ratingAvg.toFixed(2) : "", r.ratingCount,
+            )),
+            "",
+            line("Totals", "", totals.attendees, totals.checkedIn, totals.checkInRate, totals.questions, totals.polls, totals.avgRating ? totals.avgRating.toFixed(2) : "", ""),
+        ];
+        downloadCSV("nexvenue-analytics.csv", lines.join("\n"));
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background dark:bg-[#0f101e]">
@@ -99,9 +118,19 @@ export default function AnalyticsPage() {
                     <ArrowLeft size={18} /> Back to Dashboard
                 </Link>
 
-                <div className="mb-10">
-                    <h1 className="text-5xl font-black text-surface-dark dark:text-white tracking-tighter mb-2">Analytics</h1>
-                    <p className="text-surface-dark/60 dark:text-white/60 text-lg font-medium">Portfolio performance across all your events.</p>
+                <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div>
+                        <h1 className="text-5xl font-black text-surface-dark dark:text-white tracking-tighter mb-2">Analytics</h1>
+                        <p className="text-surface-dark/60 dark:text-white/60 text-lg font-medium">Portfolio performance across all your events.</p>
+                    </div>
+                    {rows.length > 0 && (
+                        <button
+                            onClick={handleExportCSV}
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-dark/5 dark:bg-white/5 hover:bg-surface-dark/10 dark:hover:bg-white/10 text-surface-dark dark:text-white text-sm font-bold transition-colors shrink-0"
+                        >
+                            <Download size={16} /> Export CSV
+                        </button>
+                    )}
                 </div>
 
                 {rows.length === 0 ? (
