@@ -14,7 +14,8 @@ import {
     TrendingUp,
     Loader2,
     Settings,
-    MoreVertical
+    MoreVertical,
+    BarChart3
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -70,11 +71,18 @@ export default function DashboardPage() {
                         <p className="text-surface-dark/60 dark:text-white/60 text-lg font-medium">Manage your events, agenda, and attendees in one place.</p>
                     </div>
 
-                    <Link href="/events/create">
-                        <Button size="lg" className="h-14 px-8 text-lg font-black shadow-lg shadow-accent/20">
-                            <Plus className="mr-2" size={24} /> Create Event
-                        </Button>
-                    </Link>
+                    <div className="flex items-center gap-3">
+                        <Link href="/analytics">
+                            <Button variant="outline" size="lg" className="h-14 px-6 text-lg font-black gap-2">
+                                <BarChart3 size={22} /> Analytics
+                            </Button>
+                        </Link>
+                        <Link href="/events/create">
+                            <Button size="lg" className="h-14 px-8 text-lg font-black shadow-lg shadow-accent/20">
+                                <Plus className="mr-2" size={24} /> Create Event
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Stats Grid */}
