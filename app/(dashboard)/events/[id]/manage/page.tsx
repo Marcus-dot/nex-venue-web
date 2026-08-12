@@ -67,7 +67,8 @@ import {
     Unlock,
     Lock,
     UserCheck,
-    BarChart3
+    BarChart3,
+    Pencil
 } from "lucide-react";
 import Link from "next/link";
 import { fetchAttendeeRows, buildAttendeeCSV, downloadCSV } from "@/lib/exportAttendees";
@@ -130,6 +131,8 @@ export default function EventManagePage() {
     // Linked-speaker picker (candidates = event attendees + speakers).
     const [speakerCandidates, setSpeakerCandidates] = useState<UserSummary[]>([]);
     const [speakerSearch, setSpeakerSearch] = useState("");
+    // When set, the "New Session" form edits this existing agenda item instead of creating.
+    const [editingId, setEditingId] = useState<string | null>(null);
 
     useEffect(() => {
         if (!id || !user) return;
@@ -346,6 +349,36 @@ export default function EventManagePage() {
         }
     };
 
+    const resetAgendaForm = () => {
+        setNewAgendaItem({
+            title: "", startTime: "", endTime: "", location: "", speaker: "",
+            description: "", category: "presentation", isBreak: false, maxAttendees: "",
+            speakerBio: "", simultaneousGroupId: "", speakerIds: [],
+        });
+        setSpeakerSearch("");
+        setEditingId(null);
+    };
+
+    const handleEditAgendaItem = (item: AgendaItem) => {
+        setEditingId(item.id);
+        setNewAgendaItem({
+            title: item.title || "",
+            startTime: item.startTime || "",
+            endTime: item.endTime || "",
+            location: item.location || "",
+            speaker: item.speaker || "",
+            description: item.description || "",
+            category: item.category || "presentation",
+            isBreak: item.isBreak || false,
+            maxAttendees: item.maxAttendees ?? "",
+            speakerBio: item.speakerBio || "",
+            simultaneousGroupId: item.simultaneousGroupId || "",
+            speakerIds: item.speakerIds || [],
+        });
+        setSpeakerSearch("");
+        if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
     const handleAddAgendaItem = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!event || !user) return;
@@ -357,17 +390,30 @@ export default function EventManagePage() {
                 .filter(Boolean)
                 .map((c) => ({ uid: c!.uid, fullName: c!.fullName, avatar: c!.avatar }));
 
-            await agendaService.createAgendaItem({
-                ...newAgendaItem,
-                linkedSpeakers,
-                maxAttendees: newAgendaItem.maxAttendees ? Number(newAgendaItem.maxAttendees) : undefined,
-                eventId: event.id,
-                date: event.date,
-                attendeeSelections: [],
-                createdBy: user!.uid,
-                lastEditedBy: user!.uid,
-                order: agenda.length,
-            });
+            if (editingId) {
+                // Strip undefined so updateDoc doesn't reject; empty speaker arrays are kept (clears them).
+                const raw = {
+                    ...newAgendaItem,
+                    linkedSpeakers,
+                    maxAttendees: newAgendaItem.maxAttendees ? Number(newAgendaItem.maxAttendees) : undefined,
+                    lastEditedBy: user.uid,
+                    updatedAt: Date.now(),
+                };
+                const payload = Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined)) as Partial<AgendaItem>;
+                await agendaService.updateAgendaItem(editingId, payload);
+            } else {
+                await agendaService.createAgendaItem({
+                    ...newAgendaItem,
+                    linkedSpeakers,
+                    maxAttendees: newAgendaItem.maxAttendees ? Number(newAgendaItem.maxAttendees) : undefined,
+                    eventId: event.id,
+                    date: event.date,
+                    attendeeSelections: [],
+                    createdBy: user!.uid,
+                    lastEditedBy: user!.uid,
+                    order: agenda.length,
+                });
+            }
 
             // Promote linked speakers onto the event so they show in the Speakers section.
             if (newAgendaItem.speakerIds.length > 0) {
@@ -379,23 +425,11 @@ export default function EventManagePage() {
                     console.error("Failed to promote speakers:", e);
                 }
             }
-            setNewAgendaItem({
-                title: "",
-                startTime: "",
-                endTime: "",
-                location: "",
-                speaker: "",
-                description: "",
-                category: "presentation",
-                isBreak: false,
-                maxAttendees: "",
-                speakerBio: "",
-                simultaneousGroupId: "",
-                speakerIds: [],
-            });
-            showToast("Agenda item added!", "success");
+            showToast(editingId ? "Session updated!" : "Agenda item added!", "success");
+            resetAgendaForm();
         } catch (error) {
-            console.error("Error adding agenda item:", error);
+            console.error("Error saving agenda item:", error);
+            showToast("Could not save the session. Please try again.", "error");
         } finally {
             setSaveLoading(false);
         }
@@ -633,13 +667,13 @@ export default function EventManagePage() {
                                     <div className="relative flex items-center justify-between mb-10">
                                         <div>
                                             <h3 className="text-2xl font-black text-surface-dark dark:text-white flex items-center gap-3">
-                                                <Plus size={26} className="text-accent" /> New Session
+                                                <Plus size={26} className="text-accent" /> {editingId ? "Edit Session" : "New Session"}
                                             </h3>
-                                            <p className="text-sm font-medium text-surface-dark/40 dark:text-white/40 mt-1">Fill in the details to expand your event's timeline.</p>
+                                            <p className="text-sm font-medium text-surface-dark/40 dark:text-white/40 mt-1">{editingId ? "Update this session's details." : "Fill in the details to expand your event's timeline."}</p>
                                         </div>
                                         <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-accent/10 rounded-full text-accent font-black text-[10px] uppercase tracking-widest border border-accent/20">
                                             <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                                            Drafting Session
+                                            {editingId ? "Editing" : "Drafting Session"}
                                         </div>
                                     </div>
 
@@ -940,12 +974,17 @@ export default function EventManagePage() {
                                             </div>
                                         </div>
 
-                                        <div className="pt-4 border-t border-surface-dark/5 dark:border-white/5">
-                                            <Button type="submit" disabled={saveLoading} className="w-full font-black py-7 text-xl shadow-2xl shadow-accent/20 transition-all active:scale-[0.98] group overflow-hidden relative">
+                                        <div className="pt-4 border-t border-surface-dark/5 dark:border-white/5 flex gap-3">
+                                            {editingId && (
+                                                <Button type="button" variant="ghost" onClick={resetAgendaForm} disabled={saveLoading} className="font-black py-7 text-lg bg-surface-dark/5 dark:bg-white/5 px-8">
+                                                    Cancel
+                                                </Button>
+                                            )}
+                                            <Button type="submit" disabled={saveLoading} className="flex-1 font-black py-7 text-xl shadow-2xl shadow-accent/20 transition-all active:scale-[0.98] group overflow-hidden relative">
                                                 <div className="absolute inset-0 bg-gradient-to-r from-accent to-accent-dark opacity-0 group-hover:opacity-10 transition-opacity" />
                                                 {saveLoading ? <Loader2 className="animate-spin mx-auto" size={32} /> : (
                                                     <span className="flex items-center justify-center gap-3">
-                                                        Publish to Schedule <Plus size={24} strokeWidth={3} />
+                                                        {editingId ? <>Save Changes <CheckCircle2 size={24} strokeWidth={3} /></> : <>Publish to Schedule <Plus size={24} strokeWidth={3} /></>}
                                                     </span>
                                                 )}
                                             </Button>
@@ -1013,6 +1052,7 @@ export default function EventManagePage() {
                                                                                 getStyles={getCategoryStyles}
                                                                                 onDelete={() => handleDeleteAgendaItem(item.id)}
                                                                                 onStartLive={() => handleSetGoLive(item.id)}
+                                                                                onEdit={() => handleEditAgendaItem(item)}
                                                                                 isCurrent={event.currentAgendaItem === item.id}
                                                                             />
                                                                         ))}
@@ -1024,6 +1064,7 @@ export default function EventManagePage() {
                                                                     getStyles={getCategoryStyles}
                                                                     onDelete={() => handleDeleteAgendaItem(firstItem.id)}
                                                                     onStartLive={() => handleSetGoLive(firstItem.id)}
+                                                                    onEdit={() => handleEditAgendaItem(firstItem)}
                                                                     isCurrent={event.currentAgendaItem === firstItem.id}
                                                                 />
                                                             )}
@@ -1411,10 +1452,11 @@ interface AgendaManagementCardProps {
     getStyles: (cat?: string) => { icon: React.ReactNode, color: string, bg: string, border: string, label: string };
     onDelete: () => void;
     onStartLive: () => void;
+    onEdit: () => void;
     isCurrent: boolean;
 }
 
-const AgendaManagementCard = ({ item, getStyles, onDelete, onStartLive, isCurrent }: AgendaManagementCardProps) => {
+const AgendaManagementCard = ({ item, getStyles, onDelete, onStartLive, onEdit, isCurrent }: AgendaManagementCardProps) => {
     const styles = getStyles(item.category);
 
     return (
@@ -1488,6 +1530,13 @@ const AgendaManagementCard = ({ item, getStyles, onDelete, onStartLive, isCurren
                     )}
                 >
                     {isCurrent ? "Session Active" : "Go Live"}
+                </button>
+                <button
+                    onClick={onEdit}
+                    className="w-12 h-12 rounded-2xl bg-surface-dark/5 dark:bg-white/5 text-surface-dark/40 dark:text-white/40 hover:bg-accent hover:text-white transition-all flex items-center justify-center"
+                    title="Edit Session"
+                >
+                    <Pencil size={18} />
                 </button>
                 <button
                     onClick={onDelete}
