@@ -94,6 +94,8 @@ export default function EventManagePage() {
     const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
     const [checkInSearch, setCheckInSearch] = useState("");
     const [checkInBusy, setCheckInBusy] = useState<string | null>(null);
+    const [staffSearch, setStaffSearch] = useState("");
+    const [assigningRole, setAssigningRole] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [saveLoading, setSaveLoading] = useState(false);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -271,6 +273,31 @@ export default function EventManagePage() {
             else showToast("Could not approve request. Please try again.", "error");
         } finally {
             setActionLoading(null);
+        }
+    };
+
+    const handleAssignRole = async (c: UserSummary, role: EventRole) => {
+        if (!event) return;
+        setAssigningRole(c.uid + role);
+        try {
+            await eventService.assignRole(event.id, c.uid, role, {
+                displayName: c.fullName,
+                company: c.company,
+                photoUrl: c.avatar ?? undefined,
+            });
+            const field = role === "organiser" ? "organisers" : role === "speaker" ? "speakers" : "exhibitors";
+            setEvent((prev) => prev ? {
+                ...prev,
+                [field]: Array.from(new Set([...((prev[field as keyof Event] as string[]) || []), c.uid])),
+                attendees: Array.from(new Set([...(prev.attendees || []), c.uid])),
+            } as Event : prev);
+            const parts = await eventService.getEventParticipants(event.id);
+            setParticipants(parts);
+            showToast(`${c.fullName} added as ${role}.`, "success");
+        } catch {
+            showToast("Could not assign role. Please try again.", "error");
+        } finally {
+            setAssigningRole(null);
         }
     };
 
@@ -1069,6 +1096,56 @@ export default function EventManagePage() {
 
                         {activeTab === "staff" && (
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+                                {/* Add staff directly */}
+                                <GlassCard className="!p-6">
+                                    <div className="flex items-center gap-3 mb-1">
+                                        <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center text-accent"><Users size={18} /></div>
+                                        <div>
+                                            <h3 className="text-lg font-black text-surface-dark dark:text-white">Add staff</h3>
+                                            <p className="text-sm text-surface-dark/40 dark:text-white/40 font-medium">Promote a registered attendee to organiser, speaker, or exhibitor.</p>
+                                        </div>
+                                    </div>
+                                    <Input className="mt-4 h-12" placeholder="Search attendees by name…" value={staffSearch} onChange={(e) => setStaffSearch(e.target.value)} />
+                                    {staffSearch.trim() && (() => {
+                                        const q = staffSearch.trim().toLowerCase();
+                                        const matches = speakerCandidates.filter((c) => c.fullName.toLowerCase().includes(q)).slice(0, 15);
+                                        return (
+                                            <div className="mt-3 max-h-72 overflow-y-auto rounded-xl border border-surface-dark/10 dark:border-white/10 divide-y divide-surface-dark/5 dark:divide-white/5">
+                                                {matches.length === 0 ? (
+                                                    <p className="p-3 text-xs text-surface-dark/40 dark:text-white/40">No matching attendees. They must register and join the event first.</p>
+                                                ) : matches.map((c) => {
+                                                    const isOrg = event?.organisers?.includes(c.uid);
+                                                    return (
+                                                        <div key={c.uid} className="flex items-center gap-3 p-3">
+                                                            <AvatarDisplay avatarUrl={c.avatar} fullName={c.fullName} size={34} />
+                                                            <div className="min-w-0 flex-1">
+                                                                <p className="font-bold text-sm text-surface-dark dark:text-white truncate">{c.fullName}</p>
+                                                                {(c.jobTitle || c.company) && <p className="text-xs text-surface-dark/50 dark:text-white/50 truncate">{[c.jobTitle, c.company].filter(Boolean).join(" · ")}</p>}
+                                                            </div>
+                                                            {isOrg ? (
+                                                                <span className="text-xs font-bold text-green-600 dark:text-green-400 flex items-center gap-1 shrink-0"><CheckCircle2 size={13} /> Organiser</span>
+                                                            ) : (
+                                                                <div className="flex items-center gap-1.5 shrink-0">
+                                                                    {(["organiser", "speaker", "exhibitor"] as EventRole[]).map((role) => (
+                                                                        <button
+                                                                            key={role}
+                                                                            onClick={() => handleAssignRole(c, role)}
+                                                                            disabled={assigningRole === c.uid + role}
+                                                                            className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-surface-dark/5 dark:bg-white/5 hover:bg-accent hover:text-white text-surface-dark/70 dark:text-white/70 transition-colors disabled:opacity-50 capitalize"
+                                                                        >
+                                                                            {assigningRole === c.uid + role ? <Loader2 size={12} className="animate-spin" /> : `+ ${role}`}
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        );
+                                    })()}
+                                </GlassCard>
 
                                 {/* Attendance requests (closed events) */}
                                 {attendanceReqs.length > 0 && (

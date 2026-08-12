@@ -273,6 +273,46 @@ export const eventService = {
         }
     },
 
+    // Directly promote a registered attendee to a role (no request/approval step).
+    // Mirrors approveRoleRequest: updates the role array + attendees and writes a
+    // participant record so they show in the staff list.
+    assignRole: async (
+        eventId: string,
+        userId: string,
+        role: EventRole,
+        info: { displayName: string; company?: string; photoUrl?: string },
+    ): Promise<void> => {
+        try {
+            const fieldMap: Record<EventRole, string> = {
+                organiser: "organisers",
+                speaker: "speakers",
+                exhibitor: "exhibitors",
+            };
+            await updateDoc(doc(db, "events", eventId), {
+                [fieldMap[role]]: arrayUnion(userId),
+                attendees: arrayUnion(userId),
+            });
+            const raw = {
+                id: userId,
+                eventId,
+                role,
+                displayName: info.displayName,
+                bio: "",
+                boothDetails: "",
+                company: info.company || "",
+                photoUrl: info.photoUrl,
+                timestamp: Date.now(),
+            };
+            const participantData = Object.fromEntries(
+                Object.entries(raw).filter(([, v]) => v !== undefined)
+            );
+            await setDoc(doc(db, "events", eventId, "participants", userId), participantData);
+        } catch (error) {
+            console.error("Error assigning role:", error);
+            throw error;
+        }
+    },
+
     rejectRoleRequest: async (requestId: string): Promise<void> => {
         try {
             const requestRef = doc(db, "roleRequests", requestId);
