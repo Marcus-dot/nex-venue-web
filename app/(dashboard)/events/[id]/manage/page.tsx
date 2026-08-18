@@ -146,6 +146,9 @@ export default function EventManagePage() {
     const [speakerPhotoFile, setSpeakerPhotoFile] = useState<File | null>(null);
     const [speakerPhotoPreview, setSpeakerPhotoPreview] = useState<string | null>(null);
     const [speakerSaving, setSpeakerSaving] = useState(false);
+    // "Link to attendee" — which card's picker is open, plus its search text.
+    const [linkingSpeakerId, setLinkingSpeakerId] = useState<string | null>(null);
+    const [linkSearch, setLinkSearch] = useState("");
 
     useEffect(() => {
         if (!id || !user) return;
@@ -463,6 +466,20 @@ export default function EventManagePage() {
             await persistSpeakers(reordered);
         } catch {
             showToast("Failed to reorder speakers.", "error");
+        }
+    };
+
+    // Link (or unlink) a curated speaker card to a real attendee account.
+    // Once linked, both apps treat the card as that person and drop any duplicate.
+    const handleSetSpeakerLink = async (spId: string, uid: string | null) => {
+        const next = speakerProfiles.map((s) => (s.id === spId ? { ...s, linkedUserId: uid } : s));
+        try {
+            await persistSpeakers(next);
+            showToast(uid ? "Speaker linked to attendee." : "Speaker unlinked.", "success");
+            setLinkingSpeakerId(null);
+            setLinkSearch("");
+        } catch {
+            showToast("Failed to update link.", "error");
         }
     };
 
@@ -928,6 +945,19 @@ export default function EventManagePage() {
                                                         </button>
                                                         <button
                                                             type="button"
+                                                            onClick={() => { setLinkingSpeakerId(linkingSpeakerId === sp.id ? null : sp.id); setLinkSearch(""); }}
+                                                            className={cn(
+                                                                "p-2 rounded-lg transition-colors",
+                                                                (sp.linkedUserId || linkingSpeakerId === sp.id)
+                                                                    ? "text-accent bg-accent/10"
+                                                                    : "text-surface-dark/50 dark:text-white/50 hover:bg-accent/10 hover:text-accent"
+                                                            )}
+                                                            aria-label="Link to attendee"
+                                                        >
+                                                            <Link2 size={16} />
+                                                        </button>
+                                                        <button
+                                                            type="button"
                                                             onClick={() => handleEditSpeaker(sp)}
                                                             className="p-2 rounded-lg text-surface-dark/50 dark:text-white/50 hover:bg-accent/10 hover:text-accent transition-colors"
                                                             aria-label="Edit speaker"
@@ -944,6 +974,71 @@ export default function EventManagePage() {
                                                         </button>
                                                     </div>
                                                 </div>
+
+                                                {linkingSpeakerId === sp.id && (
+                                                    <div className="mt-4 pt-4 border-t border-surface-dark/10 dark:border-white/10">
+                                                        {sp.linkedUserId ? (
+                                                            <div className="flex items-center justify-between gap-3">
+                                                                <p className="text-sm font-medium text-surface-dark/60 dark:text-white/60">
+                                                                    Linked to{" "}
+                                                                    <span className="font-black text-surface-dark dark:text-white">
+                                                                        {speakerCandidates.find((c) => c.uid === sp.linkedUserId)?.fullName ?? "an attendee"}
+                                                                    </span>
+                                                                    . Tapping their card in the app opens their profile.
+                                                                </p>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleSetSpeakerLink(sp.id, null)}
+                                                                    className="shrink-0 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 text-xs font-bold hover:bg-red-500/20 transition-colors"
+                                                                >
+                                                                    Unlink
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <>
+                                                                <p className="text-xs font-bold text-surface-dark/50 dark:text-white/50 mb-2">
+                                                                    Link this speaker to an attendee who has joined the event. Only people who have joined appear here.
+                                                                </p>
+                                                                <Input
+                                                                    placeholder="Search attendees & speakers…"
+                                                                    value={linkSearch}
+                                                                    onChange={(e) => setLinkSearch(e.target.value)}
+                                                                    className="h-11"
+                                                                />
+                                                                {linkSearch.trim() && (() => {
+                                                                    const q = linkSearch.trim().toLowerCase();
+                                                                    const alreadyLinked = new Set(
+                                                                        speakerProfiles.map((s) => s.linkedUserId).filter(Boolean) as string[]
+                                                                    );
+                                                                    const matches = speakerCandidates
+                                                                        .filter((c) => c.fullName.toLowerCase().includes(q) && !alreadyLinked.has(c.uid))
+                                                                        .slice(0, 12);
+                                                                    return (
+                                                                        <div className="mt-2 space-y-1 max-h-56 overflow-y-auto">
+                                                                            {matches.length === 0 ? (
+                                                                                <p className="text-sm text-surface-dark/40 dark:text-white/40 py-2">
+                                                                                    No matches. They may not have joined the event yet.
+                                                                                </p>
+                                                                            ) : (
+                                                                                matches.map((c) => (
+                                                                                    <button
+                                                                                        key={c.uid}
+                                                                                        type="button"
+                                                                                        onClick={() => handleSetSpeakerLink(sp.id, c.uid)}
+                                                                                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-accent/10 transition-colors text-left"
+                                                                                    >
+                                                                                        <AvatarDisplay avatarUrl={c.avatar} fullName={c.fullName} size={32} />
+                                                                                        <span className="font-bold text-surface-dark dark:text-white text-sm">{c.fullName}</span>
+                                                                                    </button>
+                                                                                ))
+                                                                            )}
+                                                                        </div>
+                                                                    );
+                                                                })()}
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </GlassCard>
                                         ))}
                                     </div>
