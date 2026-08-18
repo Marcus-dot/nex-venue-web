@@ -20,6 +20,23 @@ export interface Event {
     organisers: string[];   // User IDs with management access
     speakers: string[];     // User IDs of speakers
     exhibitors: string[];   // User IDs of exhibitors
+
+    // Curated speaker cards for people who don't (yet) have an app account.
+    // Rendered in the Speakers section alongside account-based `speakers[]`.
+    speakerProfiles?: SpeakerProfile[];
+}
+
+// A display-only speaker card. `linkedUserId` optionally bridges the card to a
+// real account once that speaker signs up — see dedupe/merge in the Speakers UI.
+export interface SpeakerProfile {
+    id: string;                    // stable id for keying/editing/reordering
+    name: string;
+    title?: string;                // job title, e.g. "CEO, ZECHL"
+    company?: string;
+    bio?: string;
+    photoUrl?: string;             // Firebase Storage URL
+    order?: number;                // display order (ascending)
+    linkedUserId?: string | null;  // links this card to a real user account
 }
 
 export type EventRole = 'organiser' | 'speaker' | 'exhibitor';

@@ -10,7 +10,8 @@ import { agendaService } from "@/services/agenda";
 import { usersService, type UserSummary } from "@/services/users";
 import { checkInService } from "@/services/checkins";
 import type { CheckIn } from "@/types/checkins";
-import { Event, RoleRequest, EventParticipant, EventRole, AttendanceRequest } from "@/types/events";
+import { Event, RoleRequest, EventParticipant, EventRole, AttendanceRequest, SpeakerProfile } from "@/types/events";
+import { imageUploadService } from "@/services/imageUpload";
 import { attendanceRequestService } from "@/services/attendanceRequests";
 import { AgendaItem } from "@/types/agenda";
 import { UserProfile } from "@/types/auth";
@@ -68,14 +69,18 @@ import {
     Lock,
     UserCheck,
     BarChart3,
-    Pencil
+    Pencil,
+    ArrowUp,
+    ArrowDown,
+    ImageIcon,
+    Link2
 } from "lucide-react";
 import Link from "next/link";
 import { fetchAttendeeRows, buildAttendeeCSV, downloadCSV } from "@/lib/exportAttendees";
 import { cn } from "@/lib/utils/cn";
 import { CATEGORY_CONFIG, CategoryKey } from "@/lib/constants/agenda";
 
-type Tab = "settings" | "agenda" | "staff" | "checkin";
+type Tab = "settings" | "agenda" | "speakers" | "staff" | "checkin";
 
 export default function EventManagePage() {
     const { id } = useParams();
@@ -134,6 +139,14 @@ export default function EventManagePage() {
     // When set, the "New Session" form edits this existing agenda item instead of creating.
     const [editingId, setEditingId] = useState<string | null>(null);
 
+    // Speaker profiles — curated cards for speakers who don't have an app account.
+    const [speakerProfiles, setSpeakerProfiles] = useState<SpeakerProfile[]>([]);
+    const [speakerForm, setSpeakerForm] = useState({ name: "", title: "", company: "", bio: "" });
+    const [editingSpeakerId, setEditingSpeakerId] = useState<string | null>(null);
+    const [speakerPhotoFile, setSpeakerPhotoFile] = useState<File | null>(null);
+    const [speakerPhotoPreview, setSpeakerPhotoPreview] = useState<string | null>(null);
+    const [speakerSaving, setSpeakerSaving] = useState(false);
+
     useEffect(() => {
         if (!id || !user) return;
 
@@ -158,6 +171,9 @@ export default function EventManagePage() {
             }
 
             setEvent(data);
+            setSpeakerProfiles(
+                (data.speakerProfiles ?? []).slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            );
             setSettingsForm({
                 title: data.title,
                 description: data.description,
@@ -349,6 +365,107 @@ export default function EventManagePage() {
         }
     };
 
+    // ---- Speaker profile handlers ----
+    const persistSpeakers = async (next: SpeakerProfile[]) => {
+        if (!event) return;
+        await eventService.updateEvent(event.id, { speakerProfiles: next });
+        setSpeakerProfiles(next);
+        setEvent((prev) => (prev ? { ...prev, speakerProfiles: next } : prev));
+    };
+
+    const resetSpeakerForm = () => {
+        setSpeakerForm({ name: "", title: "", company: "", bio: "" });
+        setSpeakerPhotoFile(null);
+        setSpeakerPhotoPreview(null);
+        setEditingSpeakerId(null);
+    };
+
+    const handleEditSpeaker = (sp: SpeakerProfile) => {
+        setEditingSpeakerId(sp.id);
+        setSpeakerForm({ name: sp.name || "", title: sp.title || "", company: sp.company || "", bio: sp.bio || "" });
+        setSpeakerPhotoFile(null);
+        setSpeakerPhotoPreview(sp.photoUrl ?? null);
+        if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const handleSpeakerPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const f = e.target.files?.[0];
+        if (!f) return;
+        setSpeakerPhotoFile(f);
+        setSpeakerPhotoPreview(URL.createObjectURL(f));
+    };
+
+    const handleSaveSpeaker = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!event || !speakerForm.name.trim()) return;
+        setSpeakerSaving(true);
+        try {
+            const id = editingSpeakerId ?? (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `sp_${Date.now()}`);
+            let photoUrl: string | undefined;
+            if (speakerPhotoFile) {
+                photoUrl = await imageUploadService.uploadImage(`events/${event.id}/speakers/${id}.jpg`, speakerPhotoFile);
+            } else {
+                // Preview holds the existing remote URL when unchanged, or null when removed.
+                photoUrl = speakerPhotoPreview ?? undefined;
+            }
+            const existing = speakerProfiles.find((s) => s.id === id);
+            const profile: SpeakerProfile = {
+                id,
+                name: speakerForm.name.trim(),
+                order: existing ? existing.order ?? 0 : speakerProfiles.length,
+                ...(speakerForm.title.trim() ? { title: speakerForm.title.trim() } : {}),
+                ...(speakerForm.company.trim() ? { company: speakerForm.company.trim() } : {}),
+                ...(speakerForm.bio.trim() ? { bio: speakerForm.bio.trim() } : {}),
+                ...(photoUrl ? { photoUrl } : {}),
+                ...(existing?.linkedUserId ? { linkedUserId: existing.linkedUserId } : {}),
+            };
+            const next = editingSpeakerId
+                ? speakerProfiles.map((s) => (s.id === id ? profile : s))
+                : [...speakerProfiles, profile];
+            await persistSpeakers(next);
+            showToast(editingSpeakerId ? "Speaker updated." : "Speaker added.", "success");
+            resetSpeakerForm();
+        } catch (err) {
+            console.error("Error saving speaker:", err);
+            showToast("Failed to save speaker.", "error");
+        } finally {
+            setSpeakerSaving(false);
+        }
+    };
+
+    const handleDeleteSpeaker = (sp: SpeakerProfile) => {
+        setConfirmModal({
+            title: "Remove speaker",
+            message: `Remove ${sp.name} from the speakers list? This can't be undone.`,
+            confirmLabel: "Remove",
+            onConfirm: async () => {
+                const next = speakerProfiles.filter((s) => s.id !== sp.id).map((s, i) => ({ ...s, order: i }));
+                try {
+                    await persistSpeakers(next);
+                    showToast("Speaker removed.", "success");
+                    if (editingSpeakerId === sp.id) resetSpeakerForm();
+                } catch {
+                    showToast("Failed to remove speaker.", "error");
+                }
+                setConfirmModal(null);
+            },
+        });
+    };
+
+    const moveSpeaker = async (spId: string, dir: -1 | 1) => {
+        const idx = speakerProfiles.findIndex((s) => s.id === spId);
+        const j = idx + dir;
+        if (idx < 0 || j < 0 || j >= speakerProfiles.length) return;
+        const next = speakerProfiles.slice();
+        [next[idx], next[j]] = [next[j], next[idx]];
+        const reordered = next.map((s, i) => ({ ...s, order: i }));
+        try {
+            await persistSpeakers(reordered);
+        } catch {
+            showToast("Failed to reorder speakers.", "error");
+        }
+    };
+
     const resetAgendaForm = () => {
         setNewAgendaItem({
             title: "", startTime: "", endTime: "", location: "", speaker: "",
@@ -522,6 +639,7 @@ export default function EventManagePage() {
 
     const tabs = [
         { id: "agenda", label: "Agenda", icon: Layout },
+        { id: "speakers", label: "Speakers", icon: Mic },
         { id: "checkin", label: "Check-in", icon: UserCheck },
         { id: "staff", label: "Staff", icon: Users },
         { id: "settings", label: "Settings", icon: Settings },
@@ -657,6 +775,180 @@ export default function EventManagePage() {
                                     </div>
                                 </form>
                             </GlassCard>
+                        )}
+
+                        {activeTab === "speakers" && (
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                {/* Add / edit speaker */}
+                                <GlassCard className="!p-8 border-2 border-accent/20 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full -mr-32 -mt-32 blur-[100px]" />
+                                    <div className="relative flex items-center justify-between mb-8">
+                                        <div>
+                                            <h3 className="text-2xl font-black text-surface-dark dark:text-white flex items-center gap-3">
+                                                <Mic size={26} className="text-accent" /> {editingSpeakerId ? "Edit Speaker" : "Add Speaker"}
+                                            </h3>
+                                            <p className="text-sm font-medium text-surface-dark/40 dark:text-white/40 mt-1">
+                                                Curated speaker cards. No account needed — link to an attendee later once they join.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <form onSubmit={handleSaveSpeaker} className="relative space-y-6">
+                                        <div className="flex flex-col sm:flex-row gap-6 sm:items-start">
+                                            {/* Photo */}
+                                            <div className="flex flex-col items-center gap-3">
+                                                <div className="w-28 h-28 rounded-2xl overflow-hidden bg-surface-dark/5 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 flex items-center justify-center">
+                                                    {speakerPhotoPreview ? (
+                                                        // eslint-disable-next-line @next/next/no-img-element
+                                                        <img src={speakerPhotoPreview} alt="Speaker" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <ImageIcon size={28} className="text-surface-dark/30 dark:text-white/30" />
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/10 hover:bg-accent/20 text-accent text-xs font-bold transition-colors">
+                                                        <ImageIcon size={13} /> {speakerPhotoPreview ? "Change" : "Photo"}
+                                                        <input type="file" accept="image/*" className="hidden" onChange={handleSpeakerPhotoChange} />
+                                                    </label>
+                                                    {speakerPhotoPreview && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => { setSpeakerPhotoFile(null); setSpeakerPhotoPreview(null); }}
+                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface-dark/5 dark:bg-white/5 hover:bg-red-500/10 text-surface-dark/50 dark:text-white/50 hover:text-red-500 text-xs font-bold transition-colors"
+                                                        >
+                                                            <X size={13} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Fields */}
+                                            <div className="flex-1 space-y-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-bold text-surface-dark dark:text-white ml-1 italic opacity-50">Full Name</label>
+                                                    <Input
+                                                        placeholder="e.g. Dr. Francis Lwanga"
+                                                        value={speakerForm.name}
+                                                        onChange={(e) => setSpeakerForm({ ...speakerForm, name: e.target.value })}
+                                                        required
+                                                    />
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-bold text-surface-dark dark:text-white ml-1 italic opacity-50">Title / Role</label>
+                                                        <Input
+                                                            placeholder="e.g. CEO"
+                                                            value={speakerForm.title}
+                                                            onChange={(e) => setSpeakerForm({ ...speakerForm, title: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-bold text-surface-dark dark:text-white ml-1 italic opacity-50">Company / Org</label>
+                                                        <Input
+                                                            placeholder="e.g. ZECHL"
+                                                            value={speakerForm.company}
+                                                            onChange={(e) => setSpeakerForm({ ...speakerForm, company: e.target.value })}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-surface-dark dark:text-white ml-1 italic opacity-50">Bio</label>
+                                            <textarea
+                                                className="w-full px-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 text-surface-dark dark:text-white font-medium min-h-[120px]"
+                                                placeholder="A short professional bio for this speaker."
+                                                value={speakerForm.bio}
+                                                onChange={(e) => setSpeakerForm({ ...speakerForm, bio: e.target.value })}
+                                            />
+                                        </div>
+
+                                        <div className="flex items-center gap-3 pt-2">
+                                            <Button type="submit" className="px-8 py-3 font-black" disabled={speakerSaving || !speakerForm.name.trim()}>
+                                                {speakerSaving ? <Loader2 className="animate-spin mx-auto" size={20} /> : editingSpeakerId ? "Save Speaker" : "Add Speaker"}
+                                            </Button>
+                                            {editingSpeakerId && (
+                                                <button
+                                                    type="button"
+                                                    onClick={resetSpeakerForm}
+                                                    className="px-5 py-3 rounded-xl text-surface-dark/50 dark:text-white/50 hover:text-surface-dark dark:hover:text-white font-bold text-sm transition-colors"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            )}
+                                        </div>
+                                    </form>
+                                </GlassCard>
+
+                                {/* Speaker list */}
+                                {speakerProfiles.length === 0 ? (
+                                    <div className="text-center py-12 text-surface-dark/40 dark:text-white/40 font-medium">
+                                        No speakers yet. Add your first speaker above.
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {speakerProfiles.map((sp, i) => (
+                                            <GlassCard key={sp.id} className="!p-4">
+                                                <div className="flex items-center gap-4">
+                                                    <AvatarDisplay avatarUrl={sp.photoUrl ?? null} fullName={sp.name} size={52} />
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <span className="font-black text-surface-dark dark:text-white truncate">{sp.name}</span>
+                                                            {sp.linkedUserId && (
+                                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/10 text-accent text-[10px] font-bold uppercase tracking-wide">
+                                                                    <Link2 size={10} /> Linked
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {(sp.title || sp.company) && (
+                                                            <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50 truncate">
+                                                                {[sp.title, sp.company].filter(Boolean).join(" · ")}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => moveSpeaker(sp.id, -1)}
+                                                            disabled={i === 0}
+                                                            className="p-2 rounded-lg text-surface-dark/40 dark:text-white/40 hover:bg-surface-dark/5 dark:hover:bg-white/5 disabled:opacity-20 transition-colors"
+                                                            aria-label="Move up"
+                                                        >
+                                                            <ArrowUp size={16} />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => moveSpeaker(sp.id, 1)}
+                                                            disabled={i === speakerProfiles.length - 1}
+                                                            className="p-2 rounded-lg text-surface-dark/40 dark:text-white/40 hover:bg-surface-dark/5 dark:hover:bg-white/5 disabled:opacity-20 transition-colors"
+                                                            aria-label="Move down"
+                                                        >
+                                                            <ArrowDown size={16} />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleEditSpeaker(sp)}
+                                                            className="p-2 rounded-lg text-surface-dark/50 dark:text-white/50 hover:bg-accent/10 hover:text-accent transition-colors"
+                                                            aria-label="Edit speaker"
+                                                        >
+                                                            <Pencil size={16} />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleDeleteSpeaker(sp)}
+                                                            className="p-2 rounded-lg text-surface-dark/50 dark:text-white/50 hover:bg-red-500/10 hover:text-red-500 transition-colors"
+                                                            aria-label="Remove speaker"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </GlassCard>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         )}
 
                         {activeTab === "agenda" && (

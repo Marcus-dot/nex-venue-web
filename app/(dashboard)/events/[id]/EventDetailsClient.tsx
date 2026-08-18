@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { eventService } from "@/services/events";
@@ -239,6 +239,33 @@ export default function EventDetailsClient() {
     const isExhibitor = user && event.exhibitors?.includes(user.uid);
     const isStaff = isOrganiser || isSpeaker || isExhibitor || user?.uid === event.creatorId;
 
+    // Merge account-based speakers (EventParticipant, role=speaker) with curated
+    // speaker cards (event.speakerProfiles). A curated card that's linked to an
+    // account already shown as a participant is dropped to avoid duplicates.
+    const displaySpeakers = useMemo(() => {
+        const accountSpeakers = participants.filter(p => p.role === 'speaker');
+        const accountIds = new Set(accountSpeakers.map(p => p.id));
+        const fromAccounts = accountSpeakers.map(p => ({
+            key: p.id,
+            name: p.displayName,
+            subtitle: p.company || "Guest Speaker",
+            photoUrl: p.photoUrl,
+            bio: p.bio,
+        }));
+        const fromProfiles = (event.speakerProfiles ?? [])
+            .slice()
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .filter(sp => !(sp.linkedUserId && accountIds.has(sp.linkedUserId)))
+            .map(sp => ({
+                key: sp.id,
+                name: sp.name,
+                subtitle: [sp.title, sp.company].filter(Boolean).join(" · ") || "Guest Speaker",
+                photoUrl: sp.photoUrl,
+                bio: sp.bio,
+            }));
+        return [...fromAccounts, ...fromProfiles];
+    }, [participants, event.speakerProfiles]);
+
     return (
         <div ref={containerRef} className="min-h-screen pb-20">
             {/* Dynamic Background */}
@@ -337,24 +364,24 @@ export default function EventDetailsClient() {
                     </div>
 
                     {/* Speakers Section */}
-                    {participants.filter(p => p.role === 'speaker').length > 0 && (
+                    {displaySpeakers.length > 0 && (
                         <div>
                             <h3 className="text-3xl font-black text-surface-dark dark:text-white mb-8 flex items-center gap-3">
                                 <Mic size={28} className="text-accent" /> Featured Speakers
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {participants.filter(p => p.role === 'speaker').map(speaker => (
-                                    <GlassCard key={speaker.id} className="!p-6 flex flex-col gap-4">
+                                {displaySpeakers.map(speaker => (
+                                    <GlassCard key={speaker.key} className="!p-6 flex flex-col gap-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center text-accent font-black text-2xl overflow-hidden">
+                                            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center text-accent font-black text-2xl overflow-hidden shrink-0">
                                                 {speaker.photoUrl
-                                                    ? <img src={speaker.photoUrl} alt={speaker.displayName} className="w-full h-full object-cover" />
-                                                    : speaker.displayName[0]
+                                                    ? <img src={speaker.photoUrl} alt={speaker.name} className="w-full h-full object-cover" />
+                                                    : (speaker.name[0] || "?")
                                                 }
                                             </div>
                                             <div>
-                                                <div className="text-xl font-black text-surface-dark dark:text-white">{speaker.displayName}</div>
-                                                <div className="text-sm font-bold text-accent uppercase tracking-wider">{speaker.company || "Guest Speaker"}</div>
+                                                <div className="text-xl font-black text-surface-dark dark:text-white">{speaker.name}</div>
+                                                <div className="text-sm font-bold text-accent uppercase tracking-wider">{speaker.subtitle}</div>
                                             </div>
                                         </div>
                                         <p className="text-surface-dark/60 dark:text-white/60 font-medium line-clamp-3">
