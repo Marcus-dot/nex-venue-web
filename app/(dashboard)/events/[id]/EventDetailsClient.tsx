@@ -262,10 +262,13 @@ export default function EventDetailsClient() {
         { id: 'exhibitor', label: 'Exhibitor', icon: Store, desc: 'Showcase your company or products with a booth.' },
     ];
 
+    const isAdmin = profile?.role === "admin";
     const isOrganiser = user && event.organisers?.includes(user.uid);
     const isSpeaker = user && event.speakers?.includes(user.uid);
     const isExhibitor = user && event.exhibitors?.includes(user.uid);
     const isStaff = isOrganiser || isSpeaker || isExhibitor || user?.uid === event.creatorId;
+    // Platform admins can manage any event even if they aren't listed as staff.
+    const canManage = isStaff || isAdmin;
 
     return (
         <div ref={containerRef} className="min-h-screen pb-20">
@@ -488,7 +491,7 @@ export default function EventDetailsClient() {
                                 </Button>
                             )}
 
-                            {isAttending && !isStaff && (
+                            {isAttending && !isStaff && !isAdmin && (
                                 <Button
                                     variant="outline"
                                     className="w-full text-lg !py-5 gap-2"
@@ -498,7 +501,7 @@ export default function EventDetailsClient() {
                                 </Button>
                             )}
 
-                            {isStaff && (
+                            {canManage && (
                                 <Link href={`/events/${event.id}/manage`} className="block">
                                     <Button variant="outline" className="w-full text-lg !py-5 gap-2 border-accent text-accent">
                                         <Shield size={20} /> Event Management
