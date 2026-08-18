@@ -145,6 +145,34 @@ export default function EventDetailsClient() {
         return () => { active = false; };
     }, [user, event]);
 
+    // Merge account-based speakers (EventParticipant, role=speaker) with curated
+    // speaker cards (event.speakerProfiles); a curated card linked to an account
+    // already shown as a participant is dropped to avoid duplicates.
+    // NOTE: must stay above the early returns below — it's a hook.
+    const displaySpeakers = useMemo(() => {
+        const accountSpeakers = participants.filter(p => p.role === 'speaker');
+        const accountIds = new Set(accountSpeakers.map(p => p.id));
+        const fromAccounts = accountSpeakers.map(p => ({
+            key: p.id,
+            name: p.displayName,
+            subtitle: p.company || "Guest Speaker",
+            photoUrl: p.photoUrl,
+            bio: p.bio,
+        }));
+        const fromProfiles = (event?.speakerProfiles ?? [])
+            .slice()
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .filter(sp => !(sp.linkedUserId && accountIds.has(sp.linkedUserId)))
+            .map(sp => ({
+                key: sp.id,
+                name: sp.name,
+                subtitle: [sp.title, sp.company].filter(Boolean).join(" · ") || "Guest Speaker",
+                photoUrl: sp.photoUrl,
+                bio: sp.bio,
+            }));
+        return [...fromAccounts, ...fromProfiles];
+    }, [participants, event?.speakerProfiles]);
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background dark:bg-[#0f101e]">
@@ -238,33 +266,6 @@ export default function EventDetailsClient() {
     const isSpeaker = user && event.speakers?.includes(user.uid);
     const isExhibitor = user && event.exhibitors?.includes(user.uid);
     const isStaff = isOrganiser || isSpeaker || isExhibitor || user?.uid === event.creatorId;
-
-    // Merge account-based speakers (EventParticipant, role=speaker) with curated
-    // speaker cards (event.speakerProfiles). A curated card that's linked to an
-    // account already shown as a participant is dropped to avoid duplicates.
-    const displaySpeakers = useMemo(() => {
-        const accountSpeakers = participants.filter(p => p.role === 'speaker');
-        const accountIds = new Set(accountSpeakers.map(p => p.id));
-        const fromAccounts = accountSpeakers.map(p => ({
-            key: p.id,
-            name: p.displayName,
-            subtitle: p.company || "Guest Speaker",
-            photoUrl: p.photoUrl,
-            bio: p.bio,
-        }));
-        const fromProfiles = (event.speakerProfiles ?? [])
-            .slice()
-            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .filter(sp => !(sp.linkedUserId && accountIds.has(sp.linkedUserId)))
-            .map(sp => ({
-                key: sp.id,
-                name: sp.name,
-                subtitle: [sp.title, sp.company].filter(Boolean).join(" · ") || "Guest Speaker",
-                photoUrl: sp.photoUrl,
-                bio: sp.bio,
-            }));
-        return [...fromAccounts, ...fromProfiles];
-    }, [participants, event.speakerProfiles]);
 
     return (
         <div ref={containerRef} className="min-h-screen pb-20">
