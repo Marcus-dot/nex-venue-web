@@ -689,6 +689,15 @@ export default function EventManagePage() {
                                 >
                                     <BarChart3 size={16} /> Post-event report
                                 </Link>
+                                <a
+                                    href={`/qa/${id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-dark/5 dark:bg-white/5 hover:bg-surface-dark/10 dark:hover:bg-white/10 text-surface-dark dark:text-white text-sm font-bold transition-colors"
+                                    title="Opens the big-screen Q&A display in a new tab — put it on the projector"
+                                >
+                                    <Monitor size={16} /> Open projection view
+                                </a>
                             </div>
                         </div>
 
