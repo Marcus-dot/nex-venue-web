@@ -84,27 +84,29 @@ export const Navigation = () => {
                     <span className="text-xl font-black tracking-tighter text-surface-dark dark:text-white hidden sm:inline">NexVenue</span>
                 </Link>
 
-                {/* Primary nav */}
-                <div className="flex items-center gap-1">
-                    {navItems.map((item) => {
-                        const isActive = pathname.startsWith(item.href);
-                        return (
-                            <Link key={item.href} href={item.href}>
-                                <span
-                                    className={cn(
-                                        "px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all font-bold text-sm",
-                                        isActive
-                                            ? "bg-accent/10 text-accent"
-                                            : "text-surface-dark/45 dark:text-white/45 hover:text-surface-dark dark:hover:text-white hover:bg-surface-dark/5 dark:hover:bg-white/5"
-                                    )}
-                                >
-                                    <item.icon size={18} />
-                                    <span className="hidden md:inline">{item.label}</span>
-                                </span>
-                            </Link>
-                        );
-                    })}
-                </div>
+                {/* Primary nav — app items only for signed-in users */}
+                {user && (
+                    <div className="flex items-center gap-1">
+                        {navItems.map((item) => {
+                            const isActive = pathname.startsWith(item.href);
+                            return (
+                                <Link key={item.href} href={item.href}>
+                                    <span
+                                        className={cn(
+                                            "px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all font-bold text-sm",
+                                            isActive
+                                                ? "bg-accent/10 text-accent"
+                                                : "text-surface-dark/45 dark:text-white/45 hover:text-surface-dark dark:hover:text-white hover:bg-surface-dark/5 dark:hover:bg-white/5"
+                                        )}
+                                    >
+                                        <item.icon size={18} />
+                                        <span className="hidden md:inline">{item.label}</span>
+                                    </span>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                )}
 
                 {/* Actions + account */}
                 <div className="flex items-center gap-2 shrink-0">
@@ -176,9 +178,14 @@ export const Navigation = () => {
                             </div>
                         </>
                     ) : (
-                        <Link href="/login">
-                            <Button size="sm" className="font-black">Sign In</Button>
-                        </Link>
+                        <>
+                            <Link href="/login">
+                                <Button variant="ghost" size="sm" className="font-bold">Sign In</Button>
+                            </Link>
+                            <Link href="/register">
+                                <Button size="sm" className="font-black">Join Now</Button>
+                            </Link>
+                        </>
                     )}
                 </div>
             </div>
