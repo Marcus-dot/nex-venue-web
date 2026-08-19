@@ -14,7 +14,12 @@ export function getCleanErrorMessage(err: any, defaultMessage: string = "An unex
     if (str.includes("auth/invalid-verification-code")) return "Invalid verification code. Please check the SMS and try again.";
     if (str.includes("auth/invalid-phone-number")) return "Invalid phone number. Ensure it includes the country code (e.g. +27).";
     if (str.includes("auth/code-expired")) return "The SMS code has expired. Please request a new one.";
-    if (str.includes("auth/captcha-check-failed")) return "reCAPTCHA verification failed. Please try again.";
-    
+    if (str.includes("auth/captcha-check-failed")) return "reCAPTCHA verification failed. Please reload and try again.";
+    if (str.includes("auth/missing-phone-number")) return "Please enter your phone number.";
+    if (str.includes("auth/quota-exceeded")) return "SMS limit reached for now. Please try again later or use Google sign-in.";
+
+    // Connectivity
+    if (str.includes("auth/network-request-failed") || str.includes("network")) return "Network error. Check your connection and try again.";
+
     return defaultMessage;
 }

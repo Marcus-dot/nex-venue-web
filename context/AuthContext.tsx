@@ -18,6 +18,17 @@ import { auth, db } from "@/lib/firebase/config";
 import { doc, getDoc, updateDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { UserProfile, UserRole } from "@/types/auth";
 
+// Single reCAPTCHA verifier reused across attempts. Creating a new one on the
+// same container each call throws "reCAPTCHA has already been rendered", which
+// would make every retry fail after one transient error until a page reload.
+let activeRecaptcha: RecaptchaVerifier | null = null;
+const resetRecaptcha = () => {
+    if (activeRecaptcha) {
+        try { activeRecaptcha.clear(); } catch { /* already gone */ }
+        activeRecaptcha = null;
+    }
+};
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AuthContextType {
@@ -218,12 +229,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         phoneNumber: string,
         recaptchaContainerId: string
     ): Promise<void> => {
-        // Create an invisible reCAPTCHA — Firebase requires this for phone auth on web
-        const verifier = new RecaptchaVerifier(auth, recaptchaContainerId, {
-            size: "invisible",
-        });
-        const result = await signInWithPhoneNumber(auth, phoneNumber, verifier);
-        setConfirmationResult(result);
+        // Tear down any previous verifier so a retry doesn't hit
+        // "reCAPTCHA has already been rendered in this element".
+        resetRecaptcha();
+        const verifier = new RecaptchaVerifier(auth, recaptchaContainerId, { size: "invisible" });
+        activeRecaptcha = verifier;
+        try {
+            const result = await signInWithPhoneNumber(auth, phoneNumber, verifier);
+            setConfirmationResult(result);
+        } catch (err) {
+            // Clear so the next attempt starts from a clean reCAPTCHA.
+            resetRecaptcha();
+            throw err;
+        }
     };
 
     // ── Google ────────────────────────────────────────────────────────────────
