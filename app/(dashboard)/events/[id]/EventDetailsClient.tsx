@@ -271,22 +271,23 @@ export default function EventDetailsClient() {
     const canManage = isStaff || isAdmin;
 
     return (
-        <div ref={containerRef} className="min-h-screen pb-20">
-            {/* Dynamic Background */}
+        <div ref={containerRef} className="relative min-h-screen pb-20">
+            {/* Hero backdrop — absolute so it scrolls away with the hero instead of
+                bleeding behind the whole page. Strong scrim keeps the white hero
+                text legible over any banner (light posters included). */}
             <div
-                className="fixed top-0 left-0 w-full h-[60vh] -z-10 overflow-hidden"
+                className="absolute top-0 left-0 w-full h-[58vh] -z-10 overflow-hidden"
                 style={{ background: getEventGradient(event.title) }}
             >
                 {event.imageUrl && (
-                    <div className="absolute inset-0">
-                        <img
-                            src={event.imageUrl}
-                            alt=""
-                            className="w-full h-full object-cover opacity-60 blur-[2px]"
-                        />
-                    </div>
+                    <img
+                        src={event.imageUrl}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover opacity-45 blur-[3px] scale-105"
+                    />
                 )}
-                <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/30 to-[#fafaf8] dark:to-[#0f101e]" />
+                {/* Darken top (nav + title) and fade to the page background at the bottom */}
+                <div className="absolute inset-0 bg-linear-to-b from-black/55 via-black/45 to-[#fafaf8] dark:to-[#0f101e]" />
             </div>
 
             {/* Navigation */}
