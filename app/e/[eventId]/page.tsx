@@ -15,6 +15,7 @@ import {
     setDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
+import type { SpeakerProfile } from "@/types/events";
 import { AnimatePresence, motion } from "framer-motion";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -43,6 +44,7 @@ interface EventData {
     location: string;
     imageUrl?: string;
     currentAgendaItem?: string | null;
+    speakerProfiles?: SpeakerProfile[];
 }
 
 interface AgendaItem {
@@ -444,7 +446,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
     const [agenda, setAgenda] = useState<AgendaItem[]>([]);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [polls, setPolls] = useState<Poll[]>([]);
-    const [tab, setTab] = useState<"agenda" | "qa" | "polls">("agenda");
+    const [tab, setTab] = useState<"agenda" | "speakers" | "qa" | "polls">("agenda");
     const [now, setNow] = useState<Date>(new Date());
 
     // Q&A form
@@ -572,6 +574,14 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
     const nowMinutes = now.getHours() * 60 + now.getMinutes();
     const days = groupByDate(agenda);
 
+    const speakers = (event?.speakerProfiles ?? []).slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    const tabList: ("agenda" | "speakers" | "qa" | "polls")[] = [
+        "agenda",
+        ...(speakers.length > 0 ? (["speakers"] as const) : []),
+        "qa",
+        "polls",
+    ];
+
     // Manual override takes priority; fall back to time-based detection
     const manualLiveId = event?.currentAgendaItem ?? null;
     const liveSession = manualLiveId
@@ -682,14 +692,14 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
 
             {/* ── Tabs ── */}
             <div className="px-5 flex gap-1 mt-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                {(["agenda", "qa", "polls"] as const).map((t) => (
+                {tabList.map((t) => (
                     <button
                         key={t}
                         onClick={() => setTab(t)}
                         className="relative px-4 py-3 text-sm font-semibold transition-colors"
                         style={{ color: tab === t ? "white" : "rgba(255,255,255,0.35)" }}
                     >
-                        {t === "agenda" ? "Agenda" : t === "qa" ? "Q&A" : (
+                        {t === "agenda" ? "Agenda" : t === "speakers" ? "Speakers" : t === "qa" ? "Q&A" : (
                             <span className="flex items-center gap-1.5">
                                 Polls
                                 {polls.length > 0 && (
@@ -776,6 +786,63 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                 })}
                             </div>
                         )}
+                    </motion.div>
+                )}
+                {tab === "speakers" && (
+                    <motion.div
+                        key="speakers"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        className="px-5 py-5 flex flex-col gap-3"
+                    >
+                        {speakers.map((sp, i) => {
+                            const initials = sp.name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+                            const subtitle = [sp.title, sp.company].filter(Boolean).join(" · ");
+                            return (
+                                <motion.div
+                                    key={sp.id}
+                                    initial={{ opacity: 0, y: 12 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.3, delay: i * 0.05, ease: "easeOut" }}
+                                    className="rounded-2xl p-5"
+                                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        {sp.photoUrl ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img
+                                                src={sp.photoUrl}
+                                                alt={sp.name}
+                                                className="w-14 h-14 rounded-full object-cover shrink-0"
+                                                style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+                                            />
+                                        ) : (
+                                            <div
+                                                className="w-14 h-14 rounded-full shrink-0 flex items-center justify-center font-bold text-lg"
+                                                style={{ background: "rgba(232,92,41,0.15)", color: accent }}
+                                            >
+                                                {initials || "?"}
+                                            </div>
+                                        )}
+                                        <div className="min-w-0">
+                                            <p className="text-white font-bold text-base leading-tight">{sp.name}</p>
+                                            {subtitle && (
+                                                <p className="text-xs font-semibold uppercase mt-1" style={{ color: accent, letterSpacing: "0.04em" }}>
+                                                    {subtitle}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {sp.bio && (
+                                        <p className="text-sm leading-relaxed mt-4" style={{ color: "rgba(255,255,255,0.5)" }}>
+                                            {sp.bio}
+                                        </p>
+                                    )}
+                                </motion.div>
+                            );
+                        })}
                     </motion.div>
                 )}
                 {tab === "qa" && (
