@@ -462,14 +462,25 @@ export default function ProfilePage() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     {[
-                                        { title: "User Management", sub: "Audit and manage users" },
+                                        { title: "User Management", sub: "Audit and manage users", href: "/users" as const },
                                         { title: "Moderation Tools", sub: "Review flagged content" },
-                                    ].map((item) => (
-                                        <div key={item.title} className="p-3.5 rounded-xl bg-surface-dark/5 dark:bg-white/5">
-                                            <div className="text-sm font-black text-surface-dark dark:text-white mb-0.5">{item.title}</div>
-                                            <div className="text-[11px] text-surface-dark/40 dark:text-white/40 font-medium">{item.sub}</div>
-                                        </div>
-                                    ))}
+                                    ].map((item) =>
+                                        item.href ? (
+                                            <button
+                                                key={item.title}
+                                                onClick={() => router.push(item.href)}
+                                                className="p-3.5 rounded-xl bg-surface-dark/5 dark:bg-white/5 hover:bg-accent/10 hover:border-accent/20 border border-transparent text-left transition-colors"
+                                            >
+                                                <div className="text-sm font-black text-surface-dark dark:text-white mb-0.5">{item.title}</div>
+                                                <div className="text-[11px] text-surface-dark/40 dark:text-white/40 font-medium">{item.sub}</div>
+                                            </button>
+                                        ) : (
+                                            <div key={item.title} className="p-3.5 rounded-xl bg-surface-dark/5 dark:bg-white/5 opacity-60">
+                                                <div className="text-sm font-black text-surface-dark dark:text-white mb-0.5">{item.title}</div>
+                                                <div className="text-[11px] text-surface-dark/40 dark:text-white/40 font-medium">{item.sub}</div>
+                                            </div>
+                                        )
+                                    )}
                                 </div>
                             </GlassCard>
                         )}
