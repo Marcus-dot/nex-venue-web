@@ -72,7 +72,6 @@ export default function LandingPage() {
 
           <div className="hidden md:flex items-center gap-8">
             <Link href="#features" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent transition-colors">Features</Link>
-            <Link href="/events" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent transition-colors">Events</Link>
             <div className="w-px h-4 bg-surface-dark/10 dark:bg-white/10" />
             <Link href="/login">
               <Button variant="ghost" className="font-bold">Sign In</Button>

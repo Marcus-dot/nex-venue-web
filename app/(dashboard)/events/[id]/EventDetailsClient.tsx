@@ -574,9 +574,14 @@ export default function EventDetailsClient() {
                             <>
                                 <div className="flex items-center -space-x-3 mb-4">
                                     {attendeePreviews.slice(0, 5).map((a) => (
-                                        <div key={a.uid} className="rounded-full ring-2 ring-white dark:ring-gray-900">
+                                        <Link
+                                            key={a.uid}
+                                            href={`/profile/${a.uid}`}
+                                            title={a.fullName}
+                                            className="rounded-full ring-2 ring-white dark:ring-gray-900 transition-transform hover:scale-110 hover:z-10"
+                                        >
                                             <AvatarDisplay avatarUrl={a.avatar} fullName={a.fullName} size={40} />
-                                        </div>
+                                        </Link>
                                     ))}
                                     {attendeeCount > 5 && (
                                         <div className="w-10 h-10 rounded-full bg-accent text-white ring-2 ring-white dark:ring-gray-900 flex items-center justify-center text-[11px] font-black">
