@@ -74,6 +74,7 @@ export default function EventDetailsClient() {
     const [showTicket, setShowTicket] = useState(false);
     const [checkedIn, setCheckedIn] = useState(false);
     const [attendeePreviews, setAttendeePreviews] = useState<UserSummary[]>([]);
+    const [selectedSpeaker, setSelectedSpeaker] = useState<{ key: string; name: string; subtitle: string; photoUrl?: string; bio?: string } | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -405,7 +406,7 @@ export default function EventDetailsClient() {
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {displaySpeakers.map(speaker => (
-                                    <GlassCard key={speaker.key} className="!p-6 flex flex-col gap-4">
+                                    <GlassCard key={speaker.key} onClick={() => setSelectedSpeaker(speaker)} className="!p-6 flex flex-col gap-4">
                                         <div className="flex items-center gap-4">
                                             <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center text-accent font-black text-2xl overflow-hidden shrink-0">
                                                 {speaker.photoUrl
@@ -413,14 +414,17 @@ export default function EventDetailsClient() {
                                                     : (speaker.name[0] || "?")
                                                 }
                                             </div>
-                                            <div>
-                                                <div className="text-xl font-black text-surface-dark dark:text-white">{speaker.name}</div>
+                                            <div className="min-w-0">
+                                                <div className="text-xl font-black text-surface-dark dark:text-white truncate">{speaker.name}</div>
                                                 <div className="text-sm font-bold text-accent uppercase tracking-wider">{speaker.subtitle}</div>
                                             </div>
                                         </div>
                                         <p className="text-surface-dark/60 dark:text-white/60 font-medium line-clamp-3">
                                             {speaker.bio || "No bio provided."}
                                         </p>
+                                        {speaker.bio && (
+                                            <span className="text-sm font-bold text-accent mt-auto">Read full bio →</span>
+                                        )}
                                     </GlassCard>
                                 ))}
                             </div>
@@ -588,6 +592,32 @@ export default function EventDetailsClient() {
                     </GlassCard>
                 </div>
             </main>
+
+            {/* Speaker profile modal — full bio */}
+            <Modal
+                isOpen={!!selectedSpeaker}
+                onClose={() => setSelectedSpeaker(null)}
+                title="Speaker"
+            >
+                {selectedSpeaker && (
+                    <div>
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center text-accent font-black text-3xl overflow-hidden shrink-0">
+                                {selectedSpeaker.photoUrl
+                                    ? <img src={selectedSpeaker.photoUrl} alt={selectedSpeaker.name} className="w-full h-full object-cover" />
+                                    : (selectedSpeaker.name[0] || "?")}
+                            </div>
+                            <div className="min-w-0">
+                                <div className="text-2xl font-black text-surface-dark dark:text-white">{selectedSpeaker.name}</div>
+                                <div className="text-sm font-bold text-accent uppercase tracking-wider">{selectedSpeaker.subtitle}</div>
+                            </div>
+                        </div>
+                        <p className="text-surface-dark/70 dark:text-white/70 font-medium leading-relaxed whitespace-pre-line">
+                            {selectedSpeaker.bio || "No bio provided."}
+                        </p>
+                    </div>
+                )}
+            </Modal>
 
             <Modal
                 isOpen={isRequestModalOpen}

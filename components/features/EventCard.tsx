@@ -72,9 +72,6 @@ export const EventCard = ({ event }: EventCardProps) => {
     return (
         <div ref={cardRef}>
             <GlassCard className="group overflow-hidden flex flex-col h-full !p-0">
-                {/* Colored accent strip — unique per event */}
-                <div className="h-1 w-full" style={{ background: gradient }} />
-
                 <div className="relative h-48 w-full overflow-hidden">
                     {event.imageUrl ? (
                         <img
@@ -105,7 +102,7 @@ export const EventCard = ({ event }: EventCardProps) => {
                 </div>
 
                 <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-black text-surface-dark dark:text-white mb-2 line-clamp-1 transition-colors" style={{ ["--accent-color" as any]: accent }}>
+                    <h3 className="text-xl font-black text-surface-dark dark:text-white mb-2 line-clamp-1 transition-colors" style={{ "--accent-color": accent } as React.CSSProperties}>
                         {event.title}
                     </h3>
                     <p className="text-surface-dark/60 dark:text-white/60 text-sm mb-6 line-clamp-2 h-10 font-medium">
