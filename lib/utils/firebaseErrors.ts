@@ -1,6 +1,7 @@
-export function getCleanErrorMessage(err: any, defaultMessage: string = "An unexpected error occurred. Please try again."): string {
-    const code = err?.code || "";
-    const message = err?.message || "";
+export function getCleanErrorMessage(err: unknown, defaultMessage: string = "An unexpected error occurred. Please try again."): string {
+    const e = err as { code?: string; message?: string } | null | undefined;
+    const code = e?.code || "";
+    const message = e?.message || "";
     const str = `${code} ${message}`.toLowerCase();
 
     // Email / Password Errors
