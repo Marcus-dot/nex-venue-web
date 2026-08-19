@@ -424,12 +424,23 @@ export default function ProfilePage() {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <button
-                                                    onClick={() => router.push(`/events/${event.id}`)}
-                                                    className="flex items-center gap-1 text-xs font-bold text-accent hover:underline underline-offset-2 shrink-0"
-                                                >
-                                                    View <ExternalLink size={11} />
-                                                </button>
+                                                <div className="flex items-center gap-3 shrink-0">
+                                                    <button
+                                                        onClick={() => router.push(`/events/${event.id}`)}
+                                                        className="flex items-center gap-1 text-xs font-bold text-accent hover:underline underline-offset-2"
+                                                    >
+                                                        View <ExternalLink size={11} />
+                                                    </button>
+                                                    {(profile?.role === "admin" || event.organisers?.includes(user?.uid ?? "") || event.creatorId === user?.uid) && (
+                                                        <Button
+                                                            onClick={() => router.push(`/events/${event.id}/manage`)}
+                                                            size="sm"
+                                                            className="font-black h-8 px-4 rounded-xl text-xs"
+                                                        >
+                                                            Manage
+                                                        </Button>
+                                                    )}
+                                                </div>
                                             </GlassCard>
                                         );
                                     })}
