@@ -14,20 +14,22 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Modal } from "@/components/ui/Modal";
 import { AgendaList } from "@/components/features/AgendaList";
 import { TicketModal } from "@/components/features/TicketModal";
+import { AvatarDisplay } from "@/components/ui/AvatarDisplay";
+import { usersService, type UserSummary } from "@/services/users";
 import {
     Calendar,
     MapPin,
     Users,
     ArrowLeft,
     Share2,
-    Bookmark,
     Loader2,
     Clock,
     Info,
     Shield,
     Mic,
     Store,
-    QrCode
+    QrCode,
+    type LucideIcon
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
@@ -71,6 +73,7 @@ export default function EventDetailsClient() {
     const [attendanceLoading, setAttendanceLoading] = useState(false);
     const [showTicket, setShowTicket] = useState(false);
     const [checkedIn, setCheckedIn] = useState(false);
+    const [attendeePreviews, setAttendeePreviews] = useState<UserSummary[]>([]);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -144,6 +147,17 @@ export default function EventDetailsClient() {
             .catch(() => { /* non-fatal */ });
         return () => { active = false; };
     }, [user, event]);
+
+    // Load a few real attendee avatars for the "Attendees" preview stack.
+    useEffect(() => {
+        const ids = (event?.attendees ?? []).slice(0, 12);
+        if (ids.length === 0) { setAttendeePreviews([]); return; }
+        let active = true;
+        usersService.getUserSummaries(ids)
+            .then((map) => { if (active) setAttendeePreviews(Object.values(map)); })
+            .catch(() => { /* non-fatal */ });
+        return () => { active = false; };
+    }, [event?.attendees]);
 
     // Merge account-based speakers (EventParticipant, role=speaker) with curated
     // speaker cards (event.speakerProfiles); a curated card linked to an account
@@ -256,7 +270,7 @@ export default function EventDetailsClient() {
         }
     };
 
-    const roles: { id: 'organiser' | 'speaker' | 'exhibitor', label: string, icon: any, desc: string }[] = [
+    const roles: { id: 'organiser' | 'speaker' | 'exhibitor', label: string, icon: LucideIcon, desc: string }[] = [
         { id: 'organiser', label: 'Organiser', icon: Shield, desc: 'Assist in managing the event and reviewing requests.' },
         { id: 'speaker', label: 'Speaker', icon: Mic, desc: 'Present a session or host a workshop.' },
         { id: 'exhibitor', label: 'Exhibitor', icon: Store, desc: 'Showcase your company or products with a booth.' },
@@ -269,6 +283,22 @@ export default function EventDetailsClient() {
     const isStaff = isOrganiser || isSpeaker || isExhibitor || user?.uid === event.creatorId;
     // Platform admins can manage any event even if they aren't listed as staff.
     const canManage = isStaff || isAdmin;
+
+    const handleShare = async () => {
+        const url = `${window.location.origin}/e/${event.id}`;
+        try {
+            if (navigator.share) {
+                await navigator.share({ title: event.title, url });
+            } else {
+                await navigator.clipboard.writeText(url);
+                showToast("Event link copied to clipboard.", "success");
+            }
+        } catch {
+            /* user dismissed the share sheet — no-op */
+        }
+    };
+
+    const attendeeCount = event.attendees?.length ?? 0;
 
     return (
         <div ref={containerRef} className="relative min-h-screen pb-20">
@@ -299,14 +329,13 @@ export default function EventDetailsClient() {
                     <ArrowLeft size={24} />
                 </button>
 
-                <div className="flex gap-4">
-                    <button className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all shadow-lg">
-                        <Share2 size={24} />
-                    </button>
-                    <button className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all shadow-lg">
-                        <Bookmark size={24} />
-                    </button>
-                </div>
+                <button
+                    onClick={handleShare}
+                    aria-label="Share event"
+                    className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all shadow-lg"
+                >
+                    <Share2 size={24} />
+                </button>
             </nav>
 
             <main className="max-w-7xl mx-auto px-8 py-4 grid grid-cols-1 lg:grid-cols-3 gap-12 relative z-10">
@@ -533,19 +562,29 @@ export default function EventDetailsClient() {
 
                     <GlassCard className="!p-8">
                         <h4 className="font-black text-surface-dark dark:text-white mb-6">Attendees</h4>
-                        <div className="flex items-center -space-x-3 mb-4">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <div key={i} className="w-10 h-10 rounded-full bg-surface-dark/10 dark:bg-white/10 border-2 border-white dark:border-gray-900 flex items-center justify-center text-[10px] font-black dark:text-white">
-                                    A{i}
+                        {attendeeCount === 0 ? (
+                            <p className="text-sm text-surface-dark/60 dark:text-white/60 font-medium">
+                                No one has joined yet — be the first.
+                            </p>
+                        ) : (
+                            <>
+                                <div className="flex items-center -space-x-3 mb-4">
+                                    {attendeePreviews.slice(0, 5).map((a) => (
+                                        <div key={a.uid} className="rounded-full ring-2 ring-white dark:ring-gray-900">
+                                            <AvatarDisplay avatarUrl={a.avatar} fullName={a.fullName} size={40} />
+                                        </div>
+                                    ))}
+                                    {attendeeCount > 5 && (
+                                        <div className="w-10 h-10 rounded-full bg-accent text-white ring-2 ring-white dark:ring-gray-900 flex items-center justify-center text-[11px] font-black">
+                                            +{attendeeCount - 5}
+                                        </div>
+                                    )}
                                 </div>
-                            ))}
-                            <div className="w-10 h-10 rounded-full bg-accent text-white border-2 border-white flex items-center justify-center text-[10px] font-black">
-                                +{Math.max(0, (event.attendees?.length || 0) - 5)}
-                            </div>
-                        </div>
-                        <p className="text-sm text-surface-dark/60 dark:text-white/60 font-medium">
-                            Join {event.attendees?.length || 0} others at this event.
-                        </p>
+                                <p className="text-sm text-surface-dark/60 dark:text-white/60 font-medium">
+                                    {attendeeCount === 1 ? "1 person is attending." : `${attendeeCount} people are attending.`}
+                                </p>
+                            </>
+                        )}
                     </GlassCard>
                 </div>
             </main>
@@ -557,7 +596,7 @@ export default function EventDetailsClient() {
             >
                 <div className="relative space-y-4">
                     <p className="text-surface-dark/60 dark:text-white/60 mb-6">
-                        Select the role you'd like to apply for. The event organizers will review your request.
+                        Select the role you&apos;d like to apply for. The event organisers will review your request.
                     </p>
                     {roles.map((role) => (
                         <button
