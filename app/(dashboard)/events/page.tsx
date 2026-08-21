@@ -165,7 +165,7 @@ export default function EventsPage() {
                         <h1 className="text-4xl font-black text-surface-dark dark:text-white tracking-tight">
                             Discover Events
                         </h1>
-                        <p className="text-surface-dark/50 dark:text-white/50 font-medium mt-1">
+                        <p className="text-surface-dark/60 dark:text-white/50 font-medium mt-1">
                             {allEvents.length > 0
                                 ? `${allEvents.length} event${allEvents.length !== 1 ? "s" : ""} happening${hasMore ? "+" : ""}`
                                 : "Explore what's happening in your community"}
@@ -174,13 +174,13 @@ export default function EventsPage() {
 
                     {/* Search */}
                     <div className="relative w-full md:w-72">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-dark/30 dark:text-white/30" size={16} />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-dark/45 dark:text-white/30" size={16} />
                         <input
                             type="text"
                             placeholder="Search events..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl text-sm font-medium text-surface-dark dark:text-white placeholder:text-surface-dark/30 dark:placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl text-sm font-medium text-surface-dark dark:text-white placeholder:text-surface-dark/45 dark:placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
                         />
                     </div>
                 </div>
@@ -202,14 +202,14 @@ export default function EventsPage() {
                                     "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-black whitespace-nowrap transition-all border",
                                     activeTab === tab.id
                                         ? "bg-accent text-white border-accent shadow-sm shadow-accent/20"
-                                        : "bg-transparent border-surface-dark/10 dark:border-white/10 text-surface-dark/50 dark:text-white/50 hover:border-accent/40 hover:text-surface-dark dark:hover:text-white"
+                                        : "bg-transparent border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/50 hover:border-accent/40 hover:text-surface-dark dark:hover:text-white"
                                 )}
                             >
                                 {tab.label}
                                 {count > 0 && (
                                     <span className={cn(
                                         "text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center",
-                                        activeTab === tab.id ? "bg-white/20 text-white" : "bg-surface-dark/8 dark:bg-white/10 text-surface-dark/40 dark:text-white/40"
+                                        activeTab === tab.id ? "bg-white/20 text-white" : "bg-surface-dark/8 dark:bg-white/10 text-surface-dark/55 dark:text-white/40"
                                     )}>
                                         {count}
                                     </span>
@@ -257,7 +257,7 @@ export default function EventsPage() {
                             <>
                                 {/* Section label when search or filter is active */}
                                 {(search || activeTab !== "all") && (
-                                    <p className="text-xs font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest mb-5">
+                                    <p className="text-xs font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest mb-5">
                                         {filtered.length} result{filtered.length !== 1 ? "s" : ""}
                                     </p>
                                 )}
@@ -291,7 +291,7 @@ export default function EventsPage() {
                                 <h3 className="text-xl font-black text-surface-dark dark:text-white mb-2">
                                     {search ? `No results for "${search}"` : activeTab === "my" ? "No events yet" : "Nothing here yet"}
                                 </h3>
-                                <p className="text-sm text-surface-dark/50 dark:text-white/50 max-w-xs mx-auto mb-6 font-medium">
+                                <p className="text-sm text-surface-dark/60 dark:text-white/50 max-w-xs mx-auto mb-6 font-medium">
                                     {search
                                         ? "Try a different search term or browse all events."
                                         : activeTab === "my"

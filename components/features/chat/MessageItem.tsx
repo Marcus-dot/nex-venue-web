@@ -32,7 +32,7 @@ export const MessageItem = ({ message, isConsecutive }: MessageItemProps) => {
             )}
         >
             {!isConsecutive && !isOwnMessage && (
-                <span className="text-xs font-bold text-surface-dark/40 dark:text-white/40 mb-1 ml-4">
+                <span className="text-xs font-bold text-surface-dark/55 dark:text-white/40 mb-1 ml-4">
                     {message.senderName}
                 </span>
             )}

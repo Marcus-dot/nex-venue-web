@@ -80,7 +80,7 @@ export default function ProfileSetupPage() {
                     <h1 className="text-3xl font-black text-surface-dark dark:text-white tracking-tight mb-2">
                         Welcome, let&apos;s set up<br />your profile
                     </h1>
-                    <p className="text-sm text-surface-dark/50 dark:text-white/50 font-medium">
+                    <p className="text-sm text-surface-dark/60 dark:text-white/50 font-medium">
                         Takes less than a minute. You can fill in more details later.
                     </p>
                 </div>
@@ -112,7 +112,7 @@ export default function ProfileSetupPage() {
                                 <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                             </label>
                         </div>
-                        <p className="text-xs text-surface-dark/40 dark:text-white/40 font-medium">
+                        <p className="text-xs text-surface-dark/55 dark:text-white/40 font-medium">
                             {imagePreview ? "Looking good!" : "Add a profile picture (optional)"}
                         </p>
                     </div>
@@ -133,7 +133,7 @@ export default function ProfileSetupPage() {
                     {/* Gender */}
                     <div className="space-y-2.5">
                         <label className="text-sm font-bold text-surface-dark dark:text-white">
-                            Gender <span className="text-surface-dark/30 dark:text-white/30 font-medium">(optional)</span>
+                            Gender <span className="text-surface-dark/45 dark:text-white/30 font-medium">(optional)</span>
                         </label>
                         <div className="flex flex-wrap gap-2">
                             {GENDER_OPTIONS.map((opt) => {
@@ -174,7 +174,7 @@ export default function ProfileSetupPage() {
                         }
                     </Button>
 
-                    <p className="text-center text-xs text-surface-dark/30 dark:text-white/30 font-medium">
+                    <p className="text-center text-xs text-surface-dark/45 dark:text-white/30 font-medium">
                         You can always update your profile later from settings.
                     </p>
                 </form>

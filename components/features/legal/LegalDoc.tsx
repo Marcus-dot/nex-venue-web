@@ -26,7 +26,7 @@ export function LegalDoc({ sections }: { sections: LegalSection[] }) {
                         case "title":
                             return <h1 key={i} className="text-4xl font-black text-surface-dark dark:text-white tracking-tighter mb-2">{section.text}</h1>;
                         case "meta":
-                            return <p key={i} className="text-sm font-bold text-surface-dark/40 dark:text-white/40 mb-10">{section.text}</p>;
+                            return <p key={i} className="text-sm font-bold text-surface-dark/55 dark:text-white/40 mb-10">{section.text}</p>;
                         case "heading":
                             return <h2 key={i} className="text-xl font-black text-surface-dark dark:text-white mt-10 mb-3">{section.text}</h2>;
                         case "paragraph":

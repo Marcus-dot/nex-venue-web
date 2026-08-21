@@ -222,7 +222,7 @@ export default function LandingPage() {
             <Link href="/terms" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Terms</Link>
             <a href="mailto:info@gralix.co" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Contact</a>
           </div>
-          <p className="text-sm font-bold text-surface-dark/40 dark:text-white/40">
+          <p className="text-sm font-bold text-surface-dark/55 dark:text-white/40">
             © 2026 <span className="text-surface-dark/60 dark:text-white/60">Gralix Technologies</span>
           </p>
         </div>

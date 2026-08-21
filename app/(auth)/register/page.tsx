@@ -136,7 +136,7 @@ export default function RegisterPage() {
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhoneNumber(e.target.value)}
                                     required
                                 />
-                                <p className="text-xs text-surface-dark/40 dark:text-white/40 ml-1">
+                                <p className="text-xs text-surface-dark/55 dark:text-white/40 ml-1">
                                     Include country code (e.g. +27 for South Africa)
                                 </p>
                             </div>
@@ -165,7 +165,7 @@ export default function RegisterPage() {
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOtp(e.target.value)}
                                     required
                                 />
-                                <p className="text-xs text-surface-dark/40 dark:text-white/40 ml-1">
+                                <p className="text-xs text-surface-dark/55 dark:text-white/40 ml-1">
                                     Sent to {phoneNumber}. Check your SMS.
                                 </p>
                             </div>
@@ -175,7 +175,7 @@ export default function RegisterPage() {
                             <button
                                 type="button"
                                 onClick={() => { setPhoneStep("input"); setOtp(""); setError(""); setConfirmationResult(null); }}
-                                className="w-full text-sm text-surface-dark/40 dark:text-white/40 hover:text-accent font-bold transition-colors"
+                                className="w-full text-sm text-surface-dark/55 dark:text-white/40 hover:text-accent font-bold transition-colors"
                             >
                                 ← Change number
                             </button>
@@ -184,7 +184,7 @@ export default function RegisterPage() {
 
                     <div className="flex items-center gap-3 my-6">
                         <div className="flex-1 h-px bg-surface-dark/10 dark:bg-white/10" />
-                        <span className="text-xs font-bold text-surface-dark/40 dark:text-white/40">OR</span>
+                        <span className="text-xs font-bold text-surface-dark/55 dark:text-white/40">OR</span>
                         <div className="flex-1 h-px bg-surface-dark/10 dark:bg-white/10" />
                     </div>
 

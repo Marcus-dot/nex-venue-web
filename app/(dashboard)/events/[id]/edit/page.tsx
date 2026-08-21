@@ -279,7 +279,7 @@ export default function EditEventPage() {
                                 {imagePreview ? (
                                     <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="flex flex-col items-center gap-2 text-surface-dark/40 dark:text-white/40 group-hover:text-accent transition-colors">
+                                    <div className="flex flex-col items-center gap-2 text-surface-dark/55 dark:text-white/40 group-hover:text-accent transition-colors">
                                         <ImageIcon size={32} />
                                         <span className="text-sm font-bold">Click to upload new banner image</span>
                                     </div>
@@ -300,7 +300,7 @@ export default function EditEventPage() {
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-surface-dark dark:text-white ml-1">Description</label>
                             <textarea
-                                className="w-full px-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 placeholder:text-surface-dark/30 dark:placeholder:text-white/30 text-surface-dark dark:text-white font-medium min-h-[120px]"
+                                className="w-full px-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 placeholder:text-surface-dark/45 dark:placeholder:text-white/30 text-surface-dark dark:text-white font-medium min-h-[120px]"
                                 placeholder="What is your event about?"
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -373,7 +373,7 @@ export default function EditEventPage() {
 
                     <div className="space-y-4 mb-20">
                         {agenda.length === 0 ? (
-                            <GlassCard className="py-12 text-center text-surface-dark/40 dark:text-white/40 font-bold border-2 border-dashed border-surface-dark/10 dark:border-white/10">
+                            <GlassCard className="py-12 text-center text-surface-dark/55 dark:text-white/40 font-bold border-2 border-dashed border-surface-dark/10 dark:border-white/10">
                                 No sessions added yet. Click above to build the agenda.
                             </GlassCard>
                         ) : (
@@ -390,7 +390,7 @@ export default function EditEventPage() {
                                             )}
                                         </div>
                                         <h4 className="text-xl font-black text-surface-dark dark:text-white">{item.title}</h4>
-                                        <div className="flex flex-wrap gap-4 mt-2 text-sm font-bold text-surface-dark/50 dark:text-white/50">
+                                        <div className="flex flex-wrap gap-4 mt-2 text-sm font-bold text-surface-dark/60 dark:text-white/50">
                                             {item.speaker && <span>🗣️ {item.speaker}</span>}
                                             {item.location && <span>📍 {item.location}</span>}
                                             <span>📅 {item.date}</span>
@@ -477,7 +477,7 @@ export default function EditEventPage() {
                                         value={agendaForm.simultaneousGroupId} 
                                         onChange={e => setAgendaForm({...agendaForm, simultaneousGroupId: e.target.value})} 
                                     />
-                                    <p className="text-xs text-surface-dark/40 dark:text-white/40 font-bold ml-1">
+                                    <p className="text-xs text-surface-dark/55 dark:text-white/40 font-bold ml-1">
                                         Give concurrent sessions the exact same ID so attendees can choose between them.
                                     </p>
                                 </div>

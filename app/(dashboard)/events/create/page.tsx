@@ -106,7 +106,7 @@ export default function CreateEventPage() {
                                 {imagePreview ? (
                                     <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="flex flex-col items-center gap-2 text-surface-dark/40 dark:text-white/40 group-hover:text-accent transition-colors">
+                                    <div className="flex flex-col items-center gap-2 text-surface-dark/55 dark:text-white/40 group-hover:text-accent transition-colors">
                                         <ImageIcon size={32} />
                                         <span className="text-sm font-bold">Click to upload banner image</span>
                                     </div>
@@ -127,7 +127,7 @@ export default function CreateEventPage() {
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-surface-dark dark:text-white ml-1">Description</label>
                             <textarea
-                                className="w-full px-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 placeholder:text-surface-dark/30 dark:placeholder:text-white/30 text-surface-dark dark:text-white font-medium min-h-[120px]"
+                                className="w-full px-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 placeholder:text-surface-dark/45 dark:placeholder:text-white/30 text-surface-dark dark:text-white font-medium min-h-[120px]"
                                 placeholder="What is your event about?"
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -177,7 +177,7 @@ export default function CreateEventPage() {
                                     onClick={() => setIsOpen(true)}
                                     className={cn(
                                         "flex flex-col items-center gap-1 p-4 rounded-xl border-2 transition-all text-center",
-                                        isOpen ? "border-accent bg-accent/5 text-accent" : "border-surface-dark/10 dark:border-white/10 text-surface-dark/50 dark:text-white/50 hover:border-surface-dark/20 dark:hover:border-white/20"
+                                        isOpen ? "border-accent bg-accent/5 text-accent" : "border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/50 hover:border-surface-dark/20 dark:hover:border-white/20"
                                     )}
                                 >
                                     <Unlock size={18} />
@@ -189,7 +189,7 @@ export default function CreateEventPage() {
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
                                         "flex flex-col items-center gap-1 p-4 rounded-xl border-2 transition-all text-center",
-                                        !isOpen ? "border-accent bg-accent/5 text-accent" : "border-surface-dark/10 dark:border-white/10 text-surface-dark/50 dark:text-white/50 hover:border-surface-dark/20 dark:hover:border-white/20"
+                                        !isOpen ? "border-accent bg-accent/5 text-accent" : "border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/50 hover:border-surface-dark/20 dark:hover:border-white/20"
                                     )}
                                 >
                                     <Lock size={18} />

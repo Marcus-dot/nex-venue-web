@@ -25,7 +25,7 @@ import { useToast } from "@/context/ToastContext";
 const NETWORKING_CONFIG: Record<string, { label: string; dot: string; bg: string; text: string }> = {
     open:          { label: "Open to Networking", dot: "bg-green-500",  bg: "bg-green-500/10",  text: "text-green-600 dark:text-green-400" },
     selective:     { label: "Selective",          dot: "bg-amber-400",  bg: "bg-amber-500/10",  text: "text-amber-600 dark:text-amber-400" },
-    not_available: { label: "Not Available",      dot: "bg-surface-dark/30 dark:bg-white/30", bg: "bg-surface-dark/8 dark:bg-white/8", text: "text-surface-dark/50 dark:text-white/40" },
+    not_available: { label: "Not Available",      dot: "bg-surface-dark/30 dark:bg-white/30", bg: "bg-surface-dark/8 dark:bg-white/8", text: "text-surface-dark/60 dark:text-white/40" },
 };
 
 export default function ProfilePage() {
@@ -87,11 +87,11 @@ export default function ProfilePage() {
     }, [user?.uid]);
 
     const getEventRole = (event: Event): { label: string; bg: string; text: string } => {
-        if (!user) return { label: "Attendee", bg: "bg-surface-dark/5 dark:bg-white/5", text: "text-surface-dark/40 dark:text-white/40" };
+        if (!user) return { label: "Attendee", bg: "bg-surface-dark/5 dark:bg-white/5", text: "text-surface-dark/55 dark:text-white/40" };
         if (event.organisers?.includes(user.uid)) return { label: "Organiser", bg: "bg-purple-500/10", text: "text-purple-500 dark:text-purple-400" };
         if (event.speakers?.includes(user.uid))   return { label: "Speaker",   bg: "bg-blue-500/10",   text: "text-blue-500 dark:text-blue-400" };
         if (event.exhibitors?.includes(user.uid)) return { label: "Exhibitor", bg: "bg-green-500/10",  text: "text-green-500 dark:text-green-400" };
-        return { label: "Attendee", bg: "bg-surface-dark/5 dark:bg-white/5", text: "text-surface-dark/40 dark:text-white/40" };
+        return { label: "Attendee", bg: "bg-surface-dark/5 dark:bg-white/5", text: "text-surface-dark/55 dark:text-white/40" };
     };
 
     const handleLogout = async () => { await signOut(auth); router.push("/"); };
@@ -158,19 +158,19 @@ export default function ProfilePage() {
                                 <div className="flex items-center gap-1.5">
                                     {profile?.linkedinUrl && (
                                         <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer"
-                                           className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-[#0077b5]/10 flex items-center justify-center text-surface-dark/40 dark:text-white/40 hover:text-[#0077b5] transition-all">
+                                           className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-[#0077b5]/10 flex items-center justify-center text-surface-dark/55 dark:text-white/40 hover:text-[#0077b5] transition-all">
                                             <Linkedin size={15} />
                                         </a>
                                     )}
                                     {profile?.twitterHandle && (
                                         <a href={`https://twitter.com/${profile.twitterHandle}`} target="_blank" rel="noopener noreferrer"
-                                           className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-[#1DA1F2]/10 flex items-center justify-center text-surface-dark/40 dark:text-white/40 hover:text-[#1DA1F2] transition-all">
+                                           className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-[#1DA1F2]/10 flex items-center justify-center text-surface-dark/55 dark:text-white/40 hover:text-[#1DA1F2] transition-all">
                                             <Twitter size={15} />
                                         </a>
                                     )}
                                     {profile?.websiteUrl && (
                                         <a href={profile.websiteUrl} target="_blank" rel="noopener noreferrer"
-                                           className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-accent/10 flex items-center justify-center text-surface-dark/40 dark:text-white/40 hover:text-accent transition-all">
+                                           className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-accent/10 flex items-center justify-center text-surface-dark/55 dark:text-white/40 hover:text-accent transition-all">
                                             <Globe size={15} />
                                         </a>
                                     )}
@@ -215,7 +215,7 @@ export default function ProfilePage() {
                                         {networking.label}
                                     </span>
                                 )}
-                                <span className="text-[11px] font-bold text-surface-dark/30 dark:text-white/30">
+                                <span className="text-[11px] font-bold text-surface-dark/45 dark:text-white/30">
                                     Member since {profile?.createdAt ? new Date(profile.createdAt).getFullYear() : "2026"}
                                 </span>
                             </div>
@@ -241,7 +241,7 @@ export default function ProfilePage() {
                                 <s.icon size={20} />
                             </div>
                             <div className="text-3xl font-black text-surface-dark dark:text-white">{s.value}</div>
-                            <div className="text-[11px] font-bold text-surface-dark/40 dark:text-white/40 uppercase tracking-widest mt-1">{s.label}</div>
+                            <div className="text-[11px] font-bold text-surface-dark/55 dark:text-white/40 uppercase tracking-widest mt-1">{s.label}</div>
                         </GlassCard>
                     ))}
                 </div>
@@ -249,7 +249,7 @@ export default function ProfilePage() {
                 {/* ── Connection requests ──────────────────────────────────── */}
                 {incomingRequests.length > 0 && (
                     <GlassCard className="!p-6 space-y-3">
-                        <h3 className="text-xs font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest flex items-center gap-2">
+                        <h3 className="text-xs font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest flex items-center gap-2">
                             <UserPlus size={14} /> Connection Requests ({incomingRequests.length})
                         </h3>
                         <div className="space-y-2">
@@ -258,7 +258,7 @@ export default function ProfilePage() {
                                     <AvatarDisplay avatarUrl={req.fromAvatar} fullName={req.fromName} size={40} />
                                     <div className="flex-1 min-w-0">
                                         <Link href={`/profile/${req.fromId}`} className="font-bold text-surface-dark dark:text-white hover:text-accent truncate block">{req.fromName}</Link>
-                                        <p className="text-xs font-medium text-surface-dark/50 dark:text-white/50">wants to connect with you</p>
+                                        <p className="text-xs font-medium text-surface-dark/60 dark:text-white/50">wants to connect with you</p>
                                     </div>
                                     <button onClick={() => respondToRequest(req, false)} disabled={!!respondingId} className="w-9 h-9 rounded-full flex items-center justify-center border border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/60 hover:border-red-500/40 hover:text-red-500 disabled:opacity-50 transition-all"><X size={16} /></button>
                                     <button onClick={() => respondToRequest(req, true)} disabled={!!respondingId} className="w-9 h-9 rounded-full flex items-center justify-center bg-accent text-white hover:opacity-90 disabled:opacity-50 transition-all">{respondingId === req.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}</button>
@@ -276,11 +276,11 @@ export default function ProfilePage() {
                         {/* Preferences card */}
                         {hasPrefs && (
                             <GlassCard className="!p-6 space-y-5">
-                                <h3 className="text-xs font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest">Preferences</h3>
+                                <h3 className="text-xs font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest">Preferences</h3>
 
                                 {(profile?.eventInterests?.length ?? 0) > 0 && (
                                     <div className="space-y-2.5">
-                                        <p className="text-[11px] font-bold text-surface-dark/40 dark:text-white/40 flex items-center gap-1.5">
+                                        <p className="text-[11px] font-bold text-surface-dark/55 dark:text-white/40 flex items-center gap-1.5">
                                             <Zap size={11} className="text-accent" /> Interests
                                         </p>
                                         <div className="flex flex-wrap gap-1.5">
@@ -295,7 +295,7 @@ export default function ProfilePage() {
 
                                 {profile?.dietaryRestrictions && profile.dietaryRestrictions !== "none" && (
                                     <div className="flex items-center justify-between pt-3 border-t border-surface-dark/5 dark:border-white/5">
-                                        <span className="text-[11px] font-bold text-surface-dark/40 dark:text-white/40 flex items-center gap-1.5">
+                                        <span className="text-[11px] font-bold text-surface-dark/55 dark:text-white/40 flex items-center gap-1.5">
                                             <Utensils size={11} className="text-accent" /> Dietary
                                         </span>
                                         <span className="text-[11px] font-black text-surface-dark dark:text-white capitalize">
@@ -306,7 +306,7 @@ export default function ProfilePage() {
 
                                 {profile?.tshirtSize && (
                                     <div className="flex items-center justify-between pt-3 border-t border-surface-dark/5 dark:border-white/5">
-                                        <span className="text-[11px] font-bold text-surface-dark/40 dark:text-white/40 flex items-center gap-1.5">
+                                        <span className="text-[11px] font-bold text-surface-dark/55 dark:text-white/40 flex items-center gap-1.5">
                                             <Shirt size={11} className="text-accent" /> T-Shirt
                                         </span>
                                         <span className="text-[11px] font-black text-surface-dark dark:text-white">{profile.tshirtSize}</span>
@@ -328,10 +328,10 @@ export default function ProfilePage() {
                                     onClick={() => item.href && router.push(item.href)}
                                     className="w-full px-4 py-3.5 flex items-center gap-3 rounded-2xl hover:bg-surface-dark/5 dark:hover:bg-white/5 transition-all group text-left"
                                 >
-                                    <item.icon size={16} className="text-surface-dark/30 dark:text-white/30 group-hover:text-accent transition-colors shrink-0" />
+                                    <item.icon size={16} className="text-surface-dark/45 dark:text-white/30 group-hover:text-accent transition-colors shrink-0" />
                                     <div className="flex-1 min-w-0">
                                         <div className="text-sm font-bold text-surface-dark dark:text-white">{item.label}</div>
-                                        <div className="text-[11px] text-surface-dark/30 dark:text-white/30 font-medium">{item.sub}</div>
+                                        <div className="text-[11px] text-surface-dark/45 dark:text-white/30 font-medium">{item.sub}</div>
                                     </div>
                                     <ChevronRight size={14} className="text-surface-dark/20 dark:text-white/20 group-hover:translate-x-0.5 transition-transform shrink-0" />
                                 </button>
@@ -368,7 +368,7 @@ export default function ProfilePage() {
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="font-black text-surface-dark dark:text-white text-sm truncate">{event.title}</div>
-                                                <div className="text-[11px] text-surface-dark/40 dark:text-white/40 font-medium flex items-center gap-1.5 mt-0.5">
+                                                <div className="text-[11px] text-surface-dark/55 dark:text-white/40 font-medium flex items-center gap-1.5 mt-0.5">
                                                     <span>{event.date}</span>
                                                     {event.location && <><span>·</span><MapPin size={10} className="inline" /><span className="truncate">{event.location}</span></>}
                                                 </div>
@@ -397,7 +397,7 @@ export default function ProfilePage() {
                                         <Clock size={32} />
                                     </div>
                                     <h4 className="text-base font-black text-surface-dark dark:text-white mb-2">Nothing yet</h4>
-                                    <p className="text-sm text-surface-dark/50 dark:text-white/50 font-medium mb-6 max-w-xs mx-auto">
+                                    <p className="text-sm text-surface-dark/60 dark:text-white/50 font-medium mb-6 max-w-xs mx-auto">
                                         Events you register for will appear here.
                                     </p>
                                     <Button size="sm" onClick={() => router.push("/events")} className="px-6 font-black">
@@ -420,7 +420,7 @@ export default function ProfilePage() {
                                                             {role.label}
                                                         </span>
                                                         {event.date && (
-                                                            <span className="text-[11px] text-surface-dark/30 dark:text-white/30 font-medium">{event.date}</span>
+                                                            <span className="text-[11px] text-surface-dark/45 dark:text-white/30 font-medium">{event.date}</span>
                                                         )}
                                                     </div>
                                                 </div>
@@ -457,7 +457,7 @@ export default function ProfilePage() {
                                     </div>
                                     <div>
                                         <h4 className="font-black text-surface-dark dark:text-white text-sm">Administrative Access</h4>
-                                        <p className="text-[11px] text-surface-dark/40 dark:text-white/40 font-medium">Elevated platform permissions</p>
+                                        <p className="text-[11px] text-surface-dark/55 dark:text-white/40 font-medium">Elevated platform permissions</p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
@@ -472,12 +472,12 @@ export default function ProfilePage() {
                                                 className="p-3.5 rounded-xl bg-surface-dark/5 dark:bg-white/5 hover:bg-accent/10 hover:border-accent/20 border border-transparent text-left transition-colors"
                                             >
                                                 <div className="text-sm font-black text-surface-dark dark:text-white mb-0.5">{item.title}</div>
-                                                <div className="text-[11px] text-surface-dark/40 dark:text-white/40 font-medium">{item.sub}</div>
+                                                <div className="text-[11px] text-surface-dark/55 dark:text-white/40 font-medium">{item.sub}</div>
                                             </button>
                                         ) : (
                                             <div key={item.title} className="p-3.5 rounded-xl bg-surface-dark/5 dark:bg-white/5 opacity-60">
                                                 <div className="text-sm font-black text-surface-dark dark:text-white mb-0.5">{item.title}</div>
-                                                <div className="text-[11px] text-surface-dark/40 dark:text-white/40 font-medium">{item.sub}</div>
+                                                <div className="text-[11px] text-surface-dark/55 dark:text-white/40 font-medium">{item.sub}</div>
                                             </div>
                                         )
                                     )}

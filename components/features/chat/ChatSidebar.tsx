@@ -58,9 +58,9 @@ export const ChatSidebar = ({ onSelect, selectedId }: ChatSidebarProps) => {
             <div className="p-6 space-y-4">
                 <h2 className="text-2xl font-black text-surface-dark dark:text-white">Messages</h2>
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-dark/30 dark:text-white/30" size={16} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-dark/45 dark:text-white/30" size={16} />
                     <input
-                        className="w-full bg-surface-dark/5 dark:bg-white/5 border-none rounded-xl pl-10 pr-4 py-2 text-sm font-medium text-surface-dark dark:text-white placeholder:text-surface-dark/30 dark:placeholder:text-white/30 focus:ring-2 focus:ring-accent/20 outline-none"
+                        className="w-full bg-surface-dark/5 dark:bg-white/5 border-none rounded-xl pl-10 pr-4 py-2 text-sm font-medium text-surface-dark dark:text-white placeholder:text-surface-dark/45 dark:placeholder:text-white/30 focus:ring-2 focus:ring-accent/20 outline-none"
                         placeholder="Search conversations..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -69,7 +69,7 @@ export const ChatSidebar = ({ onSelect, selectedId }: ChatSidebarProps) => {
             </div>
 
             <div className="flex-1 overflow-y-auto px-4 space-y-2 pb-6">
-                <div className="text-[10px] uppercase tracking-widest font-black text-surface-dark/30 dark:text-white/30 ml-2 mb-2">Direct Chats</div>
+                <div className="text-[10px] uppercase tracking-widest font-black text-surface-dark/45 dark:text-white/30 ml-2 mb-2">Direct Chats</div>
 
                 {conversations.length === 0 && (
                     <div className="text-center py-10 opacity-40">
@@ -107,7 +107,7 @@ export const ChatSidebar = ({ onSelect, selectedId }: ChatSidebarProps) => {
                                 <div className="font-black truncate">{info.name}</div>
                                 <div className={cn(
                                     "text-xs truncate",
-                                    isSelected ? "text-white/70" : "text-surface-dark/40 dark:text-white/40 font-medium"
+                                    isSelected ? "text-white/70" : "text-surface-dark/55 dark:text-white/40 font-medium"
                                 )}>
                                     {conv.typingIndicator?.[recipientId!] && (Date.now() - conv.typingIndicator[recipientId!] < 3000) ? (
                                         <span className={cn("font-black italic", isSelected ? "text-white/90" : "text-accent")}>Typing...</span>

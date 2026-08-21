@@ -61,7 +61,7 @@ export const AgendaList = ({ items, currentId }: AgendaListProps) => {
 
     if (items.length === 0) {
         return (
-            <div className="py-12 text-center text-surface-dark/40 dark:text-white/40 border-2 border-dashed border-surface-dark/5 dark:border-white/5 rounded-3xl font-medium">
+            <div className="py-12 text-center text-surface-dark/55 dark:text-white/40 border-2 border-dashed border-surface-dark/5 dark:border-white/5 rounded-3xl font-medium">
                 The agenda hasn't been posted yet. Check back soon!
             </div>
         );
@@ -183,7 +183,7 @@ const SessionCard = ({ item, isLive, isGrouped, user, onSelect, isSelecting, get
                         <Clock size={16} />
                         {item.startTime}
                     </div>
-                    <div className="text-[10px] text-surface-dark/30 dark:text-white/30 font-bold uppercase tracking-tighter">
+                    <div className="text-[10px] text-surface-dark/45 dark:text-white/30 font-bold uppercase tracking-tighter">
                         Until {item.endTime}
                     </div>
                 </div>
@@ -221,7 +221,7 @@ const SessionCard = ({ item, isLive, isGrouped, user, onSelect, isSelecting, get
 
                     {item.description && (
                         <p className={cn(
-                            "text-surface-dark/50 dark:text-white/50 font-medium mt-2 line-clamp-2",
+                            "text-surface-dark/60 dark:text-white/50 font-medium mt-2 line-clamp-2",
                             isGrouped ? "text-xs" : "text-sm"
                         )}>
                             {item.description}
@@ -249,7 +249,7 @@ const SessionCard = ({ item, isLive, isGrouped, user, onSelect, isSelecting, get
                             </div>
                         ) : null}
                         {item.location && (
-                            <div className="flex items-center gap-2 text-xs font-bold text-surface-dark/40 dark:text-white/40">
+                            <div className="flex items-center gap-2 text-xs font-bold text-surface-dark/55 dark:text-white/40">
                                 <MapPin size={14} className="text-accent/60" />
                                 {item.location}
                             </div>

@@ -38,7 +38,7 @@ export default function ErrorBoundary({
             <RefreshCcw size={20} /> Try to Recover
           </Button>
           
-          <div className="mt-6 text-xs text-surface-dark/40 dark:text-white/40 font-bold bg-white/50 dark:bg-white/5 p-4 rounded-xl text-left overflow-x-auto border border-surface-dark/10 dark:border-white/10">
+          <div className="mt-6 text-xs text-surface-dark/55 dark:text-white/40 font-bold bg-white/50 dark:bg-white/5 p-4 rounded-xl text-left overflow-x-auto border border-surface-dark/10 dark:border-white/10">
             <code>{error.message || "An unknown error occurred."}</code>
           </div>
         </GlassCard>

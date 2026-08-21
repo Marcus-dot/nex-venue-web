@@ -60,7 +60,7 @@ function SectionCard({
                     {step}
                 </div>
                 <div className="flex items-center gap-2">
-                    <Icon size={16} className="text-surface-dark/40 dark:text-white/40" />
+                    <Icon size={16} className="text-surface-dark/55 dark:text-white/40" />
                     <h2 className="font-black text-surface-dark dark:text-white">{title}</h2>
                 </div>
             </div>
@@ -73,7 +73,7 @@ function FieldLabel({ children, hint }: { children: React.ReactNode; hint?: stri
     return (
         <div className="flex items-center justify-between mb-2">
             <label className="text-sm font-bold text-surface-dark dark:text-white">{children}</label>
-            {hint && <span className="text-[11px] text-surface-dark/30 dark:text-white/30 font-medium">{hint}</span>}
+            {hint && <span className="text-[11px] text-surface-dark/45 dark:text-white/30 font-medium">{hint}</span>}
         </div>
     );
 }
@@ -259,7 +259,7 @@ export default function EditProfilePage() {
                     </Link>
                     <div>
                         <h1 className="text-xl font-black text-surface-dark dark:text-white tracking-tight">Edit Profile</h1>
-                        <p className="text-xs text-surface-dark/40 dark:text-white/40 font-medium">Your changes are visible to other attendees</p>
+                        <p className="text-xs text-surface-dark/55 dark:text-white/40 font-medium">Your changes are visible to other attendees</p>
                     </div>
                 </div>
 
@@ -317,7 +317,7 @@ export default function EditProfilePage() {
                             </div>
                             <div>
                                 <p className="text-sm font-black text-surface-dark dark:text-white mb-0.5">Profile Picture</p>
-                                <p className="text-xs text-surface-dark/40 dark:text-white/40 font-medium mb-2">PNG, JPG up to 5MB</p>
+                                <p className="text-xs text-surface-dark/55 dark:text-white/40 font-medium mb-2">PNG, JPG up to 5MB</p>
                                 <label className="cursor-pointer text-xs font-black text-accent hover:underline underline-offset-2">
                                     Change photo
                                     <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
@@ -344,7 +344,7 @@ export default function EditProfilePage() {
                             <FieldLabel>Phone Number</FieldLabel>
                             <div className="w-full px-5 py-3.5 bg-surface-dark/5 dark:bg-white/5 border border-surface-dark/8 dark:border-white/8 rounded-xl flex items-center justify-between">
                                 <div className="flex items-center gap-2.5">
-                                    <Phone size={14} className="text-surface-dark/30 dark:text-white/30" />
+                                    <Phone size={14} className="text-surface-dark/45 dark:text-white/30" />
                                     <span className="text-sm font-medium text-surface-dark dark:text-white">
                                         {profile?.phoneNumber || "—"}
                                     </span>
@@ -396,10 +396,10 @@ export default function EditProfilePage() {
                                 onClick={() => setShowIndustryModal(true)}
                                 className="w-full px-5 py-3.5 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl flex items-center justify-between hover:border-accent/40 transition-all text-sm"
                             >
-                                <span className={form.industry ? "text-surface-dark dark:text-white font-medium" : "text-surface-dark/30 dark:text-white/30"}>
+                                <span className={form.industry ? "text-surface-dark dark:text-white font-medium" : "text-surface-dark/45 dark:text-white/30"}>
                                     {form.industry || "Select industry…"}
                                 </span>
-                                <ChevronDown size={16} className="text-surface-dark/30 dark:text-white/30" />
+                                <ChevronDown size={16} className="text-surface-dark/45 dark:text-white/30" />
                             </button>
                         </div>
 
@@ -408,7 +408,7 @@ export default function EditProfilePage() {
                             <FieldLabel hint={`${bioLen}/160`}>Bio</FieldLabel>
                             <textarea
                                 className={cn(
-                                    "w-full px-5 py-3.5 bg-white/50 dark:bg-white/5 border rounded-xl text-sm font-medium resize-none min-h-[100px] focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all placeholder:text-surface-dark/30 dark:placeholder:text-white/30 text-surface-dark dark:text-white",
+                                    "w-full px-5 py-3.5 bg-white/50 dark:bg-white/5 border rounded-xl text-sm font-medium resize-none min-h-[100px] focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all placeholder:text-surface-dark/45 dark:placeholder:text-white/30 text-surface-dark dark:text-white",
                                     bioLen > 160 ? "border-red-400 dark:border-red-500" : "border-surface-dark/10 dark:border-white/10"
                                 )}
                                 placeholder="A short intro about yourself…"
@@ -509,9 +509,9 @@ export default function EditProfilePage() {
                                 <span className="flex items-center gap-1.5"><Twitter size={13} className="text-[#1DA1F2]" /> Twitter / X</span>
                             </FieldLabel>
                             <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-dark/40 dark:text-white/40 font-bold text-sm select-none pointer-events-none">@</span>
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-dark/55 dark:text-white/40 font-bold text-sm select-none pointer-events-none">@</span>
                                 <input
-                                    className="w-full pl-8 pr-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl text-sm font-medium text-surface-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all placeholder:text-surface-dark/30 dark:placeholder:text-white/30"
+                                    className="w-full pl-8 pr-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl text-sm font-medium text-surface-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all placeholder:text-surface-dark/45 dark:placeholder:text-white/30"
                                     placeholder="yourhandle"
                                     value={form.twitterHandle.replace(/^@/, "")}
                                     onChange={(e) => set("twitterHandle", e.target.value)}

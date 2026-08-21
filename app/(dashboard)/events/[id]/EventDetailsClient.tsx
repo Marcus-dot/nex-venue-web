@@ -391,7 +391,7 @@ export default function EventDetailsClient() {
                     <div>
                         <div className="flex items-center justify-between mb-8">
                             <h3 className="text-3xl font-black text-surface-dark dark:text-white">Event Schedule</h3>
-                            <div className="flex items-center gap-2 text-surface-dark/40 dark:text-white/40 text-sm font-bold">
+                            <div className="flex items-center gap-2 text-surface-dark/55 dark:text-white/40 text-sm font-bold">
                                 <span className="w-2 h-2 rounded-full bg-green-500" /> Live Updates Enabled
                             </div>
                         </div>
@@ -441,12 +441,12 @@ export default function EventDetailsClient() {
                                 {participants.filter(p => p.role === 'exhibitor').map(exhibitor => (
                                     <GlassCard key={exhibitor.id} className="!p-6 flex flex-col gap-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-16 h-16 rounded-xl bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center text-surface-dark/40 dark:text-white/40">
+                                            <div className="w-16 h-16 rounded-xl bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center text-surface-dark/55 dark:text-white/40">
                                                 <Store size={32} />
                                             </div>
                                             <div>
                                                 <div className="text-xl font-black text-surface-dark dark:text-white">{exhibitor.company || exhibitor.displayName}</div>
-                                                <div className="text-sm font-bold text-surface-dark/40 dark:text-white/40 uppercase tracking-wider italic">Exhibitor Booth</div>
+                                                <div className="text-sm font-bold text-surface-dark/55 dark:text-white/40 uppercase tracking-wider italic">Exhibitor Booth</div>
                                             </div>
                                         </div>
                                         <p className="text-surface-dark/60 dark:text-white/60 font-medium line-clamp-3">
@@ -463,7 +463,7 @@ export default function EventDetailsClient() {
                 <div className="space-y-8 animate-up">
                     <GlassCard className="sticky top-28 !p-8 border-2 border-accent/20">
                         <div className="mb-6">
-                            <div className="text-sm font-bold text-surface-dark/40 dark:text-white/40 uppercase tracking-widest mb-1">Status</div>
+                            <div className="text-sm font-bold text-surface-dark/55 dark:text-white/40 uppercase tracking-widest mb-1">Status</div>
                             <div className="text-3xl font-black text-surface-dark dark:text-white">
                                 {isAttending
                                     ? "You're Attending"
@@ -474,7 +474,7 @@ export default function EventDetailsClient() {
                                             : "Registration Open"}
                             </div>
                             {needsApproval && !hasPendingReq && (
-                                <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50 mt-2">
+                                <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50 mt-2">
                                     This event requires organiser approval to attend.
                                 </p>
                             )}
@@ -558,7 +558,7 @@ export default function EventDetailsClient() {
                                 </div>
                                 <div>
                                     <div className="font-black text-surface-dark dark:text-white">{event.creatorName}</div>
-                                    <div className="text-xs text-surface-dark/40 dark:text-white/40 font-bold uppercase">Event Host</div>
+                                    <div className="text-xs text-surface-dark/55 dark:text-white/40 font-bold uppercase">Event Host</div>
                                 </div>
                             </div>
                         </div>
@@ -640,7 +640,7 @@ export default function EventDetailsClient() {
                             disabled={requestLoading}
                             className="w-full text-left p-4 rounded-xl border border-surface-dark/10 dark:border-white/10 hover:border-accent/40 hover:bg-accent/5 transition-all group flex items-start gap-4 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <div className="w-12 h-12 rounded-lg bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center text-surface-dark/40 dark:text-white/40 group-hover:bg-accent/10 group-hover:text-accent transition-all shrink-0">
+                            <div className="w-12 h-12 rounded-lg bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center text-surface-dark/55 dark:text-white/40 group-hover:bg-accent/10 group-hover:text-accent transition-all shrink-0">
                                 <role.icon size={24} />
                             </div>
                             <div>

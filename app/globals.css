@@ -11,8 +11,11 @@
 
 :root {
   --foreground-rgb: 31, 41, 55;
-  --background-start-rgb: 216, 217, 212; /* #D8D9D4 brand warm-gray */
-  --background-end-rgb: 216, 217, 212;
+  /* Near-white with a whisper of warmth (#fafaf8). Lighter than the old
+     #D8D9D4 so muted text clears WCAG AA; cards keep separation via their
+     deep shadow. Matches the #fafaf8 the event-page scrim already fades to. */
+  --background-start-rgb: 250, 250, 248;
+  --background-end-rgb: 250, 250, 248;
 }
 
 /* Reusable deep, layered shadow — tactile depth without glassmorphism */

@@ -56,10 +56,10 @@ export const TimePicker = ({ value, onChange, label, className }: TimePickerProp
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full px-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl flex items-center justify-between hover:border-accent/40 transition-all group"
             >
-                <span className={cn("font-medium", value ? "text-surface-dark dark:text-white" : "text-surface-dark/30 dark:text-white/30")}>
+                <span className={cn("font-medium", value ? "text-surface-dark dark:text-white" : "text-surface-dark/45 dark:text-white/30")}>
                     {value || "Select time"}
                 </span>
-                <Clock size={20} className="text-surface-dark/30 dark:text-white/30 group-hover:text-accent transition-colors" />
+                <Clock size={20} className="text-surface-dark/45 dark:text-white/30 group-hover:text-accent transition-colors" />
             </button>
 
             <AnimatePresence>
@@ -123,7 +123,7 @@ export const TimePicker = ({ value, onChange, label, className }: TimePickerProp
                                                 onClick={() => handleSelect(hour, minute, p)}
                                                 className={cn(
                                                     "w-full py-4 rounded-lg text-sm font-black transition-all",
-                                                    period === p ? "bg-accent text-white shadow-lg shadow-accent/20" : "hover:bg-surface-dark/5 dark:hover:bg-white/5 text-surface-dark/30 dark:text-white/30"
+                                                    period === p ? "bg-accent text-white shadow-lg shadow-accent/20" : "hover:bg-surface-dark/5 dark:hover:bg-white/5 text-surface-dark/45 dark:text-white/30"
                                                 )}
                                             >
                                                 {p}

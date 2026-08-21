@@ -126,7 +126,7 @@ export default function SpecialAccessPage() {
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-surface-dark dark:text-white ml-1">Display Name</label>
                                 <Input value={participant.displayName} disabled className="bg-surface-dark/5 opacity-70" />
-                                <p className="text-[10px] text-surface-dark/30 dark:text-white/30 font-bold uppercase ml-1">Managed via your main profile</p>
+                                <p className="text-[10px] text-surface-dark/45 dark:text-white/30 font-bold uppercase ml-1">Managed via your main profile</p>
                             </div>
 
                             <div className="space-y-2">
@@ -142,7 +142,7 @@ export default function SpecialAccessPage() {
                                 <div className="space-y-2">
                                     <label className="text-sm font-bold text-surface-dark dark:text-white ml-1">Speaker Bio</label>
                                     <textarea
-                                        className="w-full px-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 placeholder:text-surface-dark/30 dark:placeholder:text-white/30 text-surface-dark dark:text-white font-medium min-h-[150px]"
+                                        className="w-full px-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 placeholder:text-surface-dark/45 dark:placeholder:text-white/30 text-surface-dark dark:text-white font-medium min-h-[150px]"
                                         placeholder="Tell attendees about yourself and your expertise..."
                                         value={formData.bio}
                                         onChange={(e) => setFormData({...formData, bio: e.target.value})}
@@ -156,7 +156,7 @@ export default function SpecialAccessPage() {
                                         <Layout size={18} className="text-accent" /> Booth / Product Details
                                     </label>
                                     <textarea
-                                        className="w-full px-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 placeholder:text-surface-dark/30 dark:placeholder:text-white/30 text-surface-dark dark:text-white font-medium min-h-[150px]"
+                                        className="w-full px-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 placeholder:text-surface-dark/45 dark:placeholder:text-white/30 text-surface-dark dark:text-white font-medium min-h-[150px]"
                                         placeholder="Describe what you are showcasing at your booth..."
                                         value={formData.boothDetails}
                                         onChange={(e) => setFormData({...formData, boothDetails: e.target.value})}

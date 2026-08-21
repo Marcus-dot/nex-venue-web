@@ -265,15 +265,15 @@ export default function SettingsPage() {
                         <div className="space-y-6 pl-2">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h4 className="font-bold text-surface-dark dark:text-white flex items-center gap-2"><Mail size={16} className="text-surface-dark/40" /> Email Updates</h4>
-                                    <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50 mt-1">Receive daily digests and important event announcements.</p>
+                                    <h4 className="font-bold text-surface-dark dark:text-white flex items-center gap-2"><Mail size={16} className="text-surface-dark/55" /> Email Updates</h4>
+                                    <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50 mt-1">Receive daily digests and important event announcements.</p>
                                 </div>
                                 <Switch checked={settings.emailNotifications} onCheckedChange={() => handleToggle('emailNotifications')} />
                             </div>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h4 className="font-bold text-surface-dark dark:text-white flex items-center gap-2"><Smartphone size={16} className="text-surface-dark/40" /> Push Notifications</h4>
-                                    <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50 mt-1">Get instant alerts for chat messages and event starts.</p>
+                                    <h4 className="font-bold text-surface-dark dark:text-white flex items-center gap-2"><Smartphone size={16} className="text-surface-dark/55" /> Push Notifications</h4>
+                                    <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50 mt-1">Get instant alerts for chat messages and event starts.</p>
                                 </div>
                                 <Switch checked={settings.pushNotifications} onCheckedChange={() => handleToggle('pushNotifications')} />
                             </div>
@@ -292,7 +292,7 @@ export default function SettingsPage() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h4 className="font-bold text-surface-dark dark:text-white">Dark Mode Theme</h4>
-                                    <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50 mt-1">Switch to a darker interface for low-light environments.</p>
+                                    <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50 mt-1">Switch to a darker interface for low-light environments.</p>
                                 </div>
                                 <Switch checked={isDark} onCheckedChange={() => handleToggle('darkMode')} />
                             </div>
@@ -311,7 +311,7 @@ export default function SettingsPage() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h4 className="font-bold text-surface-dark dark:text-white">Private Profile</h4>
-                                    <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50 mt-1">Hide your profile from the public attendee directory.</p>
+                                    <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50 mt-1">Hide your profile from the public attendee directory.</p>
                                 </div>
                                 <Switch checked={settings.privateProfile} onCheckedChange={() => handleToggle('privateProfile')} />
                             </div>
@@ -319,16 +319,16 @@ export default function SettingsPage() {
                             {/* Blocked users */}
                             <div className="pt-2">
                                 <div className="flex items-center gap-2 mb-3">
-                                    <Ban size={16} className="text-surface-dark/40 dark:text-white/40" />
+                                    <Ban size={16} className="text-surface-dark/55 dark:text-white/40" />
                                     <h4 className="font-bold text-surface-dark dark:text-white">Blocked Users</h4>
                                     {blocked.length > 0 && (
-                                        <span className="text-xs font-black text-surface-dark/40 dark:text-white/40">{blocked.length}</span>
+                                        <span className="text-xs font-black text-surface-dark/55 dark:text-white/40">{blocked.length}</span>
                                     )}
                                 </div>
                                 {blockedLoading ? (
-                                    <div className="flex items-center gap-2 text-sm text-surface-dark/40 dark:text-white/40"><Loader2 size={14} className="animate-spin" /> Loading…</div>
+                                    <div className="flex items-center gap-2 text-sm text-surface-dark/55 dark:text-white/40"><Loader2 size={14} className="animate-spin" /> Loading…</div>
                                 ) : blocked.length === 0 ? (
-                                    <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50">You haven&apos;t blocked anyone. Blocked users can&apos;t message you or send connection requests.</p>
+                                    <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50">You haven&apos;t blocked anyone. Blocked users can&apos;t message you or send connection requests.</p>
                                 ) : (
                                     <div className="space-y-2">
                                         {blocked.map((b) => (
@@ -337,7 +337,7 @@ export default function SettingsPage() {
                                                     <AvatarDisplay avatarUrl={b.avatar} fullName={b.fullName} size={36} />
                                                     <div className="min-w-0">
                                                         <p className="font-bold text-surface-dark dark:text-white truncate">{b.fullName}</p>
-                                                        {b.company && <p className="text-xs font-medium text-surface-dark/50 dark:text-white/50 truncate">{b.company}</p>}
+                                                        {b.company && <p className="text-xs font-medium text-surface-dark/60 dark:text-white/50 truncate">{b.company}</p>}
                                                     </div>
                                                 </div>
                                                 <Button variant="ghost" disabled={unblocking === b.uid} onClick={() => handleUnblock(b.uid)} className="text-accent font-bold bg-white dark:bg-white/5 shrink-0">
@@ -366,7 +366,7 @@ export default function SettingsPage() {
                                     <div className="w-10 h-10 rounded-xl bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center text-accent"><Phone size={18} /></div>
                                     <div>
                                         <h4 className="font-bold text-surface-dark dark:text-white">Phone Number</h4>
-                                        <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50">{phoneLinked ? (linkedPhone ?? "Linked") : "Add your phone number as a sign-in option"}</p>
+                                        <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50">{phoneLinked ? (linkedPhone ?? "Linked") : "Add your phone number as a sign-in option"}</p>
                                     </div>
                                 </div>
                                 {phoneLinked ? (
@@ -382,14 +382,14 @@ export default function SettingsPage() {
                                     {phoneLinkStep === "input" ? (
                                         <>
                                             <Input type="tel" placeholder="+27 71 234 5678" value={linkPhoneNumber} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLinkPhoneNumber(e.target.value)} />
-                                            <p className="text-xs text-surface-dark/40 dark:text-white/40">Include the country code. We&apos;ll text a 6-digit code.</p>
+                                            <p className="text-xs text-surface-dark/55 dark:text-white/40">Include the country code. We&apos;ll text a 6-digit code.</p>
                                             <Button className="w-full" disabled={linkingPhone} onClick={handleSendPhoneLink}>{linkingPhone ? <Loader2 className="animate-spin mx-auto" size={20} /> : "Send Code"}</Button>
                                         </>
                                     ) : (
                                         <>
                                             <Input type="text" inputMode="numeric" maxLength={6} placeholder="123456" value={linkOtp} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLinkOtp(e.target.value)} />
                                             <Button className="w-full" disabled={linkingPhone} onClick={handleVerifyPhoneLink}>{linkingPhone ? <Loader2 className="animate-spin mx-auto" size={20} /> : "Verify & Link"}</Button>
-                                            <button type="button" onClick={() => { setPhoneLinkStep("input"); setLinkOtp(""); }} className="w-full text-sm text-surface-dark/40 dark:text-white/40 hover:text-accent font-bold">← Change number</button>
+                                            <button type="button" onClick={() => { setPhoneLinkStep("input"); setLinkOtp(""); }} className="w-full text-sm text-surface-dark/55 dark:text-white/40 hover:text-accent font-bold">← Change number</button>
                                         </>
                                     )}
                                 </div>
@@ -401,7 +401,7 @@ export default function SettingsPage() {
                                     <div className="w-10 h-10 rounded-xl bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center"><GoogleIcon size={18} /></div>
                                     <div>
                                         <h4 className="font-bold text-surface-dark dark:text-white flex items-center gap-2">Google {googleLinked && <Check size={14} className="text-green-500" />}</h4>
-                                        <p className="text-sm font-medium text-surface-dark/50 dark:text-white/50">{googleLinked ? "Linked" : "Add Google as a sign-in option"}</p>
+                                        <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50">{googleLinked ? "Linked" : "Add Google as a sign-in option"}</p>
                                     </div>
                                 </div>
                                 {googleLinked ? (

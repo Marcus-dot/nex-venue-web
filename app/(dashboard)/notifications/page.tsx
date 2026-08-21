@@ -64,7 +64,7 @@ export default function NotificationsPage() {
             case 'event_invite': return <Calendar size={18} className="text-green-500" />;
             case 'event_update': return <Calendar size={18} className="text-accent" />;
             case 'system_alert': return <ShieldAlert size={18} className="text-red-500" />;
-            default: return <Bell size={18} className="text-surface-dark/40" />;
+            default: return <Bell size={18} className="text-surface-dark/55" />;
         }
     };
 
@@ -119,7 +119,7 @@ export default function NotificationsPage() {
                 {/* List */}
                 <div className="space-y-4">
                     {notifications.length === 0 ? (
-                        <GlassCard className="py-20 text-center text-surface-dark/40 dark:text-white/40 font-bold border-2 border-dashed border-surface-dark/10 dark:border-white/10">
+                        <GlassCard className="py-20 text-center text-surface-dark/55 dark:text-white/40 font-bold border-2 border-dashed border-surface-dark/10 dark:border-white/10">
                             <Bell size={48} className="mx-auto mb-4 opacity-20" />
                             You're all caught up!
                         </GlassCard>
@@ -142,11 +142,11 @@ export default function NotificationsPage() {
                                             <h4 className={cn("text-base truncate", !notification.read ? "font-black text-surface-dark dark:text-white" : "font-bold text-surface-dark/70 dark:text-white/70")}>
                                                 {notification.title}
                                             </h4>
-                                            <div className="text-[10px] font-black uppercase text-surface-dark/30 dark:text-white/30 whitespace-nowrap pt-1">
+                                            <div className="text-[10px] font-black uppercase text-surface-dark/45 dark:text-white/30 whitespace-nowrap pt-1">
                                                 {new Date(notification.createdAt).toLocaleDateString()}
                                             </div>
                                         </div>
-                                        <p className={cn("text-sm line-clamp-2", !notification.read ? "font-bold text-surface-dark/80 dark:text-white/80" : "font-medium text-surface-dark/50 dark:text-white/50")}>
+                                        <p className={cn("text-sm line-clamp-2", !notification.read ? "font-bold text-surface-dark/80 dark:text-white/80" : "font-medium text-surface-dark/60 dark:text-white/50")}>
                                             {notification.body}
                                         </p>
                                     </div>

@@ -145,7 +145,7 @@ export const Navigation = () => {
                                     aria-label="Account menu"
                                 >
                                     <AvatarDisplay avatarUrl={profile?.avatar ?? null} fullName={displayName} size={34} />
-                                    <ChevronDown size={15} className={cn("text-surface-dark/40 dark:text-white/40 transition-transform", menuOpen && "rotate-180")} />
+                                    <ChevronDown size={15} className={cn("text-surface-dark/55 dark:text-white/40 transition-transform", menuOpen && "rotate-180")} />
                                 </button>
 
                                 {menuOpen && (

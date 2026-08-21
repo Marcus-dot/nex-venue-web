@@ -87,10 +87,10 @@ export const DatePicker = ({ value, onChange, label, className }: DatePickerProp
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full px-5 py-4 bg-white/50 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 rounded-xl flex items-center justify-between hover:border-accent/40 transition-all group"
             >
-                <span className={cn("font-medium", value ? "text-surface-dark dark:text-white" : "text-surface-dark/30 dark:text-white/30")}>
+                <span className={cn("font-medium", value ? "text-surface-dark dark:text-white" : "text-surface-dark/45 dark:text-white/30")}>
                     {value ? new Date(value).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : "Select date"}
                 </span>
-                <CalendarIcon size={20} className="text-surface-dark/30 dark:text-white/30 group-hover:text-accent transition-colors" />
+                <CalendarIcon size={20} className="text-surface-dark/45 dark:text-white/30 group-hover:text-accent transition-colors" />
             </button>
 
             <AnimatePresence>
@@ -103,13 +103,13 @@ export const DatePicker = ({ value, onChange, label, className }: DatePickerProp
                     >
                         <GlassCard className="!p-6 shadow-2xl border-white/40">
                             <div className="flex items-center justify-between mb-6">
-                                <button type="button" onClick={handlePrevMonth} className="p-2 rounded-lg hover:bg-surface-dark/5 dark:hover:bg-white/5 text-surface-dark/40 dark:text-white/40">
+                                <button type="button" onClick={handlePrevMonth} className="p-2 rounded-lg hover:bg-surface-dark/5 dark:hover:bg-white/5 text-surface-dark/55 dark:text-white/40">
                                     <ChevronLeft size={20} />
                                 </button>
                                 <div className="text-lg font-black text-surface-dark dark:text-white">
                                     {monthNames[currentMonth]} {currentYear}
                                 </div>
-                                <button type="button" onClick={handleNextMonth} className="p-2 rounded-lg hover:bg-surface-dark/5 dark:hover:bg-white/5 text-surface-dark/40 dark:text-white/40">
+                                <button type="button" onClick={handleNextMonth} className="p-2 rounded-lg hover:bg-surface-dark/5 dark:hover:bg-white/5 text-surface-dark/55 dark:text-white/40">
                                     <ChevronRight size={20} />
                                 </button>
                             </div>

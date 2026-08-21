@@ -106,11 +106,11 @@ export const ChatWindow = ({ id, type, name }: ChatWindowProps) => {
                         <h3 className="font-black text-surface-dark dark:text-white">{name}</h3>
                         <div className="flex items-center gap-1.5">
                             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                            <span className="text-[10px] font-black text-surface-dark/40 dark:text-white/40 uppercase tracking-widest">Live Connection</span>
+                            <span className="text-[10px] font-black text-surface-dark/55 dark:text-white/40 uppercase tracking-widest">Live Connection</span>
                         </div>
                     </div>
                 </div>
-                <Button variant="ghost" size="sm" className="text-surface-dark/40">
+                <Button variant="ghost" size="sm" className="text-surface-dark/55">
                     <Info size={20} />
                 </Button>
             </header>
@@ -146,7 +146,7 @@ export const ChatWindow = ({ id, type, name }: ChatWindowProps) => {
             <footer className="p-6">
                 <form onSubmit={handleSend} className="relative">
                     <input
-                        className="w-full bg-surface-dark/5 dark:bg-white/5 border-none rounded-2xl pl-6 pr-16 py-4 text-sm font-medium text-surface-dark dark:text-white placeholder:text-surface-dark/30 dark:placeholder:text-white/30 focus:ring-2 focus:ring-accent/20 outline-none min-h-14"
+                        className="w-full bg-surface-dark/5 dark:bg-white/5 border-none rounded-2xl pl-6 pr-16 py-4 text-sm font-medium text-surface-dark dark:text-white placeholder:text-surface-dark/45 dark:placeholder:text-white/30 focus:ring-2 focus:ring-accent/20 outline-none min-h-14"
                         placeholder={`Message ${name}...`}
                         value={inputText}
                         onChange={handleInputChange}

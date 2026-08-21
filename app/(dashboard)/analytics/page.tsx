@@ -114,7 +114,7 @@ export default function AnalyticsPage() {
     return (
         <div className="min-h-screen bg-background dark:bg-[#0f101e] pt-24 pb-20 px-8">
             <div className="max-w-7xl mx-auto">
-                <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-bold text-surface-dark/50 dark:text-white/50 hover:text-accent transition-colors mb-6">
+                <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-bold text-surface-dark/60 dark:text-white/50 hover:text-accent transition-colors mb-6">
                     <ArrowLeft size={18} /> Back to Dashboard
                 </Link>
 
@@ -136,8 +136,8 @@ export default function AnalyticsPage() {
                 {rows.length === 0 ? (
                     <GlassCard className="!p-16 text-center">
                         <BarChart3 size={40} className="mx-auto text-surface-dark/20 dark:text-white/20 mb-4" />
-                        <p className="font-black text-surface-dark/50 dark:text-white/50">No events yet</p>
-                        <p className="text-sm text-surface-dark/40 dark:text-white/40 mt-1 font-medium">Host an event and its analytics will appear here.</p>
+                        <p className="font-black text-surface-dark/60 dark:text-white/50">No events yet</p>
+                        <p className="text-sm text-surface-dark/55 dark:text-white/40 mt-1 font-medium">Host an event and its analytics will appear here.</p>
                         <Link href="/events/create" className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 rounded-xl bg-accent text-white text-sm font-black">Create Event</Link>
                     </GlassCard>
                 ) : (
@@ -160,7 +160,7 @@ export default function AnalyticsPage() {
                                     <div key={r.id}>
                                         <div className="flex justify-between text-sm font-bold text-surface-dark/70 dark:text-white/70 mb-1.5">
                                             <span className="truncate pr-3">{r.title}</span>
-                                            <span className="shrink-0 text-surface-dark/40 dark:text-white/40">{r.attendees}</span>
+                                            <span className="shrink-0 text-surface-dark/55 dark:text-white/40">{r.attendees}</span>
                                         </div>
                                         <div className="h-2.5 rounded-full bg-surface-dark/5 dark:bg-white/5 overflow-hidden">
                                             <div className="h-full rounded-full bg-accent" style={{ width: `${(r.attendees / maxAttendees) * 100}%` }} />
@@ -178,7 +178,7 @@ export default function AnalyticsPage() {
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
                                     <thead>
-                                        <tr className="text-left text-[11px] font-black uppercase tracking-wider text-surface-dark/40 dark:text-white/40 border-b border-surface-dark/5 dark:border-white/5">
+                                        <tr className="text-left text-[11px] font-black uppercase tracking-wider text-surface-dark/55 dark:text-white/40 border-b border-surface-dark/5 dark:border-white/5">
                                             <th className="px-8 py-3 font-black">Event</th>
                                             <th className="px-4 py-3 font-black text-right">Attendees</th>
                                             <th className="px-4 py-3 font-black text-right">Checked in</th>
@@ -195,16 +195,16 @@ export default function AnalyticsPage() {
                                                 <tr key={r.id} className="border-b border-surface-dark/5 dark:border-white/5 last:border-0 hover:bg-surface-dark/[0.02] dark:hover:bg-white/[0.02]">
                                                     <td className="px-8 py-4">
                                                         <div className="font-black text-surface-dark dark:text-white truncate max-w-xs">{r.title}</div>
-                                                        <div className="text-xs font-medium text-surface-dark/40 dark:text-white/40">{r.date}</div>
+                                                        <div className="text-xs font-medium text-surface-dark/55 dark:text-white/40">{r.date}</div>
                                                     </td>
                                                     <td className="px-4 py-4 text-right font-black text-surface-dark dark:text-white tabular-nums">{r.attendees}</td>
-                                                    <td className="px-4 py-4 text-right font-bold text-surface-dark/70 dark:text-white/70 tabular-nums">{r.checkedIn}<span className="text-surface-dark/30 dark:text-white/30"> ({rate}%)</span></td>
+                                                    <td className="px-4 py-4 text-right font-bold text-surface-dark/70 dark:text-white/70 tabular-nums">{r.checkedIn}<span className="text-surface-dark/45 dark:text-white/30"> ({rate}%)</span></td>
                                                     <td className="px-4 py-4 text-right font-bold text-surface-dark/70 dark:text-white/70 tabular-nums">{r.questions}</td>
                                                     <td className="px-4 py-4 text-right font-bold text-surface-dark/70 dark:text-white/70 tabular-nums">{r.polls}</td>
                                                     <td className="px-4 py-4 text-right">
                                                         {r.ratingCount ? (
                                                             <span className="inline-flex items-center gap-1 font-black text-accent tabular-nums"><Star size={12} className="fill-accent" /> {r.ratingAvg.toFixed(1)}</span>
-                                                        ) : <span className="text-surface-dark/30 dark:text-white/30">—</span>}
+                                                        ) : <span className="text-surface-dark/45 dark:text-white/30">—</span>}
                                                     </td>
                                                     <td className="px-8 py-4 text-right">
                                                         <Link href={`/events/${r.id}/report`} className="inline-flex items-center gap-1 text-accent font-bold hover:underline">
@@ -230,7 +230,7 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
         <GlassCard className="!p-5">
             <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-3">{icon}</div>
             <div className="text-2xl font-black text-surface-dark dark:text-white tabular-nums">{value}</div>
-            <div className="text-[11px] font-bold text-surface-dark/50 dark:text-white/50 mt-0.5 uppercase tracking-wider">{label}</div>
+            <div className="text-[11px] font-bold text-surface-dark/60 dark:text-white/50 mt-0.5 uppercase tracking-wider">{label}</div>
         </GlassCard>
     );
 }

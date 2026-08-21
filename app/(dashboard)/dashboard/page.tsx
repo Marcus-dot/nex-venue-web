@@ -92,10 +92,10 @@ export default function DashboardPage() {
                             <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
                                 <Calendar size={24} />
                             </div>
-                            <div className="text-[10px] font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest">Events Hosted</div>
+                            <div className="text-[10px] font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest">Events Hosted</div>
                         </div>
                         <div className="text-4xl font-black text-surface-dark dark:text-white">{events.length}</div>
-                        <div className="text-xs font-bold text-surface-dark/40 dark:text-white/40 mt-1">
+                        <div className="text-xs font-bold text-surface-dark/55 dark:text-white/40 mt-1">
                             {distinctLocations > 0
                                 ? `Across ${distinctLocations} location${distinctLocations === 1 ? "" : "s"}`
                                 : "No events yet"}
@@ -107,10 +107,10 @@ export default function DashboardPage() {
                             <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
                                 <Users size={24} />
                             </div>
-                            <div className="text-[10px] font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest">Total Reach</div>
+                            <div className="text-[10px] font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest">Total Reach</div>
                         </div>
                         <div className="text-4xl font-black text-surface-dark dark:text-white">{totalAttendees}</div>
-                        <div className="text-xs font-bold text-surface-dark/40 dark:text-white/40 mt-1">Attendees across your events</div>
+                        <div className="text-xs font-bold text-surface-dark/55 dark:text-white/40 mt-1">Attendees across your events</div>
                     </GlassCard>
 
                     <GlassCard className="!p-8">
@@ -118,10 +118,10 @@ export default function DashboardPage() {
                             <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500">
                                 <TrendingUp size={24} />
                             </div>
-                            <div className="text-[10px] font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest">Avg. Turnout</div>
+                            <div className="text-[10px] font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest">Avg. Turnout</div>
                         </div>
                         <div className="text-4xl font-black text-surface-dark dark:text-white">{avgPerEvent}</div>
-                        <div className="text-xs font-bold text-surface-dark/40 dark:text-white/40 mt-1">Attendees per event</div>
+                        <div className="text-xs font-bold text-surface-dark/55 dark:text-white/40 mt-1">Attendees per event</div>
                     </GlassCard>
                 </div>
 
@@ -158,7 +158,7 @@ export default function DashboardPage() {
                                         <div className="flex-1 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                             <div className="space-y-1">
                                                 <h4 className="text-xl font-black text-surface-dark dark:text-white group-hover:text-accent transition-colors">{event.title}</h4>
-                                                <div className="flex items-center gap-4 text-sm font-bold text-surface-dark/40 dark:text-white/40">
+                                                <div className="flex items-center gap-4 text-sm font-bold text-surface-dark/55 dark:text-white/40">
                                                     <span className="flex items-center gap-1.5"><Calendar size={14} /> {event.date}</span>
                                                     <span className="flex items-center gap-1.5"><Users size={14} /> {event.attendees?.length || 0} Joined</span>
                                                 </div>
@@ -172,7 +172,7 @@ export default function DashboardPage() {
                                                     <Button variant="ghost" size="sm" className="font-bold">Open Chat</Button>
                                                 </Link>
                                                 <button className="p-2 hover:bg-surface-dark/5 dark:hover:bg-white/5 rounded-xl transition-colors">
-                                                    <Settings size={20} className="text-surface-dark/40 dark:text-white/40" />
+                                                    <Settings size={20} className="text-surface-dark/55 dark:text-white/40" />
                                                 </button>
                                             </div>
                                         </div>

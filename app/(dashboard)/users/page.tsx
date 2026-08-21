@@ -195,7 +195,7 @@ export default function UserManagementPage() {
                         ].map((s) => (
                             <GlassCard key={s.label} className="!p-4 text-center">
                                 <div className={cn("text-3xl font-black", s.accent ? "text-accent" : "text-surface-dark dark:text-white")}>{s.value}</div>
-                                <div className="text-xs font-bold text-surface-dark/40 dark:text-white/40 mt-1">{s.label}</div>
+                                <div className="text-xs font-bold text-surface-dark/55 dark:text-white/40 mt-1">{s.label}</div>
                             </GlassCard>
                         ))}
                     </div>
@@ -210,7 +210,7 @@ export default function UserManagementPage() {
                                     "flex-1 px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all font-black text-sm",
                                     activeTab === tab.id
                                         ? "bg-white dark:bg-white/10 text-accent shadow-sm"
-                                        : "text-surface-dark/40 dark:text-white/40 hover:text-surface-dark dark:hover:text-white"
+                                        : "text-surface-dark/55 dark:text-white/40 hover:text-surface-dark dark:hover:text-white"
                                 )}
                             >
                                 <tab.icon size={16} />
@@ -230,17 +230,17 @@ export default function UserManagementPage() {
                         <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             {/* Search */}
                             <div className="flex items-center gap-3 rounded-2xl px-4 h-12 bg-surface-dark/5 dark:bg-white/5 border border-surface-dark/10 dark:border-white/10 mb-2">
-                                <Search size={17} className="text-surface-dark/40 dark:text-white/40 shrink-0" />
+                                <Search size={17} className="text-surface-dark/55 dark:text-white/40 shrink-0" />
                                 <input
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     placeholder="Search by name or phone…"
-                                    className="flex-1 bg-transparent outline-none text-surface-dark dark:text-white font-medium placeholder:text-surface-dark/30 dark:placeholder:text-white/30"
+                                    className="flex-1 bg-transparent outline-none text-surface-dark dark:text-white font-medium placeholder:text-surface-dark/45 dark:placeholder:text-white/30"
                                 />
                             </div>
 
                             {filteredUsers.length === 0 ? (
-                                <div className="text-center py-16 text-surface-dark/40 dark:text-white/40 font-medium">
+                                <div className="text-center py-16 text-surface-dark/55 dark:text-white/40 font-medium">
                                     {search ? "No users match your search." : "No users yet."}
                                 </div>
                             ) : (
@@ -256,11 +256,11 @@ export default function UserManagementPage() {
                                                     <span className="font-black text-surface-dark dark:text-white truncate">{u.fullName || "Unknown"}</span>
                                                     {isSelf && <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-accent text-white">You</span>}
                                                 </div>
-                                                <p className="text-sm text-surface-dark/40 dark:text-white/40 font-medium truncate">{u.phoneNumber || "No phone"}</p>
+                                                <p className="text-sm text-surface-dark/55 dark:text-white/40 font-medium truncate">{u.phoneNumber || "No phone"}</p>
                                                 <span
                                                     className={cn(
                                                         "inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-black",
-                                                        admin ? "bg-accent/10 text-accent" : "bg-surface-dark/5 dark:bg-white/5 text-surface-dark/50 dark:text-white/50"
+                                                        admin ? "bg-accent/10 text-accent" : "bg-surface-dark/5 dark:bg-white/5 text-surface-dark/60 dark:text-white/50"
                                                     )}
                                                 >
                                                     <Shield size={11} /> {admin ? "Gralix Admin" : "Member"}
@@ -294,7 +294,7 @@ export default function UserManagementPage() {
                                         <Shield size={30} />
                                     </div>
                                     <p className="font-black text-surface-dark dark:text-white mb-1">No pending requests</p>
-                                    <p className="text-sm text-surface-dark/40 dark:text-white/40 font-medium">Admin access requests will appear here.</p>
+                                    <p className="text-sm text-surface-dark/55 dark:text-white/40 font-medium">Admin access requests will appear here.</p>
                                 </div>
                             ) : (
                                 <>
@@ -312,15 +312,15 @@ export default function UserManagementPage() {
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <div className="font-black text-surface-dark dark:text-white truncate">{req.userName}</div>
-                                                        <div className="text-sm text-surface-dark/40 dark:text-white/40 font-medium truncate">{req.userPhone}</div>
+                                                        <div className="text-sm text-surface-dark/55 dark:text-white/40 font-medium truncate">{req.userPhone}</div>
                                                     </div>
                                                     <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-500">Pending</span>
                                                 </div>
                                                 <div className="rounded-xl p-3 bg-surface-dark/5 dark:bg-white/5 mb-3">
-                                                    <div className="text-[10px] font-black uppercase tracking-wider text-surface-dark/30 dark:text-white/30 mb-1">Reason</div>
+                                                    <div className="text-[10px] font-black uppercase tracking-wider text-surface-dark/45 dark:text-white/30 mb-1">Reason</div>
                                                     <p className="text-sm text-surface-dark dark:text-white leading-relaxed">{req.reason}</p>
                                                 </div>
-                                                <div className="text-xs text-surface-dark/30 dark:text-white/30 font-medium mb-4">Requested {timeAgo(req.timestamp)}</div>
+                                                <div className="text-xs text-surface-dark/45 dark:text-white/30 font-medium mb-4">Requested {timeAgo(req.timestamp)}</div>
                                                 <div className="flex gap-3">
                                                     <button
                                                         onClick={() => handleReject(req)}

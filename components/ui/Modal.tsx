@@ -53,7 +53,7 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
                                 </h3>
                                 <button
                                     onClick={onClose}
-                                    className="p-2 rounded-xl hover:bg-surface-dark/5 dark:hover:bg-white/5 text-surface-dark/40 dark:text-white/40 hover:text-surface-dark dark:hover:text-white transition-all"
+                                    className="p-2 rounded-xl hover:bg-surface-dark/5 dark:hover:bg-white/5 text-surface-dark/55 dark:text-white/40 hover:text-surface-dark dark:hover:text-white transition-all"
                                 >
                                     <X size={20} />
                                 </button>

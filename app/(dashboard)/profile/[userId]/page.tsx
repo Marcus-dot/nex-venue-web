@@ -26,7 +26,7 @@ import type { ConnectionRequest } from "@/types/connections";
 const NETWORKING_CONFIG: Record<string, { label: string; dot: string; bg: string; text: string }> = {
     open:          { label: "Open to Networking", dot: "bg-green-500",  bg: "bg-green-500/10",  text: "text-green-600 dark:text-green-400" },
     selective:     { label: "Selective",           dot: "bg-amber-400",  bg: "bg-amber-500/10",  text: "text-amber-600 dark:text-amber-400" },
-    not_available: { label: "Not Available",       dot: "bg-white/30",   bg: "bg-white/8",       text: "text-surface-dark/50 dark:text-white/40" },
+    not_available: { label: "Not Available",       dot: "bg-white/30",   bg: "bg-white/8",       text: "text-surface-dark/60 dark:text-white/40" },
 };
 
 // Read any user's profile from Firestore without touching global auth state
@@ -156,7 +156,7 @@ export default function PublicProfilePage() {
                 Organiser: { bg: "bg-purple-500/10",    text: "text-purple-500 dark:text-purple-400" },
                 Speaker:   { bg: "bg-blue-500/10",      text: "text-blue-500 dark:text-blue-400" },
                 Exhibitor: { bg: "bg-green-500/10",     text: "text-green-500 dark:text-green-400" },
-                Attendee:  { bg: "bg-surface-dark/5 dark:bg-white/5", text: "text-surface-dark/40 dark:text-white/40" },
+                Attendee:  { bg: "bg-surface-dark/5 dark:bg-white/5", text: "text-surface-dark/55 dark:text-white/40" },
             };
 
             const getRole = (event: Event): string => {
@@ -215,7 +215,7 @@ export default function PublicProfilePage() {
                 {/* Back */}
                 <button
                     onClick={() => router.back()}
-                    className="flex items-center gap-2 text-surface-dark/50 dark:text-white/50 hover:text-accent font-bold text-sm mb-8 transition-colors"
+                    className="flex items-center gap-2 text-surface-dark/60 dark:text-white/50 hover:text-accent font-bold text-sm mb-8 transition-colors"
                 >
                     <ArrowLeft size={16} /> Back
                 </button>
@@ -249,19 +249,19 @@ export default function PublicProfilePage() {
                                 <div className="flex items-center gap-1.5">
                                     {showLinkedin && (
                                         <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer"
-                                           className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-[#0077b5]/10 flex items-center justify-center text-surface-dark/40 dark:text-white/40 hover:text-[#0077b5] transition-all">
+                                           className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-[#0077b5]/10 flex items-center justify-center text-surface-dark/55 dark:text-white/40 hover:text-[#0077b5] transition-all">
                                             <Linkedin size={14} />
                                         </a>
                                     )}
                                     {showTwitter && (
                                         <a href={`https://twitter.com/${profile.twitterHandle}`} target="_blank" rel="noopener noreferrer"
-                                           className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-[#1DA1F2]/10 flex items-center justify-center text-surface-dark/40 dark:text-white/40 hover:text-[#1DA1F2] transition-all">
+                                           className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-[#1DA1F2]/10 flex items-center justify-center text-surface-dark/55 dark:text-white/40 hover:text-[#1DA1F2] transition-all">
                                             <Twitter size={14} />
                                         </a>
                                     )}
                                     {showWebsite && (
                                         <a href={profile.websiteUrl} target="_blank" rel="noopener noreferrer"
-                                           className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-accent/10 flex items-center justify-center text-surface-dark/40 dark:text-white/40 hover:text-accent transition-all">
+                                           className="w-8 h-8 rounded-full bg-surface-dark/5 dark:bg-white/5 hover:bg-accent/10 flex items-center justify-center text-surface-dark/55 dark:text-white/40 hover:text-accent transition-all">
                                             <Globe size={14} />
                                         </a>
                                     )}
@@ -290,7 +290,7 @@ export default function PublicProfilePage() {
                                             ) : connStatus === null ? (
                                                 <button onClick={handleConnect} disabled={connBusy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-white text-xs font-bold hover:opacity-90 disabled:opacity-50 transition-all"><UserPlus size={12} /> Connect</button>
                                             ) : null}
-                                            <button onClick={handleBlock} disabled={blockBusy} title="Block this user" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-surface-dark/10 dark:border-white/10 text-surface-dark/40 dark:text-white/40 hover:text-red-600 hover:border-red-500/30 text-xs font-bold disabled:opacity-50 transition-colors">
+                                            <button onClick={handleBlock} disabled={blockBusy} title="Block this user" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-surface-dark/10 dark:border-white/10 text-surface-dark/55 dark:text-white/40 hover:text-red-600 hover:border-red-500/30 text-xs font-bold disabled:opacity-50 transition-colors">
                                                 {blockBusy ? <Loader2 size={12} className="animate-spin" /> : <Ban size={12} />} Block
                                             </button>
                                         </>
@@ -306,7 +306,7 @@ export default function PublicProfilePage() {
 
                         {(profile.jobTitle || profile.company) && (
                             <p className="text-sm font-semibold text-surface-dark/60 dark:text-white/50 flex items-center gap-1.5 mb-2">
-                                <Briefcase size={13} className="text-surface-dark/30 dark:text-white/30" />
+                                <Briefcase size={13} className="text-surface-dark/45 dark:text-white/30" />
                                 {[profile.jobTitle, profile.company].filter(Boolean).join(" · ")}
                             </p>
                         )}
@@ -336,7 +336,7 @@ export default function PublicProfilePage() {
                 {/* Event interests */}
                 {(profile.eventInterests?.length ?? 0) > 0 && (
                     <GlassCard className="!p-5 mb-4">
-                        <p className="text-xs font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <p className="text-xs font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest mb-3 flex items-center gap-2">
                             <Tag size={12} /> Interests
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -352,7 +352,7 @@ export default function PublicProfilePage() {
                 {/* Events */}
                 {userEvents.length > 0 && (
                     <GlassCard className="!p-5">
-                        <p className="text-xs font-black text-surface-dark/30 dark:text-white/30 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <p className="text-xs font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest mb-4 flex items-center gap-2">
                             <Calendar size={12} /> Events
                         </p>
                         <div className="space-y-2">
@@ -368,7 +368,7 @@ export default function PublicProfilePage() {
                                                 {role}
                                             </span>
                                             {event.date && (
-                                                <span className="text-[11px] text-surface-dark/30 dark:text-white/30 font-medium">{event.date}</span>
+                                                <span className="text-[11px] text-surface-dark/45 dark:text-white/30 font-medium">{event.date}</span>
                                             )}
                                         </div>
                                     </div>
