@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import type { DocumentSnapshot } from "firebase/firestore";
 import { eventService } from "@/services/events";
 import { Event } from "@/types/events";
 import { EventCard } from "@/components/features/EventCard";
@@ -95,7 +96,7 @@ export default function EventsPage() {
     const [allEvents, setAllEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
-    const [lastDoc, setLastDoc] = useState<any>(null);
+    const [lastDoc, setLastDoc] = useState<DocumentSnapshot | null>(null);
     const [hasMore, setHasMore] = useState(true);
     const [search, setSearch] = useState("");
     const [activeTab, setActiveTab] = useState<FilterTab>("all");
@@ -144,6 +145,8 @@ export default function EventsPage() {
     // Featured = first event with a cover image (or just first event)
     const featured = allEvents.find(e => e.imageUrl) ?? allEvents[0];
     const showFeatured = activeTab === "all" && !search && featured;
+    // Don't repeat the featured event in the grid below the hero.
+    const gridEvents = showFeatured ? filtered.filter(e => e.id !== featured!.id) : filtered;
 
     const TABS: { id: FilterTab; label: string }[] = [
         { id: "all",   label: "All Events" },
@@ -227,9 +230,23 @@ export default function EventsPage() {
 
                 {/* ── Content ──────────────────────────────────────────────── */}
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-40 text-accent">
-                        <Loader2 className="animate-spin mb-3" size={36} />
-                        <span className="font-bold text-sm text-surface-dark/40 dark:text-white/40">Loading events...</span>
+                    <div aria-busy="true" aria-label="Loading events">
+                        {/* Featured skeleton */}
+                        <div className="w-full h-72 rounded-3xl bg-surface-dark/5 dark:bg-white/5 animate-pulse mb-10" />
+                        {/* Card skeletons */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className="rounded-3xl overflow-hidden bg-white dark:bg-[#171a2e] border border-surface-dark/8 dark:border-white/8">
+                                    <div className="h-48 bg-surface-dark/5 dark:bg-white/5 animate-pulse" />
+                                    <div className="p-6 space-y-3">
+                                        <div className="h-5 w-3/4 rounded-lg bg-surface-dark/8 dark:bg-white/8 animate-pulse" />
+                                        <div className="h-3.5 w-full rounded bg-surface-dark/6 dark:bg-white/6 animate-pulse" />
+                                        <div className="h-3.5 w-2/3 rounded bg-surface-dark/6 dark:bg-white/6 animate-pulse" />
+                                        <div className="h-9 w-full rounded-xl bg-surface-dark/5 dark:bg-white/5 animate-pulse mt-4" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 ) : (
                     <>
@@ -246,7 +263,7 @@ export default function EventsPage() {
                                 )}
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-                                    {filtered.map(event => (
+                                    {gridEvents.map(event => (
                                         <EventCard key={event.id} event={event} />
                                     ))}
                                 </div>

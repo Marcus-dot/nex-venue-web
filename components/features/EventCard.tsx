@@ -77,6 +77,8 @@ export const EventCard = ({ event }: EventCardProps) => {
                         <img
                             src={event.imageUrl}
                             alt={event.title}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                     ) : (
