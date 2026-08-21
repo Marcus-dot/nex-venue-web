@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
 import { ChatWindow } from "@/components/features/chat/ChatWindow";
 import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
 
 function ChatPageInner() {
     const { user, loading } = useAuth();
@@ -47,24 +48,30 @@ function ChatPageInner() {
 
     return (
         <div className="h-screen w-full flex bg-background dark:bg-[#0f101e] pt-[72px]">
-            <ChatSidebar
-                onSelect={(id, type, name) => setSelectedChat({ id, type, name })}
-                selectedId={selectedChat?.id}
-            />
+            {/* Mobile shows a single pane: the list, or the open conversation. */}
+            <div className={cn("h-full shrink-0", selectedChat ? "hidden md:block" : "w-full md:w-auto")}>
+                <ChatSidebar
+                    onSelect={(id, type, name) => setSelectedChat({ id, type, name })}
+                    selectedId={selectedChat?.id}
+                />
+            </div>
 
             {selectedChat ? (
                 <ChatWindow
                     id={selectedChat.id}
                     type={selectedChat.type}
                     name={selectedChat.name}
+                    onBack={() => setSelectedChat(null)}
                 />
             ) : (
-                <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-gray-950 opacity-20">
-                    <div className="w-24 h-24 bg-surface-dark/10 dark:bg-white/10 rounded-full flex items-center justify-center mb-6">
+                <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-white dark:bg-gray-950 px-8 text-center">
+                    <div className="w-24 h-24 bg-accent/10 rounded-3xl flex items-center justify-center mb-6">
                         <Image src="/nexvenue-logo.png" alt="NexVenue" width={48} height={48} className="rounded-2xl" />
                     </div>
-                    <h2 className="text-2xl font-black text-surface-dark dark:text-white">NexVenue Messenger</h2>
-                    <p className="font-bold">Select a conversation to start chatting</p>
+                    <h2 className="text-2xl font-black text-surface-dark dark:text-white mb-1">NexVenue Messenger</h2>
+                    <p className="font-medium text-surface-dark/55 dark:text-white/45 max-w-xs">
+                        Pick a conversation from the left to start chatting, or open an event chat from its page.
+                    </p>
                 </div>
             )}
         </div>

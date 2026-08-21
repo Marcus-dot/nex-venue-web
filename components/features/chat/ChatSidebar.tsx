@@ -53,8 +53,13 @@ export const ChatSidebar = ({ onSelect, selectedId }: ChatSidebarProps) => {
         };
     };
 
+    const q = search.trim().toLowerCase();
+    const filtered = q
+        ? conversations.filter(c => getRecipientInfo(c).name.toLowerCase().includes(q))
+        : conversations;
+
     return (
-        <div className="w-80 h-full border-r border-surface-dark/5 dark:border-white/5 flex flex-col bg-white dark:bg-gray-950">
+        <div className="w-full md:w-80 h-full border-r border-surface-dark/5 dark:border-white/5 flex flex-col bg-white dark:bg-gray-950">
             <div className="p-6 space-y-4">
                 <h2 className="text-2xl font-black text-surface-dark dark:text-white">Messages</h2>
                 <div className="relative">
@@ -71,14 +76,14 @@ export const ChatSidebar = ({ onSelect, selectedId }: ChatSidebarProps) => {
             <div className="flex-1 overflow-y-auto px-4 space-y-2 pb-6">
                 <div className="text-[10px] uppercase tracking-widest font-black text-surface-dark/45 dark:text-white/30 ml-2 mb-2">Direct Chats</div>
 
-                {conversations.length === 0 && (
-                    <div className="text-center py-10 opacity-40">
-                        <MessageSquare size={32} className="mx-auto mb-2" />
-                        <p className="text-xs font-bold">No conversations yet</p>
+                {filtered.length === 0 && (
+                    <div className="text-center py-10 text-surface-dark/45 dark:text-white/40">
+                        <MessageSquare size={32} className="mx-auto mb-2 opacity-60" />
+                        <p className="text-xs font-bold">{q ? "No matches" : "No conversations yet"}</p>
                     </div>
                 )}
 
-                {conversations.map((conv) => {
+                {filtered.map((conv) => {
                     const info = getRecipientInfo(conv);
                     const isSelected = selectedId === conv.id;
                     const recipientId = conv.participants.find(p => p !== user?.uid);

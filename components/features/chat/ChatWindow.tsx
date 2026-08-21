@@ -5,17 +5,17 @@ import { useAuth } from "@/context/AuthContext";
 import { chatService } from "@/services/chat";
 import { ChatMessage } from "@/types/chat";
 import { MessageItem } from "./MessageItem";
-import { Button } from "@/components/ui/Button";
-import { Send, ArrowLeft, Loader2, Info } from "lucide-react";
+import { Send, ArrowLeft, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 interface ChatWindowProps {
     id: string;
     type: 'direct' | 'event';
     name: string;
+    onBack?: () => void;
 }
 
-export const ChatWindow = ({ id, type, name }: ChatWindowProps) => {
+export const ChatWindow = ({ id, type, name, onBack }: ChatWindowProps) => {
     const { user, profile } = useAuth();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [loading, setLoading] = useState(true);
@@ -97,22 +97,26 @@ export const ChatWindow = ({ id, type, name }: ChatWindowProps) => {
 
     return (
         <div className="flex-1 flex flex-col h-full bg-white dark:bg-gray-950 relative">
-            <header className="px-8 py-4 border-b border-surface-dark/5 dark:border-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center text-accent font-black text-xl">
-                        {name[0]}
-                    </div>
-                    <div>
-                        <h3 className="font-black text-surface-dark dark:text-white">{name}</h3>
-                        <div className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                            <span className="text-[10px] font-black text-surface-dark/55 dark:text-white/40 uppercase tracking-widest">Live Connection</span>
-                        </div>
+            <header className="px-4 md:px-8 py-4 border-b border-surface-dark/5 dark:border-white/5 flex items-center gap-3 md:gap-4">
+                {onBack && (
+                    <button
+                        onClick={onBack}
+                        className="md:hidden -ml-1 p-2 rounded-xl text-surface-dark/60 dark:text-white/60 hover:bg-surface-dark/5 dark:hover:bg-white/5 transition-colors"
+                        aria-label="Back to conversations"
+                    >
+                        <ArrowLeft size={22} />
+                    </button>
+                )}
+                <div className="w-11 h-11 rounded-2xl bg-accent/10 flex items-center justify-center text-accent font-black text-xl shrink-0">
+                    {name[0]}
+                </div>
+                <div className="min-w-0">
+                    <h3 className="font-black text-surface-dark dark:text-white truncate">{name}</h3>
+                    <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                        <span className="text-[10px] font-black text-surface-dark/55 dark:text-white/40 uppercase tracking-widest">Live</span>
                     </div>
                 </div>
-                <Button variant="ghost" size="sm" className="text-surface-dark/55">
-                    <Info size={20} />
-                </Button>
             </header>
 
             <div
