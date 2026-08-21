@@ -10,13 +10,30 @@ import {
     Plus,
     Users,
     Calendar,
-    ChevronRight,
+    MapPin,
     TrendingUp,
     Loader2,
     BarChart3
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
+// Deterministic warm gradient per event (fallback when there's no cover image).
+const EVENT_GRADIENTS = [
+    ["#e85c29", "#f59e0b"], ["#d97706", "#fbbf24"], ["#c2410c", "#ea580c"],
+    ["#f59e0b", "#fcd34d"], ["#9a3412", "#c2410c"], ["#b45309", "#f59e0b"],
+];
+function eventGradient(title: string): string {
+    let hash = 0;
+    for (let i = 0; i < title.length; i++) hash = title.charCodeAt(i) + ((hash << 5) - hash);
+    const [from, to] = EVENT_GRADIENTS[Math.abs(hash) % EVENT_GRADIENTS.length];
+    return `linear-gradient(135deg, ${from}, ${to})`;
+}
+function formatDate(dateStr: string): string {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
 
 export default function DashboardPage() {
     const { user, profile, isAdmin, loading: authLoading } = useAuth();
@@ -134,52 +151,65 @@ export default function DashboardPage() {
                         )}
                     </div>
 
-                    <div className="space-y-4">
-                        {events.length === 0 ? (
-                            <GlassCard className="py-20 text-center">
-                                <div className="text-surface-dark/20 dark:text-white/20 mb-6">
-                                    <Calendar size={64} className="mx-auto" />
-                                </div>
-                                <h4 className="text-xl font-black text-surface-dark dark:text-white mb-2">No events created yet</h4>
-                                <p className="text-surface-dark/60 dark:text-white/60 mb-8 max-w-xs mx-auto">Click &quot;Create Event&quot; to launch your first experience on NexVenue.</p>
-                            </GlassCard>
-                        ) : (
-                            events.map((event) => (
-                                <GlassCard key={event.id} className="!p-0 overflow-hidden group hover:border-accent/30 transition-all">
-                                    <div className="flex flex-col md:flex-row items-stretch">
-                                        <div className="w-full md:w-32 h-32 bg-surface-dark/5 dark:bg-white/5 flex-shrink-0">
-                                            {event.imageUrl ? (
-                                                <img src={event.imageUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-surface-dark/20 bg-premium-gradient opacity-20">
-                                                    <Calendar size={32} />
-                                                </div>
+                    {events.length === 0 ? (
+                        <GlassCard className="py-20 text-center">
+                            <div className="text-surface-dark/20 dark:text-white/20 mb-6">
+                                <Calendar size={64} className="mx-auto" />
+                            </div>
+                            <h4 className="text-xl font-black text-surface-dark dark:text-white mb-2">No events created yet</h4>
+                            <p className="text-surface-dark/60 dark:text-white/60 mb-8 max-w-xs mx-auto">Create your first event to start managing an agenda, attendees, and live Q&amp;A.</p>
+                            <Link href="/events/create">
+                                <Button className="font-black gap-2"><Plus size={18} strokeWidth={3} /> Create Event</Button>
+                            </Link>
+                        </GlassCard>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                            {events.map((event) => (
+                                <GlassCard key={event.id} className="!p-0 overflow-hidden flex flex-col group">
+                                    {/* Cover */}
+                                    <div className="relative h-44 w-full overflow-hidden">
+                                        {event.imageUrl ? (
+                                            <img
+                                                src={event.imageUrl}
+                                                alt=""
+                                                loading="lazy"
+                                                decoding="async"
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-white/25" style={{ background: eventGradient(event.title) }}>
+                                                <Calendar size={40} />
+                                            </div>
+                                        )}
+                                        <span className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-white/90 dark:bg-gray-900/85 backdrop-blur-sm text-[11px] font-black text-surface-dark dark:text-white">
+                                            {formatDate(event.date)}
+                                        </span>
+                                    </div>
+
+                                    {/* Body */}
+                                    <div className="flex flex-col flex-grow p-5 gap-3">
+                                        <h4 className="text-lg font-black text-surface-dark dark:text-white line-clamp-1 group-hover:text-accent transition-colors">
+                                            {event.title}
+                                        </h4>
+                                        <div className="flex items-center gap-4 text-sm font-bold text-surface-dark/55 dark:text-white/40">
+                                            <span className="flex items-center gap-1.5 shrink-0"><Users size={14} /> {event.attendees?.length || 0} joined</span>
+                                            {event.location && (
+                                                <span className="flex items-center gap-1.5 min-w-0"><MapPin size={14} className="shrink-0" /> <span className="truncate">{event.location}</span></span>
                                             )}
                                         </div>
-
-                                        <div className="flex-1 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                                            <div className="space-y-1">
-                                                <h4 className="text-xl font-black text-surface-dark dark:text-white group-hover:text-accent transition-colors">{event.title}</h4>
-                                                <div className="flex items-center gap-4 text-sm font-bold text-surface-dark/55 dark:text-white/40">
-                                                    <span className="flex items-center gap-1.5"><Calendar size={14} /> {event.date}</span>
-                                                    <span className="flex items-center gap-1.5"><Users size={14} /> {event.attendees?.length || 0} Joined</span>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-3">
-                                                <Link href={`/events/${event.id}/manage`}>
-                                                    <Button variant="secondary" size="sm" className="font-bold">Manage</Button>
-                                                </Link>
-                                                <Link href={`/chat?id=${event.id}&type=event&name=${encodeURIComponent(event.title)}`}>
-                                                    <Button variant="ghost" size="sm" className="font-bold">Open Chat</Button>
-                                                </Link>
-                                            </div>
+                                        <div className="flex items-center gap-2 mt-auto pt-2">
+                                            <Link href={`/events/${event.id}/manage`} className="flex-1">
+                                                <Button size="sm" className="w-full font-bold">Manage</Button>
+                                            </Link>
+                                            <Link href={`/chat?id=${event.id}&type=event&name=${encodeURIComponent(event.title)}`}>
+                                                <Button variant="ghost" size="sm" className="font-bold">Chat</Button>
+                                            </Link>
                                         </div>
                                     </div>
                                 </GlassCard>
-                            ))
-                        )}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
