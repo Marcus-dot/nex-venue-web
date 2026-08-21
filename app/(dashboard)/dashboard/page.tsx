@@ -13,8 +13,6 @@ import {
     ChevronRight,
     TrendingUp,
     Loader2,
-    Settings,
-    MoreVertical,
     BarChart3
 } from "lucide-react";
 import Link from "next/link";
@@ -128,8 +126,12 @@ export default function DashboardPage() {
                 {/* My Events Table/List */}
                 <div className="space-y-6">
                     <div className="flex items-center justify-between px-2">
-                        <h3 className="text-2xl font-black text-surface-dark dark:text-white">Recent Events</h3>
-                        <Button variant="ghost" size="sm" className="font-bold text-accent">View All Archives</Button>
+                        <h3 className="text-2xl font-black text-surface-dark dark:text-white">Your Events</h3>
+                        {events.length > 0 && (
+                            <Link href="/analytics">
+                                <Button variant="ghost" size="sm" className="font-bold text-accent">View analytics</Button>
+                            </Link>
+                        )}
                     </div>
 
                     <div className="space-y-4">
@@ -147,7 +149,7 @@ export default function DashboardPage() {
                                     <div className="flex flex-col md:flex-row items-stretch">
                                         <div className="w-full md:w-32 h-32 bg-surface-dark/5 dark:bg-white/5 flex-shrink-0">
                                             {event.imageUrl ? (
-                                                <img src={event.imageUrl} alt="" className="w-full h-full object-cover" />
+                                                <img src={event.imageUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-surface-dark/20 bg-premium-gradient opacity-20">
                                                     <Calendar size={32} />
@@ -165,15 +167,12 @@ export default function DashboardPage() {
                                             </div>
 
                                             <div className="flex items-center gap-3">
-                                                <Link href={`/events/${event.id}`}>
-                                                    <Button variant="secondary" size="sm" className="font-bold">Edit Event</Button>
+                                                <Link href={`/events/${event.id}/manage`}>
+                                                    <Button variant="secondary" size="sm" className="font-bold">Manage</Button>
                                                 </Link>
                                                 <Link href={`/chat?id=${event.id}&type=event&name=${encodeURIComponent(event.title)}`}>
                                                     <Button variant="ghost" size="sm" className="font-bold">Open Chat</Button>
                                                 </Link>
-                                                <button className="p-2 hover:bg-surface-dark/5 dark:hover:bg-white/5 rounded-xl transition-colors">
-                                                    <Settings size={20} className="text-surface-dark/55 dark:text-white/40" />
-                                                </button>
                                             </div>
                                         </div>
                                     </div>
