@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { useAuth } from "@/context/AuthContext";
+import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { useToast } from "@/context/ToastContext";
 import { usersService, type UserRecord } from "@/services/users";
 import { adminRequestService, type AdminRequest } from "@/services/adminRequests";
@@ -162,11 +163,7 @@ export default function UserManagementPage() {
     };
 
     if (authLoading || (!isAdmin && !user)) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-background dark:bg-[#0f101e]">
-                <Loader2 className="animate-spin text-accent" size={48} />
-            </div>
-        );
+        return <LoadingSkeleton stats={3} cards={4} />;
     }
     if (!isAdmin) return null;
 

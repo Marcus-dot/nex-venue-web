@@ -12,11 +12,11 @@ import {
     Calendar,
     MapPin,
     TrendingUp,
-    Loader2,
     BarChart3
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 
 // Deterministic warm gradient per event (fallback when there's no cover image).
 const EVENT_GRADIENTS = [
@@ -65,11 +65,7 @@ export default function DashboardPage() {
     }, [user]);
 
     if (authLoading || loading) {
-        return (
-            <div className="h-screen w-full flex items-center justify-center bg-background dark:bg-[#0f101e]">
-                <Loader2 className="animate-spin text-accent" size={48} />
-            </div>
-        );
+        return <LoadingSkeleton stats={3} cards={3} />;
     }
 
     const totalAttendees = events.reduce((acc, curr) => acc + (curr.attendees?.length || 0), 0);

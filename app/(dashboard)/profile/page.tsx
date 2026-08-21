@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { Button } from "@/components/ui/Button";
 import { AvatarDisplay } from "@/components/ui/AvatarDisplay";
 import { auth } from "@/lib/firebase/config";
@@ -97,11 +98,7 @@ export default function ProfilePage() {
     const handleLogout = async () => { await signOut(auth); router.push("/"); };
 
     if (authLoading || loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-background dark:bg-[#0f101e]">
-                <Loader2 className="animate-spin text-accent" size={44} />
-            </div>
-        );
+        return <LoadingSkeleton stats={3} cards={4} />;
     }
     if (!user) return null;
 

@@ -9,10 +9,11 @@ import { eventService } from "@/services/events";
 import { useAuth } from "@/context/AuthContext";
 import { GlassCard } from "@/components/ui/GlassCard";
 import {
-    Loader2, Users, UserCheck, MessageSquare, Star, BarChart3,
+    Users, UserCheck, MessageSquare, Star, BarChart3,
     CalendarDays, ArrowRight, ArrowLeft, Download,
 } from "lucide-react";
 import { downloadCSV } from "@/lib/exportAttendees";
+import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 
 interface EventStat {
     id: string;
@@ -104,11 +105,7 @@ export default function AnalyticsPage() {
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-background dark:bg-[#0f101e]">
-                <Loader2 className="animate-spin text-accent" size={44} />
-            </div>
-        );
+        return <LoadingSkeleton stats={6} cards={2} />;
     }
 
     return (
