@@ -84,7 +84,7 @@ export const Navigation = () => {
                     <span className="text-xl font-black tracking-tighter text-surface-dark dark:text-white hidden sm:inline">NexVenue</span>
                 </Link>
 
-                {/* Primary nav — app items only for signed-in users */}
+                {/* Primary nav, app items only for signed-in users */}
                 {user && (
                     <div className="flex items-center gap-1">
                         {navItems.map((item) => {

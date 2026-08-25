@@ -187,7 +187,7 @@ function StarRating({ agendaItemId, eventId, guestId }: { agendaItemId: string; 
                 createdAt: Date.now(),
             }, { merge: true });
         } catch {
-            // silent — optimistic update stays
+            // silent, optimistic update stays
         } finally {
             setSaving(false);
         }
@@ -244,7 +244,7 @@ function AgendaCard({ item, status, eventId, guestId }: { item: AgendaItem; stat
     const linked = item.linkedSpeakers ?? [];
     const label = item.category && item.category !== "other" ? CATEGORY_LABELS[item.category] ?? null : null;
 
-    // Breaks — minimal styling
+    // Breaks, minimal styling
     if (item.isBreak) {
         return (
             <div className="flex items-center gap-3 py-2.5 px-4 rounded-xl"

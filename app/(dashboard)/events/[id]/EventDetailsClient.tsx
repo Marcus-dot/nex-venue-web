@@ -163,7 +163,7 @@ export default function EventDetailsClient() {
     // Merge account-based speakers (EventParticipant, role=speaker) with curated
     // speaker cards (event.speakerProfiles); a curated card linked to an account
     // already shown as a participant is dropped to avoid duplicates.
-    // NOTE: must stay above the early returns below — it's a hook.
+    // NOTE: must stay above the early returns below, it's a hook.
     const displaySpeakers = useMemo(() => {
         const accountSpeakers = participants.filter(p => p.role === 'speaker');
         const accountIds = new Set(accountSpeakers.map(p => p.id));
@@ -295,7 +295,7 @@ export default function EventDetailsClient() {
                 showToast("Event link copied to clipboard.", "success");
             }
         } catch {
-            /* user dismissed the share sheet — no-op */
+            /* user dismissed the share sheet, no-op */
         }
     };
 
@@ -303,7 +303,7 @@ export default function EventDetailsClient() {
 
     return (
         <div ref={containerRef} className="relative min-h-screen pb-20">
-            {/* Hero backdrop — absolute so it scrolls away with the hero instead of
+            {/* Hero backdrop, absolute so it scrolls away with the hero instead of
                 bleeding behind the whole page. Strong scrim keeps the white hero
                 text legible over any banner (light posters included). */}
             <div
@@ -568,7 +568,7 @@ export default function EventDetailsClient() {
                         <h4 className="font-black text-surface-dark dark:text-white mb-6">Attendees</h4>
                         {attendeeCount === 0 ? (
                             <p className="text-sm text-surface-dark/60 dark:text-white/60 font-medium">
-                                No one has joined yet — be the first.
+                                No one has joined yet, be the first.
                             </p>
                         ) : (
                             <>
@@ -598,7 +598,7 @@ export default function EventDetailsClient() {
                 </div>
             </main>
 
-            {/* Speaker profile modal — full bio */}
+            {/* Speaker profile modal, full bio */}
             <Modal
                 isOpen={!!selectedSpeaker}
                 onClose={() => setSelectedSpeaker(null)}

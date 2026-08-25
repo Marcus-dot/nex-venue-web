@@ -107,7 +107,7 @@ export default function NotificationsPage() {
                     )}
                 </div>
 
-                {/* Simulated Generator Buttons — dev only, never shipped to production */}
+                {/* Simulated Generator Buttons, dev only, never shipped to production */}
                 {process.env.NODE_ENV === "development" && (
                     <div className="flex flex-wrap gap-2 mb-8 p-4 border border-blue-500/20 bg-blue-500/5 rounded-2xl">
                         <span className="text-xs font-bold text-blue-800 dark:text-blue-300 w-full mb-1">Testing Utilities:</span>

@@ -146,7 +146,7 @@ export default function AnalyticsPage() {
                             <Stat icon={<UserCheck size={18} />} label="Check-in rate" value={`${totals.checkInRate}%`} />
                             <Stat icon={<MessageSquare size={18} />} label="Questions" value={totals.questions} />
                             <Stat icon={<BarChart3 size={18} />} label="Polls" value={totals.polls} />
-                            <Stat icon={<Star size={18} />} label="Avg rating" value={totals.avgRating ? totals.avgRating.toFixed(1) : "—"} />
+                            <Stat icon={<Star size={18} />} label="Avg rating" value={totals.avgRating ? totals.avgRating.toFixed(1) : ", "} />
                         </div>
 
                         {/* Attendees by event */}
@@ -201,7 +201,7 @@ export default function AnalyticsPage() {
                                                     <td className="px-4 py-4 text-right">
                                                         {r.ratingCount ? (
                                                             <span className="inline-flex items-center gap-1 font-black text-accent tabular-nums"><Star size={12} className="fill-accent" /> {r.ratingAvg.toFixed(1)}</span>
-                                                        ) : <span className="text-surface-dark/45 dark:text-white/30">—</span>}
+                                                        ) : <span className="text-surface-dark/45 dark:text-white/30">, </span>}
                                                     </td>
                                                     <td className="px-8 py-4 text-right">
                                                         <Link href={`/events/${r.id}/report`} className="inline-flex items-center gap-1 text-accent font-bold hover:underline">

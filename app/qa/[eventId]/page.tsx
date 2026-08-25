@@ -34,7 +34,7 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
     const [clock, setClock] = useState("");
     const prevApprovedIds = useRef<Set<string>>(new Set());
 
-    // Clock tick — client-only to avoid hydration mismatch
+    // Clock tick, client-only to avoid hydration mismatch
     useEffect(() => {
         const fmt = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         setClock(fmt());

@@ -27,7 +27,7 @@ export default function LoginPage() {
     const [googleLoading, setGoogleLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // reCAPTCHA anchor — invisible, required by Firebase phone auth on web
+    // reCAPTCHA anchor, invisible, required by Firebase phone auth on web
     const recaptchaRef = useRef<HTMLDivElement>(null);
 
     // Route a freshly-authenticated user based on their profile state
@@ -43,7 +43,7 @@ export default function LoginPage() {
         }
     };
 
-    // ── Phone OTP: Step 1 — Send OTP ────────────────────────────────────────
+    // ── Phone OTP: Step 1, Send OTP ────────────────────────────────────────
     const handleSendOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
@@ -60,7 +60,7 @@ export default function LoginPage() {
         }
     };
 
-    // ── Phone OTP: Step 2 — Confirm OTP ─────────────────────────────────────
+    // ── Phone OTP: Step 2, Confirm OTP ─────────────────────────────────────
     const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!confirmationResult) return;
@@ -103,7 +103,7 @@ export default function LoginPage() {
         <main className="min-h-screen relative flex items-center justify-center bg-background dark:bg-[#0f101e] px-4">
             <InkBackground />
 
-            {/* Invisible reCAPTCHA anchor — required by Firebase phone auth */}
+            {/* Invisible reCAPTCHA anchor, required by Firebase phone auth */}
             <div id="recaptcha-container" ref={recaptchaRef} />
 
             <Link

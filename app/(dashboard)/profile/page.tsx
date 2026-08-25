@@ -74,7 +74,7 @@ export default function ProfilePage() {
                     eventService.getAttendingEvents(user.uid),
                 ]);
                 setCreatedEvents(created);
-                // Exclude events the user created — they already appear under "My Events"
+                // Exclude events the user created, they already appear under "My Events"
                 setAttendingEvents(attending.filter(e => e.creatorId !== user.uid));
                 setStats({
                     eventsCreated:   created.length,
@@ -136,7 +136,7 @@ export default function ProfilePage() {
                         </button>
                     </div>
 
-                    {/* Avatar — bridging the seam, outside both sections */}
+                    {/* Avatar, bridging the seam, outside both sections */}
                     <div className="absolute left-8 z-10" style={{ top: "calc(11rem - 48px)" }}>
                         <div className="ring-4 ring-white dark:ring-[#0f101e] rounded-full shadow-xl">
                             <AvatarDisplay
@@ -149,7 +149,7 @@ export default function ProfilePage() {
 
                     {/* Identity area */}
                     <div className="bg-white/60 dark:bg-[#1a1c2e]/90 backdrop-blur-xl px-8 pt-16 pb-7 rounded-b-3xl">
-                        {/* Actions row — sits at top-right while avatar takes top-left space */}
+                        {/* Actions row, sits at top-right while avatar takes top-left space */}
                         <div className="flex items-center justify-end gap-2 mb-5">
                             {hasSocial && (
                                 <div className="flex items-center gap-1.5">

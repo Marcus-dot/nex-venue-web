@@ -139,14 +139,14 @@ export default function EventManagePage() {
     // When set, the "New Session" form edits this existing agenda item instead of creating.
     const [editingId, setEditingId] = useState<string | null>(null);
 
-    // Speaker profiles — curated cards for speakers who don't have an app account.
+    // Speaker profiles, curated cards for speakers who don't have an app account.
     const [speakerProfiles, setSpeakerProfiles] = useState<SpeakerProfile[]>([]);
     const [speakerForm, setSpeakerForm] = useState({ name: "", title: "", company: "", bio: "" });
     const [editingSpeakerId, setEditingSpeakerId] = useState<string | null>(null);
     const [speakerPhotoFile, setSpeakerPhotoFile] = useState<File | null>(null);
     const [speakerPhotoPreview, setSpeakerPhotoPreview] = useState<string | null>(null);
     const [speakerSaving, setSpeakerSaving] = useState(false);
-    // "Link to attendee" — which card's picker is open, plus its search text.
+    // "Link to attendee", which card's picker is open, plus its search text.
     const [linkingSpeakerId, setLinkingSpeakerId] = useState<string | null>(null);
     const [linkSearch, setLinkSearch] = useState("");
 
@@ -214,7 +214,7 @@ export default function EventManagePage() {
         };
     }, [id, user, router]);
 
-    // Fetch applicant profiles via direct Firestore read — never touches global auth state
+    // Fetch applicant profiles via direct Firestore read, never touches global auth state
     useEffect(() => {
         if (requests.length === 0) return;
         const unfetched = requests.filter(r => !(r.userId in requestProfiles));
@@ -694,7 +694,7 @@ export default function EventManagePage() {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-dark/5 dark:bg-white/5 hover:bg-surface-dark/10 dark:hover:bg-white/10 text-surface-dark dark:text-white text-sm font-bold transition-colors"
-                                    title="Opens the big-screen Q&A display in a new tab — put it on the projector"
+                                    title="Opens the big-screen Q&A display in a new tab, put it on the projector"
                                 >
                                     <Monitor size={16} /> Open projection view
                                 </a>
@@ -814,7 +814,7 @@ export default function EventManagePage() {
                                                 <Mic size={26} className="text-accent" /> {editingSpeakerId ? "Edit Speaker" : "Add Speaker"}
                                             </h3>
                                             <p className="text-sm font-medium text-surface-dark/55 dark:text-white/40 mt-1">
-                                                Curated speaker cards. No account needed — link to an attendee later once they join.
+                                                Curated speaker cards. No account needed, link to an attendee later once they join.
                                             </p>
                                         </div>
                                     </div>
@@ -1193,7 +1193,7 @@ export default function EventManagePage() {
                                                 </div>
                                             </div>
 
-                                            {/* Linked speakers (app accounts) — supports panels */}
+                                            {/* Linked speakers (app accounts), supports panels */}
                                             <div className="space-y-3">
                                                 <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1 flex items-center gap-1.5"><Users size={13} /> Speakers on the app</label>
                                                 {newAgendaItem.speakerIds.length > 0 && (
@@ -1742,7 +1742,7 @@ export default function EventManagePage() {
                                     </div>
                                 )}
 
-                                {/* Current Staff — only visible to the event creator */}
+                                {/* Current Staff, only visible to the event creator */}
                                 {participants.length > 0 && user?.uid === event?.creatorId && (
                                     <div className="space-y-4">
                                         <div>

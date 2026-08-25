@@ -18,7 +18,7 @@
   --background-end-rgb: 250, 250, 248;
 }
 
-/* Reusable deep, layered shadow — tactile depth without glassmorphism */
+/* Reusable deep, layered shadow, tactile depth without glassmorphism */
 @layer utilities {
   .deep-shadow {
     box-shadow:
@@ -84,7 +84,7 @@ body {
   background: rgba(232, 92, 41, 0.6);
 }
 
-/* Surface card — solid with a deep, layered shadow (replaces glassmorphism).
+/* Surface card, solid with a deep, layered shadow (replaces glassmorphism).
    Named .glass-card for compatibility; it is no longer glass. */
 .glass-card {
   background: #ffffff;

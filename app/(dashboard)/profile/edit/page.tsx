@@ -339,14 +339,14 @@ export default function EditProfilePage() {
                                 onChange={(e) => set("email", e.target.value)} />
                         </div>
 
-                        {/* Phone — read only */}
+                        {/* Phone, read only */}
                         <div>
                             <FieldLabel>Phone Number</FieldLabel>
                             <div className="w-full px-5 py-3.5 bg-surface-dark/5 dark:bg-white/5 border border-surface-dark/8 dark:border-white/8 rounded-xl flex items-center justify-between">
                                 <div className="flex items-center gap-2.5">
                                     <Phone size={14} className="text-surface-dark/45 dark:text-white/30" />
                                     <span className="text-sm font-medium text-surface-dark dark:text-white">
-                                        {profile?.phoneNumber || "—"}
+                                        {profile?.phoneNumber || ", "}
                                     </span>
                                 </div>
                                 <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-green-500">

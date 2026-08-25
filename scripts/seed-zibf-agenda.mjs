@@ -31,35 +31,35 @@ const ITEMS = [
     [D1, "08:45", "08:50", "Remarks & Announcements from the Conference Moderator", "remarks", false, "", ""],
     [D1, "08:50", "09:00", "Remarks by the ZIBFS President", "remarks", false, "Dr. Kuldip Paliwal", ""],
     [D1, "09:00", "09:10", "Remarks by the BAZ Chairperson", "remarks", false, "Mr. Mwindwa Siakalima", ""],
-    [D1, "09:10", "09:30", "Keynote Address by the Guest of Honour", "keynote", false, "Dr. Francis Chipimo — Deputy Governor Operations, Bank of Zambia", ""],
+    [D1, "09:10", "09:30", "Keynote Address by the Guest of Honour", "keynote", false, "Dr. Francis Chipimo, Deputy Governor Operations, Bank of Zambia", ""],
     [D1, "09:30", "09:35", "Platinum Sponsor Message (ZANACO)", "remarks", false, "", ""],
     [D1, "09:35", "10:35", "Panel Discussion: Data Privacy, Security, and Governance for Regulated Innovation in Banking and Financial Services", "panel", false, "",
-        "Panellists:\n• Ms. Tendai Luwabelwa — Principal Examiner & ICT Specialist, Prudential Supervision Department, Bank of Zambia\n• Mr. Chinedu Koggu — Chief Technology Officer, Tech Masters Zambia\n• Mr. Simon Chinungo — Chief Operating Officer, IZWE Loans Zambia Plc\n• FNB"],
+        "Panellists:\n• Ms. Tendai Luwabelwa, Principal Examiner & ICT Specialist, Prudential Supervision Department, Bank of Zambia\n• Mr. Chinedu Koggu, Chief Technology Officer, Tech Masters Zambia\n• Mr. Simon Chinungo, Chief Operating Officer, IZWE Loans Zambia Plc\n• FNB"],
     [D1, "10:35", "10:50", "Health Break (Pick & Sit)", "break", true, "", ""],
     [D1, "10:50", "10:55", "Silver Sponsor Message (MFZ)", "remarks", false, "", ""],
     [D1, "10:55", "12:05", "Presentations & Panel Discussion: Responsible AI and Customer-Centric Innovation in Banking and Financial Services", "panel", false, "",
-        "Panellists:\n• Dr. Francis Mbao — Assistant Director, Data Management, Bank of Zambia\n• Mr. Mutisunge Zulu — Chief Risk Officer, Zanaco Plc\n• Mr. Chellah Silavwe — CEO, ICT Association of Zambia (ICTAZ)"],
-    [D1, "12:05", "12:30", "Presentation + Q&A: TransUnion Zambia", "presentation", false, "Ms. Mildred Stephenson — Chief Executive Officer, TransUnion Zambia", ""],
+        "Panellists:\n• Dr. Francis Mbao, Assistant Director, Data Management, Bank of Zambia\n• Mr. Mutisunge Zulu, Chief Risk Officer, Zanaco Plc\n• Mr. Chellah Silavwe, CEO, ICT Association of Zambia (ICTAZ)"],
+    [D1, "12:05", "12:30", "Presentation + Q&A: TransUnion Zambia", "presentation", false, "Ms. Mildred Stephenson, Chief Executive Officer, TransUnion Zambia", ""],
     [D1, "12:30", "14:00", "Lunch Break", "break", true, "", ""],
-    [D1, "14:00", "14:15", "Presentation + Q&A: Gralix Zambia", "presentation", false, "Mr. Mulenga Mutati — CEO, Gralix Actuarial Consulting", ""],
-    [D1, "14:15", "15:15", "Presentation & Panel Discussion: Navigating ESG in the SADC Banking Sector — From Strategy to Sustainable Implementation", "panel", false, "",
-        "Panellists:\n• Mr. Yaseen Lockhat — Senior Specialist: Sustainable Finance, South African Banking Association\n• Dr. Oswald Mungule — Senior Analyst, Regulatory Policy Research & Licensing, Bank of Zambia; President, Economics Association of Zambia\n• Mr. James Chona — CEO, Micro Finance Zambia (MFZ)\n• Mr. Joseph Banda — Senior Project Officer, DSIK\n• Mr. Keith Hamusute — Group Chief Risk Officer & Director, Bridging Gap Solutions Group"],
+    [D1, "14:00", "14:15", "Presentation + Q&A: Gralix Zambia", "presentation", false, "Mr. Mulenga Mutati, CEO, Gralix Actuarial Consulting", ""],
+    [D1, "14:15", "15:15", "Presentation & Panel Discussion: Navigating ESG in the SADC Banking Sector, From Strategy to Sustainable Implementation", "panel", false, "",
+        "Panellists:\n• Mr. Yaseen Lockhat, Senior Specialist: Sustainable Finance, South African Banking Association\n• Dr. Oswald Mungule, Senior Analyst, Regulatory Policy Research & Licensing, Bank of Zambia; President, Economics Association of Zambia\n• Mr. James Chona, CEO, Micro Finance Zambia (MFZ)\n• Mr. Joseph Banda, Senior Project Officer, DSIK\n• Mr. Keith Hamusute, Group Chief Risk Officer & Director, Bridging Gap Solutions Group"],
     [D1, "15:15", "15:20", "Announcements / Health Break (end of day one)", "break", true, "", ""],
     [D1, "15:40", "15:40", "Departure for the Evening Boat Cruise", "networking", false, "", ""],
     [D1, "16:00", "19:00", "Evening Boat Cruise", "networking", false, "", ""],
 
     // ── Day 2 ──────────────────────────────────────────────────────────────
     [D2, "08:30", "09:00", "Recap of Day One", "remarks", false, "", ""],
-    [D2, "09:00", "10:00", "Presentation & Panel Discussion: Analytics-Driven Financial Inclusion — Turning Data Insights into Banking Solutions", "panel", false, "",
-        "Panellists:\n• Mr. Francis Mumbi — Head of Analytics, Stanbic Bank\n• Mr. Mutisunge Zulu — Chief Risk Officer, ZANACO\n• Mr. Chellah Silavwe — CEO, ICT Association of Zambia (ICTAZ)"],
+    [D2, "09:00", "10:00", "Presentation & Panel Discussion: Analytics-Driven Financial Inclusion, Turning Data Insights into Banking Solutions", "panel", false, "",
+        "Panellists:\n• Mr. Francis Mumbi, Head of Analytics, Stanbic Bank\n• Mr. Mutisunge Zulu, Chief Risk Officer, ZANACO\n• Mr. Chellah Silavwe, CEO, ICT Association of Zambia (ICTAZ)"],
     [D2, "10:00", "10:05", "Sponsor Message", "remarks", false, "", ""],
     [D2, "10:05", "11:05", "Panel Discussion: Digital Transformation, Customer Experience, and Inclusive Access in Banking", "panel", false, "",
-        "Panellists:\n• Dr. Francis Lwanga — CEO, Zambia Electronic Clearing House (ZECHL)\n• Mr. Simon Ziba — CEO, VisionFund Zambia\n• Dr. Pooja Gupta — CEO, Bridging Gap Solutions (BGS)\n• Mr. Kalimukwa Kalimukwa — Manager, Enterprise Risk, ZICB\n• INDO Zambia Bank"],
-    [D2, "11:05", "11:10", "Announcements & Remarks — Closing Day 2", "remarks", false, "", ""],
+        "Panellists:\n• Dr. Francis Lwanga, CEO, Zambia Electronic Clearing House (ZECHL)\n• Mr. Simon Ziba, CEO, VisionFund Zambia\n• Dr. Pooja Gupta, CEO, Bridging Gap Solutions (BGS)\n• Mr. Kalimukwa Kalimukwa, Manager, Enterprise Risk, ZICB\n• INDO Zambia Bank"],
+    [D2, "11:05", "11:10", "Announcements & Remarks, Closing Day 2", "remarks", false, "", ""],
     [D2, "11:10", "11:20", "Health Break", "break", true, "", ""],
     [D2, "11:20", "11:20", "Departure for Game Viewing / Kazungula Bridge Viewing", "networking", false, "", ""],
     [D2, "18:45", "22:00", "Banking & Finance Awards Gala Dinner", "networking", false, "",
-        "The 2026 Banking & Finance Awards (BFA2026) Gala Dinner recognises individual and corporate achievement across the sector, including the Leadership Awards for the top CEOs of 2026.\n\nProgramme:\n18:45 — Arrival of guests & seating\n19:00 — Arrival of award nominees & VIP guests\n19:20 — Arrival of the Guest of Honour; VIP reception\n19:30 — Entry of the Guest of Honour & VIP guests · National Anthem · Entertainment · Remarks (ZIBFS President, BAZ Chairperson) · Keynote by the Guest of Honour · Raffle draw · Dinner · Presentation of Awards · Group photo · Dancing & entertainment"],
+        "The 2026 Banking & Finance Awards (BFA2026) Gala Dinner recognises individual and corporate achievement across the sector, including the Leadership Awards for the top CEOs of 2026.\n\nProgramme:\n18:45, Arrival of guests & seating\n19:00, Arrival of award nominees & VIP guests\n19:20, Arrival of the Guest of Honour; VIP reception\n19:30, Entry of the Guest of Honour & VIP guests · National Anthem · Entertainment · Remarks (ZIBFS President, BAZ Chairperson) · Keynote by the Guest of Honour · Raffle draw · Dinner · Presentation of Awards · Group photo · Dancing & entertainment"],
 ];
 
 // Guard against duplicate loads.
@@ -94,5 +94,5 @@ ITEMS.forEach((it, i) => {
 await batch.commit();
 
 const byDay = ITEMS.reduce((m, it) => ((m[it[0]] = (m[it[0]] || 0) + 1), m), {});
-console.log(`✓ Created ${ITEMS.length} agenda items — Day 1: ${byDay[D1]}, Day 2: ${byDay[D2]}`);
+console.log(`✓ Created ${ITEMS.length} agenda items, Day 1: ${byDay[D1]}, Day 2: ${byDay[D2]}`);
 process.exit(0);

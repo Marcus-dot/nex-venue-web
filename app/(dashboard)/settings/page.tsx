@@ -239,7 +239,7 @@ export default function SettingsPage() {
 
     return (
         <div className="min-h-screen bg-background dark:bg-[#0f101e] px-8 py-12 pt-24">
-            {/* Invisible reCAPTCHA anchor — required by Firebase phone auth on web */}
+            {/* Invisible reCAPTCHA anchor, required by Firebase phone auth on web */}
             <div id="recaptcha-link" />
             <div className="max-w-2xl mx-auto space-y-8">
                 <div className="flex items-center justify-between">

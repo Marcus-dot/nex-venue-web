@@ -7,7 +7,7 @@ import { Calendar, MapPin, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import gsap from "gsap";
 
-// Deterministic gradient from event title — every event gets a unique persistent identity
+// Deterministic gradient from event title, every event gets a unique persistent identity
 const EVENT_GRADIENTS = [
     ["#e85c29", "#ff8c5a"],
     ["#d97706", "#fbbf24"],

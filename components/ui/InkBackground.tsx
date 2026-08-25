@@ -1,4 +1,4 @@
-// Organic "ink in water" backdrop — soft, drifting colour clouds whose edges are
+// Organic "ink in water" backdrop, soft, drifting colour clouds whose edges are
 // distorted by SVG turbulence so they read as diffusing ink rather than the
 // generic AI radial-blur blobs. Purely decorative; sits behind content.
 export default function InkBackground({ className = "" }: { className?: string }) {

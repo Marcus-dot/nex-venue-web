@@ -9,7 +9,7 @@ interface AvatarDisplayProps {
     className?: string;
 }
 
-// Deterministic color from name — same name always gets the same color
+// Deterministic color from name, same name always gets the same color
 function getAvatarColor(name: string): string {
     // Mirrors the mobile app palette (components/user-avatar.tsx) so a
     // given person reads with the same avatar colour on both platforms.
