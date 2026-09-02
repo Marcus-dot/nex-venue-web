@@ -160,32 +160,37 @@ export default function EventDetailsClient() {
         return () => { active = false; };
     }, [event?.attendees]);
 
-    // Merge account-based speakers (EventParticipant, role=speaker) with curated
-    // speaker cards (event.speakerProfiles); a curated card linked to an account
-    // already shown as a participant is dropped to avoid duplicates.
+    // Merge curated speaker cards (event.speakerProfiles) with account-based
+    // speakers (EventParticipant, role=speaker). Curated profiles win: an account
+    // speaker already covered by a curated card, whether linked by id OR matched
+    // by name, is dropped so the same person never appears twice.
     // NOTE: must stay above the early returns below, it's a hook.
     const displaySpeakers = useMemo(() => {
-        const accountSpeakers = participants.filter(p => p.role === 'speaker');
-        const accountIds = new Set(accountSpeakers.map(p => p.id));
-        const fromAccounts = accountSpeakers.map(p => ({
-            key: p.id,
-            name: p.displayName,
-            subtitle: p.company || "Guest Speaker",
-            photoUrl: p.photoUrl,
-            bio: p.bio,
-        }));
-        const fromProfiles = (event?.speakerProfiles ?? [])
+        const profiles = (event?.speakerProfiles ?? [])
             .slice()
-            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .filter(sp => !(sp.linkedUserId && accountIds.has(sp.linkedUserId)))
-            .map(sp => ({
-                key: sp.id,
-                name: sp.name,
-                subtitle: [sp.title, sp.company].filter(Boolean).join(" · ") || "Guest Speaker",
-                photoUrl: sp.photoUrl,
-                bio: sp.bio,
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        const linkedIds = new Set(profiles.map(p => p.linkedUserId).filter(Boolean) as string[]);
+        const profileNames = new Set(profiles.map(p => p.name.trim().toLowerCase()));
+        const covered = (p: EventParticipant) =>
+            linkedIds.has(p.id) || profileNames.has((p.displayName || "").trim().toLowerCase());
+
+        const fromProfiles = profiles.map(sp => ({
+            key: sp.id,
+            name: sp.name,
+            subtitle: [sp.title, sp.company].filter(Boolean).join(" · ") || "Guest Speaker",
+            photoUrl: sp.photoUrl,
+            bio: sp.bio,
+        }));
+        const fromAccounts = participants
+            .filter(p => p.role === "speaker" && !covered(p))
+            .map(p => ({
+                key: p.id,
+                name: p.displayName,
+                subtitle: p.company || "Guest Speaker",
+                photoUrl: p.photoUrl,
+                bio: p.bio,
             }));
-        return [...fromAccounts, ...fromProfiles];
+        return [...fromProfiles, ...fromAccounts];
     }, [participants, event?.speakerProfiles]);
 
     if (loading) {
