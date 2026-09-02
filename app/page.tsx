@@ -16,6 +16,7 @@ import {
   Radio,
 } from "lucide-react";
 import InkBackground from "@/components/ui/InkBackground";
+import { PoweredByGralix } from "@/components/ui/PoweredByGralix";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -222,9 +223,12 @@ export default function LandingPage() {
             <Link href="/terms" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Terms</Link>
             <a href="mailto:info@gralix.co" className="text-sm font-bold text-surface-dark/60 dark:text-white/60 hover:text-accent">Contact</a>
           </div>
-          <p className="text-sm font-bold text-surface-dark/55 dark:text-white/40">
-            © 2026 <span className="text-surface-dark/60 dark:text-white/60">Gralix Technologies</span>
-          </p>
+          <div className="flex flex-col items-center md:items-end gap-2">
+            <PoweredByGralix />
+            <p className="text-sm font-bold text-surface-dark/55 dark:text-white/40">
+              © 2026 <span className="text-surface-dark/60 dark:text-white/60">Gralix Technologies</span>
+            </p>
+          </div>
         </div>
       </footer>
     </div>

@@ -13,6 +13,7 @@ import { ArrowLeft, Loader2, ChevronRight } from "lucide-react";
 import { getCleanErrorMessage } from "@/lib/utils/firebaseErrors";
 import { GoogleIcon } from "@/components/ui/GoogleIcon";
 import InkBackground from "@/components/ui/InkBackground";
+import { PoweredByGralix } from "@/components/ui/PoweredByGralix";
 
 type PhoneStep = "input" | "verify";
 
@@ -222,6 +223,9 @@ export default function LoginPage() {
                             Create an account
                         </Link>
                     </p>
+                    <div className="flex justify-center mt-6 pt-6 border-t border-surface-dark/5 dark:border-white/5">
+                        <PoweredByGralix />
+                    </div>
                 </GlassCard>
             </motion.div>
         </main>

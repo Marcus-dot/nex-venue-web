@@ -7,6 +7,7 @@ import { authService } from "@/services/auth";
 import { notificationService } from "@/services/notifications";
 import { Button } from "@/components/ui/Button";
 import { AvatarDisplay } from "@/components/ui/AvatarDisplay";
+import { PoweredByGralix } from "@/components/ui/PoweredByGralix";
 import { useState, useEffect, useRef } from "react";
 import {
     MessageSquare,
@@ -173,6 +174,10 @@ export const Navigation = () => {
                                         >
                                             <LogOut size={16} /> Sign out
                                         </button>
+
+                                        <div className="mt-1 px-4 py-3 border-t border-surface-dark/5 dark:border-white/5 flex justify-center">
+                                            <PoweredByGralix />
+                                        </div>
                                     </div>
                                 )}
                             </div>

@@ -17,6 +17,7 @@ import {
 import { db } from "@/lib/firebase/config";
 import type { SpeakerProfile } from "@/types/events";
 import { AnimatePresence, motion } from "framer-motion";
+import { PoweredByGralix } from "@/components/ui/PoweredByGralix";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -1118,7 +1119,8 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                 )}
             </AnimatePresence>
 
-            <div className="px-5 py-6 text-center">
+            <div className="px-5 py-8 flex flex-col items-center gap-3">
+                <PoweredByGralix tone="light" />
                 <span className="text-xs font-semibold tracking-widest" style={{ color: "rgba(255,255,255,0.08)", letterSpacing: "0.15em" }}>
                     NEXVENUE
                 </span>

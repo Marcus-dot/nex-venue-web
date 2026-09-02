@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Input } from "@/components/ui/Input";
+import { PoweredByGralix } from "@/components/ui/PoweredByGralix";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -209,6 +210,9 @@ export default function RegisterPage() {
                             Log in
                         </Link>
                     </p>
+                    <div className="flex justify-center mt-6 pt-6 border-t border-surface-dark/5 dark:border-white/5">
+                        <PoweredByGralix />
+                    </div>
                 </GlassCard>
             </motion.div>
         </main>

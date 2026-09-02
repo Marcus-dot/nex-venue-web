@@ -4,6 +4,7 @@ import { use, useEffect, useRef, useState } from "react";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { AnimatePresence, motion } from "framer-motion";
+import { PoweredByGralix } from "@/components/ui/PoweredByGralix";
 
 interface Question {
     id: string;
@@ -318,9 +319,12 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                 <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 12 }}>
                     Scan the QR code to submit questions
                 </span>
-                <span style={{ color: "rgba(255,255,255,0.1)", fontSize: 12, fontWeight: 600, letterSpacing: "0.05em" }}>
-                    NEXVENUE
-                </span>
+                <div className="flex items-center gap-6">
+                    <PoweredByGralix tone="light" />
+                    <span style={{ color: "rgba(255,255,255,0.1)", fontSize: 12, fontWeight: 600, letterSpacing: "0.05em" }}>
+                        NEXVENUE
+                    </span>
+                </div>
             </footer>
         </div>
     );
