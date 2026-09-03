@@ -16,6 +16,7 @@ import { AgendaList } from "@/components/features/AgendaList";
 import { TicketModal } from "@/components/features/TicketModal";
 import { AvatarDisplay } from "@/components/ui/AvatarDisplay";
 import { usersService, type UserSummary } from "@/services/users";
+import { isEventEnded } from "@/lib/utils/eventStatus";
 import {
     Calendar,
     MapPin,
@@ -206,6 +207,7 @@ export default function EventDetailsClient() {
     const atCapacity = !!event.maxAttendees && (event.attendees?.length || 0) >= event.maxAttendees;
     const isFull = atCapacity && !isAttending;
     const isClosed = event.isOpen === false;
+    const isEnded = isEventEnded(event);
     const hasPendingReq = attendanceReq?.status === "pending";
     // A closed event that this non-attending user still needs approval to join.
     const needsApproval = isClosed && !isAttending;
@@ -350,8 +352,8 @@ export default function EventDetailsClient() {
                     {/* Hero Content */}
                     <div>
                         <div className="flex items-center gap-3 text-white/70 font-bold mb-4">
-                            <span className="px-3 py-1 rounded-full bg-accent/20 border border-accent/30 text-accent text-sm">
-                                Upcoming Event
+                            <span className={`px-3 py-1 rounded-full border text-sm ${isEnded ? "bg-white/15 border-white/25 text-white/90" : "bg-accent/20 border-accent/30 text-accent"}`}>
+                                {isEnded ? "Ended" : "Upcoming Event"}
                             </span>
                             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-sm backdrop-blur-sm">
                                 <Calendar size={16} /> {event.date}
@@ -470,13 +472,15 @@ export default function EventDetailsClient() {
                         <div className="mb-6">
                             <div className="text-sm font-bold text-surface-dark/55 dark:text-white/40 uppercase tracking-widest mb-1">Status</div>
                             <div className="text-3xl font-black text-surface-dark dark:text-white">
-                                {isAttending
-                                    ? "You're Attending"
-                                    : needsApproval
-                                        ? (hasPendingReq ? "Approval Pending" : "Approval Required")
-                                        : isFull
-                                            ? "Registration Full"
-                                            : "Registration Open"}
+                                {isEnded
+                                    ? "Event Ended"
+                                    : isAttending
+                                        ? "You're Attending"
+                                        : needsApproval
+                                            ? (hasPendingReq ? "Approval Pending" : "Approval Required")
+                                            : isFull
+                                                ? "Registration Full"
+                                                : "Registration Open"}
                             </div>
                             {needsApproval && !hasPendingReq && (
                                 <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50 mt-2">
@@ -486,7 +490,11 @@ export default function EventDetailsClient() {
                         </div>
 
                         <div className="space-y-4 mb-8">
-                            {needsApproval && !isFull ? (
+                            {isEnded && !isAttending ? (
+                                <Button className="w-full text-lg !py-5" disabled variant="secondary">
+                                    Event Ended
+                                </Button>
+                            ) : needsApproval && !isFull ? (
                                 <Button
                                     className="w-full text-lg !py-5"
                                     onClick={handleRequestAttendance}

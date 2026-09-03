@@ -19,6 +19,7 @@ import {
     Plus,
     Settings,
     ChevronDown,
+    Users,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
@@ -165,6 +166,11 @@ export const Navigation = () => {
                                         <Link href="/settings" className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-surface-dark/70 dark:text-white/70 hover:bg-surface-dark/5 dark:hover:bg-white/5 transition-colors">
                                             <Settings size={16} /> Settings
                                         </Link>
+                                        {isAdmin && (
+                                            <Link href="/users" className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-surface-dark/70 dark:text-white/70 hover:bg-surface-dark/5 dark:hover:bg-white/5 transition-colors">
+                                                <Users size={16} /> Users
+                                            </Link>
+                                        )}
 
                                         <div className="my-1 border-t border-surface-dark/5 dark:border-white/5" />
 

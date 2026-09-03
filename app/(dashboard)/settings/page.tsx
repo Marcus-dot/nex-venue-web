@@ -7,7 +7,8 @@ import { GlassCard, Button, Switch } from "@/components/ui";
 import { Modal } from "@/components/ui/Modal";
 import { AvatarDisplay } from "@/components/ui/AvatarDisplay";
 import { blockService, type BlockedUserSummary } from "@/services/block";
-import { Loader2, Bell, Moon, Shield, ArrowLeft, Smartphone, Mail, Trash2, KeyRound, Check, Phone, Ban } from "lucide-react";
+import { adminRequestService, type AdminRequest } from "@/services/adminRequests";
+import { Loader2, Bell, Moon, Shield, ArrowLeft, Smartphone, Mail, Trash2, KeyRound, Check, Phone, Ban, Clock } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/context/ToastContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -17,7 +18,7 @@ import { ConfirmationResult } from "firebase/auth";
 import { Input } from "@/components/ui/Input";
 
 export default function SettingsPage() {
-    const { user, profile, updateUserProfile, loading: authLoading, linkGoogle, unlinkGoogle, linkPhone, unlinkPhone, deleteAccount } = useAuth();
+    const { user, profile, isAdmin, updateUserProfile, loading: authLoading, linkGoogle, unlinkGoogle, linkPhone, unlinkPhone, deleteAccount } = useAuth();
     const { showToast } = useToast();
     const { isDark, setTheme } = useTheme();
     const router = useRouter();
@@ -33,6 +34,47 @@ export default function SettingsPage() {
     const [linkPhoneNumber, setLinkPhoneNumber] = useState("");
     const [linkOtp, setLinkOtp] = useState("");
     const [phoneConfirmation, setPhoneConfirmation] = useState<ConfirmationResult | null>(null);
+
+    // ── Admin access request ──
+    const [adminRequest, setAdminRequest] = useState<AdminRequest | null | undefined>(undefined);
+    const [showAdminModal, setShowAdminModal] = useState(false);
+    const [adminReason, setAdminReason] = useState("");
+    const [submittingAdmin, setSubmittingAdmin] = useState(false);
+
+    useEffect(() => {
+        if (!user || isAdmin) { setAdminRequest(null); return; }
+        let active = true;
+        adminRequestService.getUserRequest(user.uid)
+            .then((r) => { if (active) setAdminRequest(r); })
+            .catch(() => { if (active) setAdminRequest(null); });
+        return () => { active = false; };
+    }, [user, isAdmin]);
+
+    const submitAdminRequest = async () => {
+        if (adminReason.trim().length < 20) {
+            showToast("Please explain in at least 20 characters why you need admin access.", "error");
+            return;
+        }
+        if (!user || !profile) return;
+        setSubmittingAdmin(true);
+        try {
+            await adminRequestService.createRequest(
+                user.uid,
+                profile.fullName || "Unknown",
+                profile.phoneNumber || "",
+                adminReason.trim(),
+            );
+            const updated = await adminRequestService.getUserRequest(user.uid);
+            setAdminRequest(updated);
+            setShowAdminModal(false);
+            setAdminReason("");
+            showToast("Your admin access request has been submitted for review.", "success");
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : "Failed to submit request.", "error");
+        } finally {
+            setSubmittingAdmin(false);
+        }
+    };
 
     const refreshProviders = async () => {
         const current = auth.currentUser;
@@ -413,6 +455,45 @@ export default function SettingsPage() {
                         </div>
                     </div>
 
+                    {/* Admin Access (non-admins only) */}
+                    {!isAdmin && (
+                        <div className="pt-4">
+                            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-surface-dark/10 dark:border-white/10">
+                                <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500">
+                                    <Shield size={20} />
+                                </div>
+                                <h2 className="text-xl font-black text-surface-dark dark:text-white">Admin Access</h2>
+                            </div>
+                            <div className="pl-2">
+                                {adminRequest === undefined ? (
+                                    <div className="flex items-center gap-2 text-sm text-surface-dark/55 dark:text-white/40"><Loader2 size={14} className="animate-spin" /> Loading…</div>
+                                ) : adminRequest?.status === "pending" ? (
+                                    <div className="flex items-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+                                        <div className="w-10 h-10 rounded-full bg-amber-500/15 flex items-center justify-center text-amber-600 shrink-0"><Clock size={18} /></div>
+                                        <div>
+                                            <p className="font-bold text-surface-dark dark:text-white">Admin Request Pending</p>
+                                            <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50 mt-0.5">Your request is awaiting review.</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-between gap-3">
+                                        <div>
+                                            <h4 className="font-bold text-surface-dark dark:text-white">Request Admin Access</h4>
+                                            <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50 mt-1">
+                                                {adminRequest?.status === "rejected"
+                                                    ? "Your previous request was declined. You can re-apply."
+                                                    : "Apply for platform admin privileges to manage events and users."}
+                                            </p>
+                                        </div>
+                                        <Button className="font-bold shrink-0" onClick={() => setShowAdminModal(true)}>
+                                            {adminRequest?.status === "rejected" ? "Re-apply" : "Request Access"}
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Danger Zone */}
                     <div className="pt-12">
                         <div className="p-6 rounded-2xl border border-red-500/20 bg-red-500/5 space-y-4">
@@ -429,6 +510,34 @@ export default function SettingsPage() {
                     </div>
                 </GlassCard>
             </div>
+
+            {/* Request admin access */}
+            <Modal isOpen={showAdminModal} onClose={() => !submittingAdmin && setShowAdminModal(false)} title="Request Admin Access">
+                <div className="space-y-5">
+                    <p className="text-sm font-medium text-surface-dark/70 dark:text-white/70">
+                        Admin access lets you manage events, users, and platform settings. Tell us why you need it, an existing admin will review your request.
+                    </p>
+                    <div>
+                        <textarea
+                            value={adminReason}
+                            onChange={(e) => setAdminReason(e.target.value)}
+                            rows={4}
+                            maxLength={500}
+                            placeholder="Explain why you need admin access…"
+                            className="w-full rounded-xl border border-surface-dark/15 dark:border-white/15 bg-white dark:bg-white/5 p-3 text-sm font-medium text-surface-dark dark:text-white placeholder:text-surface-dark/40 dark:placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-accent/40 resize-none"
+                        />
+                        <p className="text-xs font-medium text-surface-dark/45 dark:text-white/35 mt-1 text-right">{adminReason.trim().length}/20 min</p>
+                    </div>
+                    <div className="flex gap-3">
+                        <Button variant="ghost" className="flex-1 bg-white dark:bg-white/5 font-bold" disabled={submittingAdmin} onClick={() => setShowAdminModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button className="flex-1 font-bold" disabled={submittingAdmin || adminReason.trim().length < 20} onClick={submitAdminRequest}>
+                            {submittingAdmin ? <Loader2 className="animate-spin" size={18} /> : "Submit Request"}
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
 
             {/* Delete account confirmation */}
             <Modal isOpen={showDeleteModal} onClose={() => !deleting && setShowDeleteModal(false)} title="Delete account">

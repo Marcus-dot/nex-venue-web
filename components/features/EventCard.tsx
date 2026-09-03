@@ -6,6 +6,7 @@ import { Event } from "@/types/events";
 import { Calendar, MapPin, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import gsap from "gsap";
+import { isEventEnded } from "@/lib/utils/eventStatus";
 
 // Deterministic gradient from event title, every event gets a unique persistent identity
 const EVENT_GRADIENTS = [
@@ -38,6 +39,7 @@ interface EventCardProps {
 export const EventCard = ({ event }: EventCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const { gradient, accent } = getEventColors(event.title);
+    const ended = isEventEnded(event);
 
     useEffect(() => {
         const card = cardRef.current;
@@ -101,6 +103,13 @@ export const EventCard = ({ event }: EventCardProps) => {
                             <Users size={11} /> {event.attendees?.length || 0}
                         </div>
                     </div>
+                    {ended && (
+                        <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
+                            <span className="bg-white/90 dark:bg-gray-900/90 text-surface-dark dark:text-white text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
+                                Ended
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="p-6 flex flex-col flex-grow">

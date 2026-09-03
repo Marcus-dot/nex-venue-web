@@ -7,8 +7,9 @@ import {
     Loader2, LogOut, Settings, Calendar, MessageSquare,
     Shield, Clock, HelpCircle, Heart, Users, ChevronRight,
     Linkedin, Twitter, Globe, MapPin, Edit3, Shirt,
-    Utensils, Zap, ExternalLink, User, UserPlus, Check, X
+    Utensils, Zap, ExternalLink, User, UserPlus, Check, X, QrCode
 } from "lucide-react";
+import { BusinessCardModal } from "@/components/features/BusinessCardModal";
 import Link from "next/link";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
@@ -39,6 +40,7 @@ export default function ProfilePage() {
     const [loading, setLoading]   = useState(true);
     const [incomingRequests, setIncomingRequests] = useState<ConnectionRequest[]>([]);
     const [respondingId, setRespondingId] = useState<string | null>(null);
+    const [showCard, setShowCard] = useState(false);
     const { showToast } = useToast();
 
     useEffect(() => {
@@ -127,13 +129,22 @@ export default function ProfilePage() {
                                 backgroundSize: "28px 28px",
                             }}
                         />
-                        {/* Edit button */}
-                        <button
-                            onClick={() => router.push("/profile/edit")}
-                            className="absolute top-4 right-4 flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-black uppercase tracking-widest transition-all"
-                        >
-                            <Edit3 size={13} /> Edit Profile
-                        </button>
+                        {/* Header actions */}
+                        <div className="absolute top-4 right-4 flex items-center gap-2">
+                            <button
+                                onClick={() => setShowCard(true)}
+                                aria-label="Business card"
+                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-black uppercase tracking-widest transition-all"
+                            >
+                                <QrCode size={13} /> <span className="hidden sm:inline">Card</span>
+                            </button>
+                            <button
+                                onClick={() => router.push("/profile/edit")}
+                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-black uppercase tracking-widest transition-all"
+                            >
+                                <Edit3 size={13} /> Edit Profile
+                            </button>
+                        </div>
                     </div>
 
                     {/* Avatar, bridging the seam, outside both sections */}
@@ -484,6 +495,10 @@ export default function ProfilePage() {
                     </div>
                 </div>
             </div>
+
+            {profile && user && (
+                <BusinessCardModal isOpen={showCard} onClose={() => setShowCard(false)} profile={profile} uid={user.uid} />
+            )}
         </div>
     );
 }
