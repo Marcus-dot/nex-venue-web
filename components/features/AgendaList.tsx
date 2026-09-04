@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Clock, MapPin, ChevronRight, CheckCircle2, Layers } from "lucide-react";
+import { Clock, MapPin, CheckCircle2, Layers } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
 import { useAuth } from "@/context/AuthContext";
@@ -272,12 +272,6 @@ const SessionCard = ({ item, isLive, isGrouped, user, onSelect, isSelecting, get
                         >
                             {isSelecting ? "Updating..." : isSelected ? "Session Booked" : "Select this session"}
                         </button>
-                    </div>
-                )}
-
-                {!isGrouped && !isBreak && (
-                    <div className="hidden md:flex items-center justify-center w-12 h-12 rounded-2xl bg-surface-dark/5 dark:bg-white/5 group-hover:bg-accent group-hover:text-white transition-all duration-300 self-center">
-                        <ChevronRight size={20} />
                     </div>
                 )}
             </div>
