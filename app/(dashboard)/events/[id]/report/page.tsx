@@ -190,7 +190,7 @@ export default function EventReportPage() {
                         </button>
                         <button
                             onClick={() => window.print()}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white text-sm font-black hover:bg-accent/90 transition-colors shadow-lg shadow-accent/20"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white text-sm font-semibold hover:bg-accent/90 transition-colors shadow-lg shadow-accent/20"
                         >
                             <Printer size={16} /> Print / Save as PDF
                         </button>
@@ -199,7 +199,7 @@ export default function EventReportPage() {
 
                 {/* Header */}
                 <header className="mb-10 pb-8 border-b border-[#e5e3df]">
-                    <p className="text-xs font-black uppercase tracking-[0.2em] text-accent mb-2">Post-event report</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent mb-2">Post-event report</p>
                     <h1 className="text-4xl font-black tracking-tight text-[#111827] mb-3">{event.title}</h1>
                     <p className="text-sm font-medium text-[#6b7280]">
                         {event.date}{event.location ? ` · ${event.location}` : ""}
@@ -231,7 +231,7 @@ export default function EventReportPage() {
                             <ol className="space-y-2.5">
                                 {topQuestions.map((q, i) => (
                                     <li key={q.id} className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-[#eceae6]">
-                                        <span className="text-sm font-black text-[#d1cfc9] w-5 shrink-0">{i + 1}</span>
+                                        <span className="text-sm font-semibold text-[#d1cfc9] w-5 shrink-0">{i + 1}</span>
                                         <p className="flex-1 text-sm text-[#374151] leading-snug">{q.text}</p>
                                         <span className="flex items-center gap-1 text-xs font-bold text-accent shrink-0">
                                             <ThumbsUp size={12} /> {q.upvotes?.length ?? 0}
@@ -285,10 +285,10 @@ export default function EventReportPage() {
                         <div className="rounded-xl bg-white border border-[#eceae6] overflow-hidden">
                             {sessionRatings.map((s, i) => (
                                 <div key={i} className="flex items-center gap-4 px-4 py-3 border-b border-[#f0eee9] last:border-0">
-                                    <span className="text-sm font-black text-[#d1cfc9] w-5 shrink-0">{i + 1}</span>
+                                    <span className="text-sm font-semibold text-[#d1cfc9] w-5 shrink-0">{i + 1}</span>
                                     <p className="flex-1 text-sm font-medium text-[#374151] truncate">{s.title}</p>
                                     <span className="text-xs text-[#9ca3af] shrink-0">{s.count} {s.count === 1 ? "rating" : "ratings"}</span>
-                                    <span className="flex items-center gap-1 text-sm font-black text-accent shrink-0 w-14 justify-end">
+                                    <span className="flex items-center gap-1 text-sm font-semibold text-accent shrink-0 w-14 justify-end">
                                         <Star size={13} className="fill-accent" /> {s.avg.toFixed(1)}
                                     </span>
                                 </div>
@@ -307,7 +307,7 @@ function StatCard({ icon, label, value, sub }: { icon: React.ReactNode; label: s
     return (
         <div className="p-5 rounded-2xl bg-white border border-[#eceae6]">
             <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-3">{icon}</div>
-            <div className="text-3xl font-black text-[#111827]">{value}</div>
+            <div className="text-3xl font-bold text-[#111827]">{value}</div>
             <div className="text-xs font-bold text-[#6b7280] mt-0.5">{label}</div>
             {sub && <div className="text-[11px] font-medium text-[#9ca3af] mt-1">{sub}</div>}
         </div>
@@ -319,7 +319,7 @@ function ReportSection({ title, icon, children }: { title: string; icon: React.R
         <section className="mb-12 break-inside-avoid">
             <div className="flex items-center gap-2.5 mb-5">
                 <div className="w-8 h-8 rounded-lg bg-[#111827] flex items-center justify-center text-white">{icon}</div>
-                <h2 className="text-xl font-black text-[#111827]">{title}</h2>
+                <h2 className="text-xl font-bold text-[#111827]">{title}</h2>
             </div>
             {children}
         </section>
@@ -333,7 +333,7 @@ function Pill({ label, value, tone }: { label: string; value: number; tone: "gre
         gray: "bg-[#f0eee9] text-[#6b7280]",
     };
     return (
-        <span className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-black ${tones[tone]}`}>
+        <span className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold ${tones[tone]}`}>
             {value} <span className="font-bold opacity-70">{label}</span>
         </span>
     );

@@ -194,7 +194,7 @@ export default function PublicProfilePage() {
     if (notFound || !profile) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-background dark:bg-[#0f101e] gap-4">
-                <p className="text-xl font-black text-surface-dark dark:text-white">Profile not found</p>
+                <p className="text-xl font-bold text-surface-dark dark:text-white">Profile not found</p>
                 <button onClick={() => router.back()} className="text-sm font-bold text-accent hover:underline flex items-center gap-1.5">
                     <ArrowLeft size={14} /> Go back
                 </button>
@@ -242,7 +242,7 @@ export default function PublicProfilePage() {
                     </div>
 
                     {/* Identity */}
-                    <div className="bg-white/60 dark:bg-[#1a1c2e]/90 backdrop-blur-xl px-6 pt-14 pb-6 rounded-b-3xl">
+                    <div className="bg-white/60 dark:bg-[#171a2e]/90 backdrop-blur-xl px-6 pt-14 pb-6 rounded-b-3xl">
                         {/* Actions */}
                         <div className="flex items-center justify-end gap-2 mb-4">
                             {hasSocial && (
@@ -300,7 +300,7 @@ export default function PublicProfilePage() {
                         </div>
 
                         {/* Name + meta */}
-                        <h1 className="text-2xl font-black text-surface-dark dark:text-white tracking-tight mb-1">
+                        <h1 className="text-2xl font-bold text-surface-dark dark:text-white tracking-tight mb-1">
                             {profile.fullName || "NexVenue User"}
                         </h1>
 
@@ -313,7 +313,7 @@ export default function PublicProfilePage() {
 
                         <div className="flex flex-wrap items-center gap-2 mt-2">
                             {profile.industry && (
-                                <span className="px-2.5 py-1 rounded-full bg-accent/10 text-accent text-[11px] font-black uppercase tracking-wider">
+                                <span className="px-2.5 py-1 rounded-full bg-accent/10 text-accent text-[11px] font-semibold uppercase tracking-wider">
                                     {profile.industry}
                                 </span>
                             )}
@@ -335,8 +335,8 @@ export default function PublicProfilePage() {
 
                 {/* Event interests */}
                 {(profile.eventInterests?.length ?? 0) > 0 && (
-                    <GlassCard className="!p-5 mb-4">
-                        <p className="text-xs font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <GlassCard className="p-5 mb-4">
+                        <p className="text-xs font-semibold text-surface-dark/45 dark:text-white/30 uppercase tracking-wider mb-3 flex items-center gap-2">
                             <Tag size={12} /> Interests
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -351,8 +351,8 @@ export default function PublicProfilePage() {
 
                 {/* Events */}
                 {userEvents.length > 0 && (
-                    <GlassCard className="!p-5">
-                        <p className="text-xs font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <GlassCard className="p-5">
+                        <p className="text-xs font-semibold text-surface-dark/45 dark:text-white/30 uppercase tracking-wider mb-4 flex items-center gap-2">
                             <Calendar size={12} /> Events
                         </p>
                         <div className="space-y-2">
@@ -362,9 +362,9 @@ export default function PublicProfilePage() {
                                         <Calendar size={14} />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <div className="font-black text-sm text-surface-dark dark:text-white truncate">{event.title}</div>
+                                        <div className="font-semibold text-sm text-surface-dark dark:text-white truncate">{event.title}</div>
                                         <div className="flex items-center gap-2 mt-0.5">
-                                            <span className={cn("text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full", roleStyle.bg, roleStyle.text)}>
+                                            <span className={cn("text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full", roleStyle.bg, roleStyle.text)}>
                                                 {role}
                                             </span>
                                             {event.date && (

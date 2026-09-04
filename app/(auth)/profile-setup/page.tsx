@@ -72,12 +72,12 @@ export default function ProfileSetupPage() {
                 {/* Brand mark */}
                 <div className="flex items-center justify-center gap-2 mb-10">
                     <Image src="/nexvenue-logo.png" alt="NexVenue" width={36} height={36} className="rounded-xl" />
-                    <span className="text-xl font-black tracking-tighter text-surface-dark dark:text-white">NexVenue</span>
+                    <span className="text-xl font-bold tracking-tighter text-surface-dark dark:text-white">NexVenue</span>
                 </div>
 
                 {/* Heading */}
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-black text-surface-dark dark:text-white tracking-tight mb-2">
+                    <h1 className="text-3xl font-bold text-surface-dark dark:text-white tracking-tight mb-2">
                         Welcome, let&apos;s set up<br />your profile
                     </h1>
                     <p className="text-sm text-surface-dark/60 dark:text-white/50 font-medium">

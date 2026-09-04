@@ -101,7 +101,7 @@ export const AgendaList = ({ items, currentId }: AgendaListProps) => {
                     >
                         {isGroup ? (
                             <div className="space-y-3">
-                                <div className="flex items-center gap-2 px-6 py-2 bg-blue-500/10 text-blue-500 rounded-full w-fit text-[10px] font-black uppercase tracking-[0.2em] mb-4">
+                                <div className="flex items-center gap-2 px-6 py-2 bg-blue-500/10 text-blue-500 rounded-full w-fit text-[10px] font-semibold uppercase tracking-[0.2em] mb-4">
                                     <Layers size={14} /> Choose your session
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -179,7 +179,7 @@ const SessionCard = ({ item, isLive, isGrouped, user, onSelect, isSelecting, get
                     "flex items-center gap-4 shrink-0",
                     !isGrouped && "md:w-32 md:flex-col md:items-start md:gap-1"
                 )}>
-                    <div className="flex items-center gap-2 text-accent font-black text-sm uppercase tracking-wider">
+                    <div className="flex items-center gap-2 text-accent font-semibold text-sm uppercase tracking-wider">
                         <Clock size={16} />
                         {item.startTime}
                     </div>
@@ -192,7 +192,7 @@ const SessionCard = ({ item, isLive, isGrouped, user, onSelect, isSelecting, get
                 <div className="flex-grow">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
                         <div className={cn(
-                            "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest",
+                            "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider",
                             isLive ? "bg-white/20 text-white" : `${styles.bg} ${styles.color} ${styles.border}`
                         )}>
                             {styles.icon}
@@ -200,20 +200,20 @@ const SessionCard = ({ item, isLive, isGrouped, user, onSelect, isSelecting, get
                         </div>
                         
                         {isLive && (
-                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent text-[9px] font-black text-white uppercase tracking-widest animate-pulse">
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent text-[9px] font-bold text-white uppercase tracking-wider animate-pulse">
                                 <div className="w-1.5 h-1.5 rounded-full bg-white" /> Live Now
                             </div>
                         )}
 
                         {isSelected && !isBreak && (
-                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500 text-[9px] font-black text-white uppercase tracking-widest">
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500 text-[9px] font-bold text-white uppercase tracking-wider">
                                 <CheckCircle2 size={10} /> Attending
                             </div>
                         )}
                     </div>
 
                     <h4 className={cn(
-                        "font-black text-surface-dark dark:text-white transition-colors group-hover:text-accent",
+                        "font-bold text-surface-dark dark:text-white transition-colors group-hover:text-accent",
                         isGrouped ? "text-xl" : "text-2xl"
                     )}>
                         {item.title}
@@ -242,7 +242,7 @@ const SessionCard = ({ item, isLive, isGrouped, user, onSelect, isSelecting, get
                             ))
                         ) : item.speaker ? (
                             <div className="flex items-center gap-2 text-xs font-bold text-surface-dark/70 dark:text-white/70">
-                                <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center text-[10px] text-accent font-black">
+                                <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center text-[10px] text-accent font-bold">
                                     {item.speaker[0]}
                                 </div>
                                 {item.speaker}
@@ -264,7 +264,7 @@ const SessionCard = ({ item, isLive, isGrouped, user, onSelect, isSelecting, get
                             onClick={onSelect}
                             disabled={isSelecting}
                             className={cn(
-                                "w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all box-shadow-xl",
+                                "w-full py-3 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all box-shadow-xl",
                                 isSelected 
                                     ? "bg-green-500 text-white shadow-lg shadow-green-500/20" 
                                     : "bg-surface-dark/5 dark:bg-white/5 text-surface-dark dark:text-white hover:bg-accent hover:text-white"

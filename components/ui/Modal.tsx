@@ -48,7 +48,7 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
                     >
                         <GlassCard className="overflow-hidden border-2 border-white/20 dark:border-white/5 shadow-2xl">
                             <div className="p-6 border-b border-surface-dark/5 dark:border-white/5 flex items-center justify-between">
-                                <h3 className="text-2xl font-black text-surface-dark dark:text-white tracking-tight">
+                                <h3 className="text-2xl font-bold text-surface-dark dark:text-white tracking-tight">
                                     {title}
                                 </h3>
                                 <button

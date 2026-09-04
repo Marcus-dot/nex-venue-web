@@ -115,10 +115,10 @@ export default function SpecialAccessPage() {
                     </div>
                 </div>
 
-                <GlassCard className="!p-10">
+                <GlassCard className="p-10">
                     <form onSubmit={handleSave} className="space-y-8">
                         <section className="space-y-4">
-                            <h3 className="text-xl font-black text-surface-dark dark:text-white flex items-center gap-2">
+                            <h3 className="text-xl font-bold text-surface-dark dark:text-white flex items-center gap-2">
                                 <UserIcon size={22} className="text-accent" /> Public Information
                             </h3>
                             <p className="text-sm text-surface-dark/60 dark:text-white/60 font-medium">This information will be displayed to all attendees on the event page.</p>

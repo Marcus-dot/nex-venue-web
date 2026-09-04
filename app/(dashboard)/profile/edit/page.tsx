@@ -54,14 +54,14 @@ function SectionCard({
     step: string; icon: React.ComponentType<{ size?: number; className?: string }>; title: string; children: React.ReactNode;
 }) {
     return (
-        <GlassCard className="!p-0 overflow-hidden">
+        <GlassCard className="p-0 overflow-hidden">
             <div className="flex items-center gap-4 px-7 py-5 border-b border-surface-dark/5 dark:border-white/5">
-                <div className="w-8 h-8 rounded-xl bg-accent flex items-center justify-center text-white text-xs font-black shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-accent flex items-center justify-center text-white text-xs font-semibold shrink-0">
                     {step}
                 </div>
                 <div className="flex items-center gap-2">
                     <Icon size={16} className="text-surface-dark/55 dark:text-white/40" />
-                    <h2 className="font-black text-surface-dark dark:text-white">{title}</h2>
+                    <h2 className="font-bold text-surface-dark dark:text-white">{title}</h2>
                 </div>
             </div>
             <div className="p-7 space-y-5">{children}</div>
@@ -258,7 +258,7 @@ export default function EditProfilePage() {
                         <ArrowLeft size={16} className="text-surface-dark dark:text-white" />
                     </Link>
                     <div>
-                        <h1 className="text-xl font-black text-surface-dark dark:text-white tracking-tight">Edit Profile</h1>
+                        <h1 className="text-xl font-bold text-surface-dark dark:text-white tracking-tight">Edit Profile</h1>
                         <p className="text-xs text-surface-dark/55 dark:text-white/40 font-medium">Your changes are visible to other attendees</p>
                     </div>
                 </div>
@@ -276,7 +276,7 @@ export default function EditProfilePage() {
                                     <img src={coverPreview} alt="Cover preview" className="absolute inset-0 w-full h-full object-cover" />
                                 )}
                                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <div className="flex items-center gap-2 text-white text-xs font-black">
+                                    <div className="flex items-center gap-2 text-white text-xs font-semibold">
                                         <Camera size={15} /> {coverPreview ? "Change cover" : "Add cover photo"}
                                     </div>
                                 </div>
@@ -316,9 +316,9 @@ export default function EditProfilePage() {
                                 />
                             </div>
                             <div>
-                                <p className="text-sm font-black text-surface-dark dark:text-white mb-0.5">Profile Picture</p>
+                                <p className="text-sm font-semibold text-surface-dark dark:text-white mb-0.5">Profile Picture</p>
                                 <p className="text-xs text-surface-dark/55 dark:text-white/40 font-medium mb-2">PNG, JPG up to 5MB</p>
-                                <label className="cursor-pointer text-xs font-black text-accent hover:underline underline-offset-2">
+                                <label className="cursor-pointer text-xs font-semibold text-accent hover:underline underline-offset-2">
                                     Change photo
                                     <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                                 </label>
@@ -349,7 +349,7 @@ export default function EditProfilePage() {
                                         {profile?.phoneNumber || ", "}
                                     </span>
                                 </div>
-                                <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-green-500">
+                                <span className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-green-500">
                                     <CheckCircle2 size={11} /> Verified
                                 </span>
                             </div>
@@ -529,7 +529,7 @@ export default function EditProfilePage() {
                     </SectionCard>
 
                     {/* Save */}
-                    <Button type="submit" size="lg" className="w-full h-13 font-black text-base" disabled={saving}>
+                    <Button type="submit" size="lg" className="w-full h-13 font-semibold text-base" disabled={saving}>
                         {saving ? <Loader2 className="animate-spin" size={20} /> : "Save Changes"}
                     </Button>
                 </form>

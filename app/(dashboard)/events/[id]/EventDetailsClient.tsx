@@ -385,8 +385,8 @@ export default function EventDetailsClient() {
                     </div>
 
                     {/* Description Section */}
-                    <GlassCard className="!p-8">
-                        <h3 className="text-2xl font-black text-surface-dark dark:text-white mb-6 flex items-center gap-2">
+                    <GlassCard className="p-8">
+                        <h3 className="text-2xl font-bold text-surface-dark dark:text-white mb-6 flex items-center gap-2">
                             <Info size={24} className="text-accent" /> About this event
                         </h3>
                         <div className="prose prose-lg text-surface-dark/70 dark:text-white/70 leading-relaxed font-medium">
@@ -397,7 +397,7 @@ export default function EventDetailsClient() {
                     {/* Agenda Section */}
                     <div>
                         <div className="flex items-center justify-between mb-8">
-                            <h3 className="text-3xl font-black text-surface-dark dark:text-white">Event Schedule</h3>
+                            <h3 className="text-3xl font-bold text-surface-dark dark:text-white">Event Schedule</h3>
                             <div className="flex items-center gap-2 text-surface-dark/55 dark:text-white/40 text-sm font-bold">
                                 <span className="w-2 h-2 rounded-full bg-green-500" /> Live Updates Enabled
                             </div>
@@ -408,21 +408,21 @@ export default function EventDetailsClient() {
                     {/* Speakers Section */}
                     {displaySpeakers.length > 0 && (
                         <div>
-                            <h3 className="text-3xl font-black text-surface-dark dark:text-white mb-8 flex items-center gap-3">
+                            <h3 className="text-3xl font-bold text-surface-dark dark:text-white mb-8 flex items-center gap-3">
                                 <Mic size={28} className="text-accent" /> Featured Speakers
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {displaySpeakers.map(speaker => (
-                                    <GlassCard key={speaker.key} onClick={() => setSelectedSpeaker(speaker)} className="!p-6 flex flex-col gap-4">
+                                    <GlassCard key={speaker.key} onClick={() => setSelectedSpeaker(speaker)} className="p-6 flex flex-col gap-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center text-accent font-black text-2xl overflow-hidden shrink-0">
+                                            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-2xl overflow-hidden shrink-0">
                                                 {speaker.photoUrl
                                                     ? <img src={speaker.photoUrl} alt={speaker.name} className="w-full h-full object-cover" />
                                                     : (speaker.name[0] || "?")
                                                 }
                                             </div>
                                             <div className="min-w-0">
-                                                <div className="text-xl font-black text-surface-dark dark:text-white truncate">{speaker.name}</div>
+                                                <div className="text-xl font-bold text-surface-dark dark:text-white truncate">{speaker.name}</div>
                                                 <div className="text-sm font-bold text-accent uppercase tracking-wider">{speaker.subtitle}</div>
                                             </div>
                                         </div>
@@ -441,18 +441,18 @@ export default function EventDetailsClient() {
                     {/* Exhibitors Section */}
                     {participants.filter(p => p.role === 'exhibitor').length > 0 && (
                         <div>
-                            <h3 className="text-3xl font-black text-surface-dark dark:text-white mb-8 flex items-center gap-3">
+                            <h3 className="text-3xl font-bold text-surface-dark dark:text-white mb-8 flex items-center gap-3">
                                 <Store size={28} className="text-accent" /> Virtual Exhibitors
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {participants.filter(p => p.role === 'exhibitor').map(exhibitor => (
-                                    <GlassCard key={exhibitor.id} className="!p-6 flex flex-col gap-4">
+                                    <GlassCard key={exhibitor.id} className="p-6 flex flex-col gap-4">
                                         <div className="flex items-center gap-4">
                                             <div className="w-16 h-16 rounded-xl bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center text-surface-dark/55 dark:text-white/40">
                                                 <Store size={32} />
                                             </div>
                                             <div>
-                                                <div className="text-xl font-black text-surface-dark dark:text-white">{exhibitor.company || exhibitor.displayName}</div>
+                                                <div className="text-xl font-bold text-surface-dark dark:text-white">{exhibitor.company || exhibitor.displayName}</div>
                                                 <div className="text-sm font-bold text-surface-dark/55 dark:text-white/40 uppercase tracking-wider italic">Exhibitor Booth</div>
                                             </div>
                                         </div>
@@ -468,10 +468,10 @@ export default function EventDetailsClient() {
 
                 {/* Right Column: CTA & Organisers */}
                 <div className="space-y-8 animate-up">
-                    <GlassCard className="sticky top-28 !p-8 border-2 border-accent/20">
+                    <GlassCard className="sticky top-28 p-8 border-2 border-accent/20">
                         <div className="mb-6">
-                            <div className="text-sm font-bold text-surface-dark/55 dark:text-white/40 uppercase tracking-widest mb-1">Status</div>
-                            <div className="text-3xl font-black text-surface-dark dark:text-white">
+                            <div className="text-sm font-bold text-surface-dark/55 dark:text-white/40 uppercase tracking-wider mb-1">Status</div>
+                            <div className="text-3xl font-bold text-surface-dark dark:text-white">
                                 {isEnded
                                     ? "Event Ended"
                                     : isAttending
@@ -491,12 +491,12 @@ export default function EventDetailsClient() {
 
                         <div className="space-y-4 mb-8">
                             {isEnded && !isAttending ? (
-                                <Button className="w-full text-lg !py-5" disabled variant="secondary">
+                                <Button className="w-full text-lg py-5" disabled variant="secondary">
                                     Event Ended
                                 </Button>
                             ) : needsApproval && !isFull ? (
                                 <Button
-                                    className="w-full text-lg !py-5"
+                                    className="w-full text-lg py-5"
                                     onClick={handleRequestAttendance}
                                     disabled={attendanceLoading || attendanceReq === undefined || hasPendingReq}
                                     variant={hasPendingReq ? "secondary" : "primary"}
@@ -511,7 +511,7 @@ export default function EventDetailsClient() {
                                 </Button>
                             ) : (
                                 <Button
-                                    className="w-full text-lg !py-5"
+                                    className="w-full text-lg py-5"
                                     onClick={handleRSVP}
                                     disabled={rsvpLoading || isFull}
                                     variant={isAttending ? "secondary" : "primary"}
@@ -531,7 +531,7 @@ export default function EventDetailsClient() {
                             {isAttending && (
                                 <Button
                                     variant="outline"
-                                    className="w-full text-lg !py-5 gap-2"
+                                    className="w-full text-lg py-5 gap-2"
                                     onClick={() => setShowTicket(true)}
                                 >
                                     <QrCode size={20} /> View Ticket
@@ -541,7 +541,7 @@ export default function EventDetailsClient() {
                             {isAttending && !isStaff && !isAdmin && (
                                 <Button
                                     variant="outline"
-                                    className="w-full text-lg !py-5 gap-2"
+                                    className="w-full text-lg py-5 gap-2"
                                     onClick={() => setIsRequestModalOpen(true)}
                                 >
                                     Apply for Staff Role
@@ -550,7 +550,7 @@ export default function EventDetailsClient() {
 
                             {canManage && (
                                 <Link href={`/events/${event.id}/manage`} className="block">
-                                    <Button variant="outline" className="w-full text-lg !py-5 gap-2 border-accent text-accent">
+                                    <Button variant="outline" className="w-full text-lg py-5 gap-2 border-accent text-accent">
                                         <Shield size={20} /> Event Management
                                     </Button>
                                 </Link>
@@ -558,27 +558,27 @@ export default function EventDetailsClient() {
 
                             {isAttending && (
                                 <Link href={`/chat?id=${event.id}&type=event&name=${encodeURIComponent(event.title)}`} className="block">
-                                    <Button variant="ghost" className="w-full text-lg !py-5">Join Discussion</Button>
+                                    <Button variant="ghost" className="w-full text-lg py-5">Join Discussion</Button>
                                 </Link>
                             )}
                         </div>
 
                         <div className="pt-8 border-t border-surface-dark/10 dark:border-white/10">
-                            <h4 className="font-black text-surface-dark dark:text-white mb-4">Organised by</h4>
+                            <h4 className="font-bold text-surface-dark dark:text-white mb-4">Organised by</h4>
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent font-black">
+                                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold">
                                     {event.creatorName?.[0]}
                                 </div>
                                 <div>
-                                    <div className="font-black text-surface-dark dark:text-white">{event.creatorName}</div>
+                                    <div className="font-bold text-surface-dark dark:text-white">{event.creatorName}</div>
                                     <div className="text-xs text-surface-dark/55 dark:text-white/40 font-bold uppercase">Event Host</div>
                                 </div>
                             </div>
                         </div>
                     </GlassCard>
 
-                    <GlassCard className="!p-8">
-                        <h4 className="font-black text-surface-dark dark:text-white mb-6">Attendees</h4>
+                    <GlassCard className="p-8">
+                        <h4 className="font-bold text-surface-dark dark:text-white mb-6">Attendees</h4>
                         {attendeeCount === 0 ? (
                             <p className="text-sm text-surface-dark/60 dark:text-white/60 font-medium">
                                 No one has joined yet, be the first.
@@ -591,13 +591,13 @@ export default function EventDetailsClient() {
                                             key={a.uid}
                                             href={`/profile/${a.uid}`}
                                             title={a.fullName}
-                                            className="rounded-full ring-2 ring-white dark:ring-gray-900 transition-transform hover:scale-110 hover:z-10"
+                                            className="rounded-full ring-2 ring-white dark:ring-[#0f101e] transition-transform hover:scale-110 hover:z-10"
                                         >
                                             <AvatarDisplay avatarUrl={a.avatar} fullName={a.fullName} size={40} />
                                         </Link>
                                     ))}
                                     {attendeeCount > 5 && (
-                                        <div className="w-10 h-10 rounded-full bg-accent text-white ring-2 ring-white dark:ring-gray-900 flex items-center justify-center text-[11px] font-black">
+                                        <div className="w-10 h-10 rounded-full bg-accent text-white ring-2 ring-white dark:ring-[#0f101e] flex items-center justify-center text-[11px] font-semibold">
                                             +{attendeeCount - 5}
                                         </div>
                                     )}
@@ -620,13 +620,13 @@ export default function EventDetailsClient() {
                 {selectedSpeaker && (
                     <div>
                         <div className="flex items-center gap-4 mb-6">
-                            <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center text-accent font-black text-3xl overflow-hidden shrink-0">
+                            <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-3xl overflow-hidden shrink-0">
                                 {selectedSpeaker.photoUrl
                                     ? <img src={selectedSpeaker.photoUrl} alt={selectedSpeaker.name} className="w-full h-full object-cover" />
                                     : (selectedSpeaker.name[0] || "?")}
                             </div>
                             <div className="min-w-0">
-                                <div className="text-2xl font-black text-surface-dark dark:text-white">{selectedSpeaker.name}</div>
+                                <div className="text-2xl font-bold text-surface-dark dark:text-white">{selectedSpeaker.name}</div>
                                 <div className="text-sm font-bold text-accent uppercase tracking-wider">{selectedSpeaker.subtitle}</div>
                             </div>
                         </div>
@@ -657,7 +657,7 @@ export default function EventDetailsClient() {
                                 <role.icon size={24} />
                             </div>
                             <div>
-                                <div className="font-black text-surface-dark dark:text-white group-hover:text-accent transition-colors">
+                                <div className="font-bold text-surface-dark dark:text-white group-hover:text-accent transition-colors">
                                     Apply as {role.label}
                                 </div>
                                 <div className="text-sm text-surface-dark/60 dark:text-white/60 font-medium">

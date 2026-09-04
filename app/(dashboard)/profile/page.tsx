@@ -134,13 +134,13 @@ export default function ProfilePage() {
                             <button
                                 onClick={() => setShowCard(true)}
                                 aria-label="Business card"
-                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-black uppercase tracking-widest transition-all"
+                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-semibold uppercase tracking-wider transition-all"
                             >
                                 <QrCode size={13} /> <span className="hidden sm:inline">Card</span>
                             </button>
                             <button
                                 onClick={() => router.push("/profile/edit")}
-                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-black uppercase tracking-widest transition-all"
+                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-semibold uppercase tracking-wider transition-all"
                             >
                                 <Edit3 size={13} /> Edit Profile
                             </button>
@@ -159,7 +159,7 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Identity area */}
-                    <div className="bg-white/60 dark:bg-[#1a1c2e]/90 backdrop-blur-xl px-8 pt-16 pb-7 rounded-b-3xl">
+                    <div className="bg-white/60 dark:bg-[#171a2e]/90 backdrop-blur-xl px-8 pt-16 pb-7 rounded-b-3xl">
                         {/* Actions row, sits at top-right while avatar takes top-left space */}
                         <div className="flex items-center justify-end gap-2 mb-5">
                             {hasSocial && (
@@ -195,11 +195,11 @@ export default function ProfilePage() {
                         {/* Name + meta */}
                         <div className="space-y-2">
                             <div className="flex flex-wrap items-center gap-2">
-                                <h1 className="text-2xl font-black text-surface-dark dark:text-white tracking-tight">
+                                <h1 className="text-2xl font-bold text-surface-dark dark:text-white tracking-tight">
                                     {profile?.fullName || "NexVenue User"}
                                 </h1>
                                 {profile?.role === "admin" && (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent text-white text-[10px] font-black uppercase tracking-widest">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent text-white text-[10px] font-semibold uppercase tracking-wider">
                                         <Shield size={10} /> Admin
                                     </span>
                                 )}
@@ -213,7 +213,7 @@ export default function ProfilePage() {
 
                             <div className="flex flex-wrap items-center gap-2 pt-1">
                                 {profile?.industry && (
-                                    <span className="px-3 py-1 rounded-full bg-accent/10 text-accent text-[11px] font-black uppercase tracking-wider">
+                                    <span className="px-3 py-1 rounded-full bg-accent/10 text-accent text-[11px] font-semibold uppercase tracking-wider">
                                         {profile.industry}
                                     </span>
                                 )}
@@ -244,20 +244,20 @@ export default function ProfilePage() {
                         { label: "Attending",        value: stats.eventsAttending, icon: Heart,    accent: "text-green-500",   glow: "bg-green-500/10" },
                         { label: "Total Reach",      value: stats.totalAttendees,  icon: Users,    accent: "text-blue-500",    glow: "bg-blue-500/10" },
                     ].map((s) => (
-                        <GlassCard key={s.label} className="!p-6 text-center hover:-translate-y-0.5 transition-transform">
+                        <GlassCard key={s.label} className="p-6 text-center hover:-translate-y-0.5 transition-transform">
                             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3", s.glow, s.accent)}>
                                 <s.icon size={20} />
                             </div>
-                            <div className="text-3xl font-black text-surface-dark dark:text-white">{s.value}</div>
-                            <div className="text-[11px] font-bold text-surface-dark/55 dark:text-white/40 uppercase tracking-widest mt-1">{s.label}</div>
+                            <div className="text-3xl font-bold text-surface-dark dark:text-white">{s.value}</div>
+                            <div className="text-[11px] font-bold text-surface-dark/55 dark:text-white/40 uppercase tracking-wider mt-1">{s.label}</div>
                         </GlassCard>
                     ))}
                 </div>
 
                 {/* ── Connection requests ──────────────────────────────────── */}
                 {incomingRequests.length > 0 && (
-                    <GlassCard className="!p-6 space-y-3">
-                        <h3 className="text-xs font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest flex items-center gap-2">
+                    <GlassCard className="p-6 space-y-3">
+                        <h3 className="text-xs font-semibold text-surface-dark/45 dark:text-white/30 uppercase tracking-wider flex items-center gap-2">
                             <UserPlus size={14} /> Connection Requests ({incomingRequests.length})
                         </h3>
                         <div className="space-y-2">
@@ -283,8 +283,8 @@ export default function ProfilePage() {
                     <div className="space-y-5">
                         {/* Preferences card */}
                         {hasPrefs && (
-                            <GlassCard className="!p-6 space-y-5">
-                                <h3 className="text-xs font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest">Preferences</h3>
+                            <GlassCard className="p-6 space-y-5">
+                                <h3 className="text-xs font-semibold text-surface-dark/45 dark:text-white/30 uppercase tracking-wider">Preferences</h3>
 
                                 {(profile?.eventInterests?.length ?? 0) > 0 && (
                                     <div className="space-y-2.5">
@@ -306,7 +306,7 @@ export default function ProfilePage() {
                                         <span className="text-[11px] font-bold text-surface-dark/55 dark:text-white/40 flex items-center gap-1.5">
                                             <Utensils size={11} className="text-accent" /> Dietary
                                         </span>
-                                        <span className="text-[11px] font-black text-surface-dark dark:text-white capitalize">
+                                        <span className="text-[11px] font-semibold text-surface-dark dark:text-white capitalize">
                                             {profile.dietaryRestrictions.replace("_", "-")}
                                         </span>
                                     </div>
@@ -317,14 +317,14 @@ export default function ProfilePage() {
                                         <span className="text-[11px] font-bold text-surface-dark/55 dark:text-white/40 flex items-center gap-1.5">
                                             <Shirt size={11} className="text-accent" /> T-Shirt
                                         </span>
-                                        <span className="text-[11px] font-black text-surface-dark dark:text-white">{profile.tshirtSize}</span>
+                                        <span className="text-[11px] font-semibold text-surface-dark dark:text-white">{profile.tshirtSize}</span>
                                     </div>
                                 )}
                             </GlassCard>
                         )}
 
                         {/* Account menu */}
-                        <GlassCard className="!p-2">
+                        <GlassCard className="p-2">
                             {[
                                 { label: "Edit Profile",       icon: Edit3,       sub: "Update your details",       href: "/profile/edit" },
                                 { label: "Direct Messages",    icon: MessageSquare, sub: "Your conversations",       href: "/chat" },
@@ -363,25 +363,25 @@ export default function ProfilePage() {
                         {createdEvents.length > 0 && (
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between px-1">
-                                    <h3 className="text-base font-black text-surface-dark dark:text-white">My Events</h3>
-                                    <button onClick={() => router.push("/events/create")} className="text-xs font-black text-accent hover:underline underline-offset-2">
+                                    <h3 className="text-base font-semibold text-surface-dark dark:text-white">My Events</h3>
+                                    <button onClick={() => router.push("/events/create")} className="text-xs font-semibold text-accent hover:underline underline-offset-2">
                                         + New Event
                                     </button>
                                 </div>
                                 <div className="space-y-2">
                                     {createdEvents.map((event) => (
-                                        <GlassCard key={event.id} className="!p-4 flex items-center gap-4 hover:border-accent/20 transition-colors">
+                                        <GlassCard key={event.id} className="p-4 flex items-center gap-4 hover:border-accent/20 transition-colors">
                                             <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent shrink-0">
                                                 <Calendar size={18} />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <div className="font-black text-surface-dark dark:text-white text-sm truncate">{event.title}</div>
+                                                <div className="font-bold text-surface-dark dark:text-white text-sm truncate">{event.title}</div>
                                                 <div className="text-[11px] text-surface-dark/55 dark:text-white/40 font-medium flex items-center gap-1.5 mt-0.5">
                                                     <span>{event.date}</span>
                                                     {event.location && <><span>·</span><MapPin size={10} className="inline" /><span className="truncate">{event.location}</span></>}
                                                 </div>
                                             </div>
-                                            <Button onClick={() => router.push(`/events/${event.id}/manage`)} size="sm" className="font-black h-8 px-4 rounded-xl text-xs shrink-0">
+                                            <Button onClick={() => router.push(`/events/${event.id}/manage`)} size="sm" className="font-semibold h-8 px-4 rounded-xl text-xs shrink-0">
                                                 Manage
                                             </Button>
                                         </GlassCard>
@@ -393,18 +393,18 @@ export default function ProfilePage() {
                         {/* Event Timeline */}
                         <div className="space-y-4">
                             <div className="flex items-center justify-between px-1">
-                                <h3 className="text-base font-black text-surface-dark dark:text-white">Attending</h3>
-                                <button onClick={() => router.push("/events")} className="text-xs font-black text-accent hover:underline underline-offset-2">
+                                <h3 className="text-base font-semibold text-surface-dark dark:text-white">Attending</h3>
+                                <button onClick={() => router.push("/events")} className="text-xs font-semibold text-accent hover:underline underline-offset-2">
                                     Explore Events
                                 </button>
                             </div>
 
                             {attendingEvents.length === 0 ? (
-                                <GlassCard className="!p-12 text-center">
+                                <GlassCard className="p-12 text-center">
                                     <div className="w-16 h-16 rounded-2xl bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center text-surface-dark/20 dark:text-white/20 mx-auto mb-5">
                                         <Clock size={32} />
                                     </div>
-                                    <h4 className="text-base font-black text-surface-dark dark:text-white mb-2">Nothing yet</h4>
+                                    <h4 className="text-base font-semibold text-surface-dark dark:text-white mb-2">Nothing yet</h4>
                                     <p className="text-sm text-surface-dark/60 dark:text-white/50 font-medium mb-6 max-w-xs mx-auto">
                                         Events you register for will appear here.
                                     </p>
@@ -417,14 +417,14 @@ export default function ProfilePage() {
                                     {attendingEvents.map((event) => {
                                         const role = getEventRole(event);
                                         return (
-                                            <GlassCard key={event.id} className="!p-4 flex items-center gap-4 hover:border-accent/20 transition-colors">
+                                            <GlassCard key={event.id} className="p-4 flex items-center gap-4 hover:border-accent/20 transition-colors">
                                                 <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", role.bg, role.text)}>
                                                     <Heart size={18} />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <div className="font-black text-surface-dark dark:text-white text-sm truncate">{event.title}</div>
+                                                    <div className="font-bold text-surface-dark dark:text-white text-sm truncate">{event.title}</div>
                                                     <div className="flex items-center gap-2 mt-0.5">
-                                                        <span className={cn("text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full", role.bg, role.text)}>
+                                                        <span className={cn("text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full", role.bg, role.text)}>
                                                             {role.label}
                                                         </span>
                                                         {event.date && (
@@ -443,7 +443,7 @@ export default function ProfilePage() {
                                                         <Button
                                                             onClick={() => router.push(`/events/${event.id}/manage`)}
                                                             size="sm"
-                                                            className="font-black h-8 px-4 rounded-xl text-xs"
+                                                            className="font-semibold h-8 px-4 rounded-xl text-xs"
                                                         >
                                                             Manage
                                                         </Button>
@@ -458,13 +458,13 @@ export default function ProfilePage() {
 
                         {/* Admin panel */}
                         {profile?.role === "admin" && (
-                            <GlassCard className="!p-6">
+                            <GlassCard className="p-6">
                                 <div className="flex items-center gap-3 mb-5">
                                     <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
                                         <Shield size={18} />
                                     </div>
                                     <div>
-                                        <h4 className="font-black text-surface-dark dark:text-white text-sm">Administrative Access</h4>
+                                        <h4 className="font-bold text-surface-dark dark:text-white text-sm">Administrative Access</h4>
                                         <p className="text-[11px] text-surface-dark/55 dark:text-white/40 font-medium">Elevated platform permissions</p>
                                     </div>
                                 </div>
@@ -479,12 +479,12 @@ export default function ProfilePage() {
                                                 onClick={() => router.push(item.href)}
                                                 className="p-3.5 rounded-xl bg-surface-dark/5 dark:bg-white/5 hover:bg-accent/10 hover:border-accent/20 border border-transparent text-left transition-colors"
                                             >
-                                                <div className="text-sm font-black text-surface-dark dark:text-white mb-0.5">{item.title}</div>
+                                                <div className="text-sm font-semibold text-surface-dark dark:text-white mb-0.5">{item.title}</div>
                                                 <div className="text-[11px] text-surface-dark/55 dark:text-white/40 font-medium">{item.sub}</div>
                                             </button>
                                         ) : (
                                             <div key={item.title} className="p-3.5 rounded-xl bg-surface-dark/5 dark:bg-white/5 opacity-60">
-                                                <div className="text-sm font-black text-surface-dark dark:text-white mb-0.5">{item.title}</div>
+                                                <div className="text-sm font-semibold text-surface-dark dark:text-white mb-0.5">{item.title}</div>
                                                 <div className="text-[11px] text-surface-dark/55 dark:text-white/40 font-medium">{item.sub}</div>
                                             </div>
                                         )

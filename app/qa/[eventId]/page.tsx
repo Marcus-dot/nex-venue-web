@@ -176,7 +176,7 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                                             transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
                                         />
                                         <span
-                                            className="text-xs font-semibold uppercase tracking-widest"
+                                            className="text-xs font-semibold uppercase tracking-wider"
                                             style={{ color: "#e85c29", letterSpacing: "0.12em" }}
                                         >
                                             {spotlight.status === "answered" ? "Answered" : "Now answering"}
@@ -225,7 +225,7 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                         {queue.length > 0 && (
                             <div>
                                 <p
-                                    className="text-xs font-semibold uppercase tracking-widest mb-4"
+                                    className="text-xs font-semibold uppercase tracking-wider mb-4"
                                     style={{ color: "rgba(255,255,255,0.25)", letterSpacing: "0.12em" }}
                                 >
                                     Up next

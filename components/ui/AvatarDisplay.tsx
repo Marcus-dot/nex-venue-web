@@ -61,7 +61,7 @@ export const AvatarDisplay = ({
 
     return (
         <div
-            className={cn("rounded-full flex items-center justify-center shrink-0 text-white font-black select-none", className)}
+            className={cn("rounded-full flex items-center justify-center shrink-0 text-white font-bold select-none", className)}
             style={{ width: size, height: size, backgroundColor: bgColor, fontSize: size * 0.36 }}
         >
             {initials}

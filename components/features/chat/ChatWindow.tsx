@@ -96,7 +96,7 @@ export const ChatWindow = ({ id, type, name, onBack }: ChatWindowProps) => {
     };
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-white dark:bg-gray-950 relative">
+        <div className="flex-1 flex flex-col h-full bg-white dark:bg-[#0f101e] relative">
             <header className="px-4 md:px-8 py-4 border-b border-surface-dark/5 dark:border-white/5 flex items-center gap-3 md:gap-4">
                 {onBack && (
                     <button
@@ -107,14 +107,14 @@ export const ChatWindow = ({ id, type, name, onBack }: ChatWindowProps) => {
                         <ArrowLeft size={22} />
                     </button>
                 )}
-                <div className="w-11 h-11 rounded-2xl bg-accent/10 flex items-center justify-center text-accent font-black text-xl shrink-0">
+                <div className="w-11 h-11 rounded-2xl bg-accent/10 flex items-center justify-center text-accent font-bold text-xl shrink-0">
                     {name[0]}
                 </div>
                 <div className="min-w-0">
-                    <h3 className="font-black text-surface-dark dark:text-white truncate">{name}</h3>
+                    <h3 className="font-bold text-surface-dark dark:text-white truncate">{name}</h3>
                     <div className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                        <span className="text-[10px] font-black text-surface-dark/55 dark:text-white/40 uppercase tracking-widest">Live</span>
+                        <span className="text-[10px] font-semibold text-surface-dark/55 dark:text-white/40 uppercase tracking-wider">Live</span>
                     </div>
                 </div>
             </header>
@@ -133,7 +133,7 @@ export const ChatWindow = ({ id, type, name, onBack }: ChatWindowProps) => {
                         <div className="w-20 h-20 bg-surface-dark/5 dark:bg-white/5 rounded-full flex items-center justify-center mb-6">
                             <Send size={40} className="-rotate-45" />
                         </div>
-                        <h4 className="text-xl font-black text-surface-dark dark:text-white mb-2">No messages yet</h4>
+                        <h4 className="text-xl font-bold text-surface-dark dark:text-white mb-2">No messages yet</h4>
                         <p className="text-sm font-medium max-w-xs">Start the conversation by sending a message below.</p>
                     </div>
                 ) : (

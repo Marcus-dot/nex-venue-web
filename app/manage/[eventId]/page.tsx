@@ -343,10 +343,10 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
             <div className="px-5 pt-8 pb-5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
                 <div className="flex items-center gap-2 mb-1">
                     <div className="w-2 h-2 rounded-full" style={{ background: accent }} />
-                    <span className="text-xs font-semibold uppercase tracking-widest"
+                    <span className="text-xs font-semibold uppercase tracking-wider"
                         style={{ color: accent, letterSpacing: "0.1em" }}>Admin</span>
                 </div>
-                <h1 className="text-white font-black text-2xl">{event?.title ?? "Loading..."}</h1>
+                <h1 className="text-white font-bold text-2xl">{event?.title ?? "Loading..."}</h1>
             </div>
 
             {/* ── Tabs ── */}
@@ -357,7 +357,7 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                         style={{ color: tab === t.id ? "white" : "rgba(255,255,255,0.35)" }}>
                         {t.label}
                         {t.badge ? (
-                            <span className="text-xs font-black w-5 h-5 rounded-full flex items-center justify-center"
+                            <span className="text-xs font-semibold w-5 h-5 rounded-full flex items-center justify-center"
                                 style={{ background: accent, color: "white" }}>
                                 {t.badge}
                             </span>
@@ -643,7 +643,7 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                                 {ratings.map((r, i) => (
                                     <div key={r.agendaItemId} className="rounded-xl p-4 flex items-center gap-4"
                                         style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                                        <span className="text-2xl font-black w-6 text-center shrink-0"
+                                        <span className="text-2xl font-bold w-6 text-center shrink-0"
                                             style={{ color: i === 0 ? accent : "rgba(255,255,255,0.2)" }}>
                                             {i + 1}
                                         </span>
@@ -652,7 +652,7 @@ export default function ManageEventPage({ params }: { params: Promise<{ eventId:
                                             <Stars score={r.avg} />
                                         </div>
                                         <div className="shrink-0 text-right">
-                                            <p className="text-lg font-black" style={{ color: accent }}>
+                                            <p className="text-lg font-bold" style={{ color: accent }}>
                                                 {r.avg.toFixed(1)}
                                             </p>
                                             <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>

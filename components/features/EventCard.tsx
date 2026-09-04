@@ -73,7 +73,7 @@ export const EventCard = ({ event }: EventCardProps) => {
 
     return (
         <div ref={cardRef}>
-            <GlassCard className="group overflow-hidden flex flex-col h-full !p-0">
+            <GlassCard className="group overflow-hidden flex flex-col h-full p-0">
                 <div className="relative h-48 w-full overflow-hidden">
                     {event.imageUrl ? (
                         <img
@@ -93,7 +93,7 @@ export const EventCard = ({ event }: EventCardProps) => {
                     )}
                     {/* Date badge */}
                     <div className="absolute top-4 left-4">
-                        <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-bold shadow-sm" style={{ color: accent }}>
+                        <div className="bg-white/90 dark:bg-[#171a2e]/90 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-bold shadow-sm" style={{ color: accent }}>
                             {event.date}
                         </div>
                     </div>
@@ -105,7 +105,7 @@ export const EventCard = ({ event }: EventCardProps) => {
                     </div>
                     {ended && (
                         <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
-                            <span className="bg-white/90 dark:bg-gray-900/90 text-surface-dark dark:text-white text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
+                            <span className="bg-white/90 dark:bg-[#171a2e]/90 text-surface-dark dark:text-white text-xs font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full">
                                 Ended
                             </span>
                         </div>
@@ -113,7 +113,7 @@ export const EventCard = ({ event }: EventCardProps) => {
                 </div>
 
                 <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-black text-surface-dark dark:text-white mb-2 line-clamp-1 transition-colors" style={{ "--accent-color": accent } as React.CSSProperties}>
+                    <h3 className="text-xl font-bold text-surface-dark dark:text-white mb-2 line-clamp-1 transition-colors" style={{ "--accent-color": accent } as React.CSSProperties}>
                         {event.title}
                     </h3>
                     <p className="text-surface-dark/60 dark:text-white/60 text-sm mb-6 line-clamp-2 h-10 font-medium">
@@ -129,7 +129,7 @@ export const EventCard = ({ event }: EventCardProps) => {
 
                     <Link href={`/events/${event.id}`} className="mt-5">
                         <button
-                            className="w-full py-3.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 border-2 hover:text-white"
+                            className="w-full py-3.5 rounded-xl font-semibold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 border-2 hover:text-white"
                             style={{
                                 borderColor: `${accent}40`,
                                 color: accent,

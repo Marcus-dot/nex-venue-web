@@ -12,7 +12,8 @@ const config: Config = {
             colors: {
                 background: {
                     DEFAULT: "#fafaf8",
-                    dark: "#222551"
+                    // App canvas (dark). Elevated dark surface is #171a2e (see .glass-card).
+                    dark: "#0f101e"
                 },
                 accent: {
                     DEFAULT: "#e85c29",

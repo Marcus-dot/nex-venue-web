@@ -190,8 +190,8 @@ export default function UserManagementPage() {
                             { label: "Members", value: memberCount },
                             { label: "Total", value: users.length },
                         ].map((s) => (
-                            <GlassCard key={s.label} className="!p-4 text-center">
-                                <div className={cn("text-3xl font-black", s.accent ? "text-accent" : "text-surface-dark dark:text-white")}>{s.value}</div>
+                            <GlassCard key={s.label} className="p-4 text-center">
+                                <div className={cn("text-3xl font-bold", s.accent ? "text-accent" : "text-surface-dark dark:text-white")}>{s.value}</div>
                                 <div className="text-xs font-bold text-surface-dark/55 dark:text-white/40 mt-1">{s.label}</div>
                             </GlassCard>
                         ))}
@@ -204,7 +204,7 @@ export default function UserManagementPage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={cn(
-                                    "flex-1 px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all font-black text-sm",
+                                    "flex-1 px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all font-semibold text-sm",
                                     activeTab === tab.id
                                         ? "bg-white dark:bg-white/10 text-accent shadow-sm"
                                         : "text-surface-dark/55 dark:text-white/40 hover:text-surface-dark dark:hover:text-white"
@@ -213,7 +213,7 @@ export default function UserManagementPage() {
                                 <tab.icon size={16} />
                                 {tab.label}
                                 {!!tab.badge && tab.badge > 0 && (
-                                    <span className="w-5 h-5 rounded-full bg-accent text-white text-[10px] font-black flex items-center justify-center">
+                                    <span className="w-5 h-5 rounded-full bg-accent text-white text-[10px] font-semibold flex items-center justify-center">
                                         {tab.badge > 9 ? "9+" : tab.badge}
                                     </span>
                                 )}
@@ -246,17 +246,17 @@ export default function UserManagementPage() {
                                     const isUpdating = updatingUserId === u.uid;
                                     const admin = u.role === "admin";
                                     return (
-                                        <GlassCard key={u.uid} className="!p-4 flex items-center gap-4">
+                                        <GlassCard key={u.uid} className="p-4 flex items-center gap-4">
                                             <AvatarDisplay avatarUrl={u.avatar} fullName={u.fullName} size={44} />
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-black text-surface-dark dark:text-white truncate">{u.fullName || "Unknown"}</span>
-                                                    {isSelf && <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-accent text-white">You</span>}
+                                                    <span className="font-bold text-surface-dark dark:text-white truncate">{u.fullName || "Unknown"}</span>
+                                                    {isSelf && <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-accent text-white">You</span>}
                                                 </div>
                                                 <p className="text-sm text-surface-dark/55 dark:text-white/40 font-medium truncate">{u.phoneNumber || "No phone"}</p>
                                                 <span
                                                     className={cn(
-                                                        "inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-black",
+                                                        "inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold",
                                                         admin ? "bg-accent/10 text-accent" : "bg-surface-dark/5 dark:bg-white/5 text-surface-dark/60 dark:text-white/50"
                                                     )}
                                                 >
@@ -268,7 +268,7 @@ export default function UserManagementPage() {
                                                     onClick={() => handleToggleRole(u)}
                                                     disabled={isUpdating}
                                                     className={cn(
-                                                        "shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black transition-colors disabled:opacity-50",
+                                                        "shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors disabled:opacity-50",
                                                         admin
                                                             ? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
                                                             : "bg-accent/10 text-accent hover:bg-accent/20"
@@ -290,7 +290,7 @@ export default function UserManagementPage() {
                                     <div className="w-16 h-16 rounded-2xl bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center text-surface-dark/20 dark:text-white/20 mx-auto mb-4">
                                         <Shield size={30} />
                                     </div>
-                                    <p className="font-black text-surface-dark dark:text-white mb-1">No pending requests</p>
+                                    <p className="font-bold text-surface-dark dark:text-white mb-1">No pending requests</p>
                                     <p className="text-sm text-surface-dark/55 dark:text-white/40 font-medium">Admin access requests will appear here.</p>
                                 </div>
                             ) : (
@@ -302,19 +302,19 @@ export default function UserManagementPage() {
                                     {pendingRequests.map((req) => {
                                         const busy = processingRequestId === req.id;
                                         return (
-                                            <GlassCard key={req.id} className="!p-5">
+                                            <GlassCard key={req.id} className="p-5">
                                                 <div className="flex items-center gap-3 mb-4">
                                                     <div className="w-11 h-11 rounded-full flex items-center justify-center font-black bg-amber-500/15 text-amber-500 shrink-0">
                                                         {req.userName.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <div className="font-black text-surface-dark dark:text-white truncate">{req.userName}</div>
+                                                        <div className="font-bold text-surface-dark dark:text-white truncate">{req.userName}</div>
                                                         <div className="text-sm text-surface-dark/55 dark:text-white/40 font-medium truncate">{req.userPhone}</div>
                                                     </div>
-                                                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-500">Pending</span>
+                                                    <span className="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-500">Pending</span>
                                                 </div>
                                                 <div className="rounded-xl p-3 bg-surface-dark/5 dark:bg-white/5 mb-3">
-                                                    <div className="text-[10px] font-black uppercase tracking-wider text-surface-dark/45 dark:text-white/30 mb-1">Reason</div>
+                                                    <div className="text-[10px] font-semibold uppercase tracking-wider text-surface-dark/45 dark:text-white/30 mb-1">Reason</div>
                                                     <p className="text-sm text-surface-dark dark:text-white leading-relaxed">{req.reason}</p>
                                                 </div>
                                                 <div className="text-xs text-surface-dark/45 dark:text-white/30 font-medium mb-4">Requested {timeAgo(req.timestamp)}</div>
@@ -322,14 +322,14 @@ export default function UserManagementPage() {
                                                     <button
                                                         onClick={() => handleReject(req)}
                                                         disabled={busy}
-                                                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 font-black text-sm transition-colors disabled:opacity-50"
+                                                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 font-semibold text-sm transition-colors disabled:opacity-50"
                                                     >
                                                         <X size={15} /> Reject
                                                     </button>
                                                     <button
                                                         onClick={() => handleApprove(req)}
                                                         disabled={busy}
-                                                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-accent text-white hover:bg-accent/90 font-black text-sm transition-colors disabled:opacity-50"
+                                                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-accent text-white hover:bg-accent/90 font-semibold text-sm transition-colors disabled:opacity-50"
                                                     >
                                                         {busy ? <Loader2 size={15} className="animate-spin" /> : <><Check size={15} /> Approve</>}
                                                     </button>

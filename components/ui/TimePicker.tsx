@@ -70,11 +70,11 @@ export const TimePicker = ({ value, onChange, label, className }: TimePickerProp
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         className="absolute z-50 mt-2 w-full min-w-[280px] right-0"
                     >
-                        <GlassCard className="!p-4 shadow-2xl border-white/40">
+                        <GlassCard className="p-4 shadow-2xl border-white/40">
                             <div className="grid grid-cols-3 gap-2 h-48">
                                 {/* Hour Column */}
                                 <div className="overflow-y-auto pr-1 scrollbar-hide overscroll-contain" data-lenis-prevent>
-                                    <div className="text-[10px] font-black uppercase text-surface-dark/20 dark:text-white/20 text-center mb-2">Hour</div>
+                                    <div className="text-[10px] font-semibold uppercase text-surface-dark/20 dark:text-white/20 text-center mb-2">Hour</div>
                                     <div className="space-y-1">
                                         {hours.map(h => (
                                             <button
@@ -94,7 +94,7 @@ export const TimePicker = ({ value, onChange, label, className }: TimePickerProp
 
                                 {/* Minute Column */}
                                 <div className="overflow-y-auto pr-1 scrollbar-hide overscroll-contain" data-lenis-prevent>
-                                    <div className="text-[10px] font-black uppercase text-surface-dark/20 dark:text-white/20 text-center mb-2">Min</div>
+                                    <div className="text-[10px] font-semibold uppercase text-surface-dark/20 dark:text-white/20 text-center mb-2">Min</div>
                                     <div className="space-y-1">
                                         {minutes.map(m => (
                                             <button
@@ -114,7 +114,7 @@ export const TimePicker = ({ value, onChange, label, className }: TimePickerProp
 
                                 {/* Period Column */}
                                 <div className="flex flex-col">
-                                    <div className="text-[10px] font-black uppercase text-surface-dark/20 dark:text-white/20 text-center mb-2">Period</div>
+                                    <div className="text-[10px] font-semibold uppercase text-surface-dark/20 dark:text-white/20 text-center mb-2">Period</div>
                                     <div className="space-y-1 flex-grow flex flex-col justify-center">
                                         {['AM', 'PM'].map(p => (
                                             <button
@@ -122,7 +122,7 @@ export const TimePicker = ({ value, onChange, label, className }: TimePickerProp
                                                 type="button"
                                                 onClick={() => handleSelect(hour, minute, p)}
                                                 className={cn(
-                                                    "w-full py-4 rounded-lg text-sm font-black transition-all",
+                                                    "w-full py-4 rounded-lg text-sm font-semibold transition-all",
                                                     period === p ? "bg-accent text-white shadow-lg shadow-accent/20" : "hover:bg-surface-dark/5 dark:hover:bg-white/5 text-surface-dark/45 dark:text-white/30"
                                                 )}
                                             >
@@ -133,7 +133,7 @@ export const TimePicker = ({ value, onChange, label, className }: TimePickerProp
                                     <button
                                         type="button"
                                         onClick={() => setIsOpen(false)}
-                                        className="mt-4 py-2 w-full bg-surface-dark text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-black transition-colors"
+                                        className="mt-4 py-2 w-full bg-surface-dark text-white text-[10px] font-semibold uppercase tracking-wider rounded-lg hover:bg-black transition-colors"
                                     >
                                         Done
                                     </button>

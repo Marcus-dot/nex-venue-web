@@ -78,12 +78,12 @@ export const Navigation = () => {
     const roleLabel = isAdmin ? "Administrator" : (profile?.company || profile?.jobTitle || "Attendee");
 
     return (
-        <nav className="fixed top-0 left-0 w-full z-50 bg-white/70 dark:bg-gray-950/70 backdrop-blur-xl border-b border-surface-dark/5 dark:border-white/5 px-6 py-3 print:hidden">
+        <nav className="fixed top-0 left-0 w-full z-50 bg-white/70 dark:bg-[#0f101e]/70 backdrop-blur-xl border-b border-surface-dark/5 dark:border-white/5 px-6 py-3 print:hidden">
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
                 {/* Brand */}
                 <Link href="/events" className="flex items-center gap-2 group shrink-0">
                     <Image src="/nexvenue-logo.png" alt="NexVenue" width={32} height={32} className="rounded-lg transition-transform group-hover:scale-105" />
-                    <span className="text-xl font-black tracking-tighter text-surface-dark dark:text-white hidden sm:inline">NexVenue</span>
+                    <span className="text-xl font-bold tracking-tight text-surface-dark dark:text-white hidden sm:inline">NexVenue</span>
                 </Link>
 
                 {/* Primary nav, app items only for signed-in users */}
@@ -95,7 +95,7 @@ export const Navigation = () => {
                                 <Link key={item.href} href={item.href}>
                                     <span
                                         className={cn(
-                                            "px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all font-bold text-sm",
+                                            "px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all font-semibold text-sm",
                                             isActive
                                                 ? "bg-accent/10 text-accent"
                                                 : "text-surface-dark/45 dark:text-white/45 hover:text-surface-dark dark:hover:text-white hover:bg-surface-dark/5 dark:hover:bg-white/5"
@@ -132,7 +132,7 @@ export const Navigation = () => {
                                 <span className="relative flex items-center justify-center w-9 h-9 rounded-xl text-surface-dark/45 dark:text-white/45 hover:text-surface-dark dark:hover:text-white hover:bg-surface-dark/5 dark:hover:bg-white/5 transition-all">
                                     <Bell size={19} />
                                     {unreadCount > 0 && (
-                                        <span className="absolute top-1 right-1 min-w-[15px] h-[15px] px-0.5 rounded-full bg-error text-[9px] font-black text-white flex items-center justify-center border-2 border-white dark:border-gray-950">
+                                        <span className="absolute top-1 right-1 min-w-[15px] h-[15px] px-0.5 rounded-full bg-error text-[9px] font-bold text-white flex items-center justify-center border-2 border-white dark:border-[#0f101e]">
                                             {unreadCount > 9 ? "9+" : unreadCount}
                                         </span>
                                     )}
@@ -155,19 +155,19 @@ export const Navigation = () => {
                                         <div className="px-4 py-3 flex items-center gap-3 border-b border-surface-dark/5 dark:border-white/5">
                                             <AvatarDisplay avatarUrl={profile?.avatar ?? null} fullName={displayName} size={42} />
                                             <div className="min-w-0">
-                                                <div className="font-black text-surface-dark dark:text-white truncate leading-tight">{displayName}</div>
+                                                <div className="font-bold text-surface-dark dark:text-white truncate leading-tight">{displayName}</div>
                                                 <div className="text-xs font-medium text-surface-dark/45 dark:text-white/45 truncate">{roleLabel}</div>
                                             </div>
                                         </div>
 
-                                        <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-surface-dark/70 dark:text-white/70 hover:bg-surface-dark/5 dark:hover:bg-white/5 transition-colors">
+                                        <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-surface-dark/70 dark:text-white/70 hover:bg-surface-dark/5 dark:hover:bg-white/5 transition-colors">
                                             <UserIcon size={16} /> Profile
                                         </Link>
-                                        <Link href="/settings" className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-surface-dark/70 dark:text-white/70 hover:bg-surface-dark/5 dark:hover:bg-white/5 transition-colors">
+                                        <Link href="/settings" className="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-surface-dark/70 dark:text-white/70 hover:bg-surface-dark/5 dark:hover:bg-white/5 transition-colors">
                                             <Settings size={16} /> Settings
                                         </Link>
                                         {isAdmin && (
-                                            <Link href="/users" className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-surface-dark/70 dark:text-white/70 hover:bg-surface-dark/5 dark:hover:bg-white/5 transition-colors">
+                                            <Link href="/users" className="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-surface-dark/70 dark:text-white/70 hover:bg-surface-dark/5 dark:hover:bg-white/5 transition-colors">
                                                 <Users size={16} /> Users
                                             </Link>
                                         )}
@@ -176,7 +176,7 @@ export const Navigation = () => {
 
                                         <button
                                             onClick={handleSignOut}
-                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-500/10 transition-colors"
+                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-500/10 transition-colors"
                                         >
                                             <LogOut size={16} /> Sign out
                                         </button>
@@ -191,10 +191,10 @@ export const Navigation = () => {
                     ) : (
                         <>
                             <Link href="/login">
-                                <Button variant="ghost" size="sm" className="font-bold">Sign In</Button>
+                                <Button variant="ghost" size="sm" className="font-semibold">Sign In</Button>
                             </Link>
                             <Link href="/register">
-                                <Button size="sm" className="font-black">Join Now</Button>
+                                <Button size="sm">Join Now</Button>
                             </Link>
                         </>
                     )}

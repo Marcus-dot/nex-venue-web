@@ -71,7 +71,7 @@ export const BusinessCardModal = ({ isOpen, onClose, profile, uid }: BusinessCar
                     <div className="flex items-center gap-4">
                         <AvatarDisplay avatarUrl={profile.avatar} fullName={profile.fullName || ""} size={56} />
                         <div className="min-w-0">
-                            <p className="font-black text-lg text-surface-dark dark:text-white truncate">{profile.fullName || "NexVenue member"}</p>
+                            <p className="font-bold text-lg text-surface-dark dark:text-white truncate">{profile.fullName || "NexVenue member"}</p>
                             {roleLine && <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50 truncate">{roleLine}</p>}
                         </div>
                     </div>
@@ -95,7 +95,7 @@ export const BusinessCardModal = ({ isOpen, onClose, profile, uid }: BusinessCar
 
                 {/* QR */}
                 <div className="flex flex-col items-center rounded-2xl border border-surface-dark/10 dark:border-white/10 bg-surface-secondary/50 dark:bg-white/[0.03] py-6">
-                    <p className="text-xs font-black tracking-wide text-surface-dark/55 dark:text-white/40 mb-4">SCAN TO CONNECT</p>
+                    <p className="text-xs font-semibold tracking-wide text-surface-dark/55 dark:text-white/40 mb-4">SCAN TO CONNECT</p>
                     <div className="bg-white p-4 rounded-2xl shadow-sm">
                         <QRCodeSVG value={uid} size={180} bgColor="#ffffff" fgColor="#111827" level="M" />
                     </div>

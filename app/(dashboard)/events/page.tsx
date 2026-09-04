@@ -64,7 +64,7 @@ function FeaturedEvent({ event }: { event: Event }) {
 
                 {/* Badge */}
                 <div className="absolute top-5 left-5">
-                    <span className="bg-accent text-white text-[11px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
+                    <span className="bg-accent text-white text-[11px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full">
                         Featured
                     </span>
                 </div>
@@ -73,14 +73,14 @@ function FeaturedEvent({ event }: { event: Event }) {
                 <div className="absolute bottom-0 left-0 right-0 p-7">
                     <div className="flex flex-wrap items-end justify-between gap-4">
                         <div>
-                            <h2 className="text-3xl font-black text-white tracking-tight mb-2 line-clamp-1">{event.title}</h2>
+                            <h2 className="text-3xl font-bold text-white tracking-tight mb-2 line-clamp-1">{event.title}</h2>
                             <div className="flex flex-wrap items-center gap-4 text-white/70 text-sm font-bold">
                                 <span className="flex items-center gap-1.5"><Calendar size={13} /> {event.date}</span>
                                 <span className="flex items-center gap-1.5"><MapPin size={13} /> {event.location}</span>
                                 <span className="flex items-center gap-1.5"><Users size={13} /> {event.attendees?.length || 0} attending</span>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-black uppercase tracking-widest px-4 py-2.5 rounded-full transition-all">
+                        <div className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-semibold uppercase tracking-wider px-4 py-2.5 rounded-full transition-all">
                             View Event <ArrowRight size={14} />
                         </div>
                     </div>
@@ -199,7 +199,7 @@ export default function EventsPage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={cn(
-                                    "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-black whitespace-nowrap transition-all border",
+                                    "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all border",
                                     activeTab === tab.id
                                         ? "bg-accent text-white border-accent shadow-sm shadow-accent/20"
                                         : "bg-transparent border-surface-dark/10 dark:border-white/10 text-surface-dark/60 dark:text-white/50 hover:border-accent/40 hover:text-surface-dark dark:hover:text-white"
@@ -208,7 +208,7 @@ export default function EventsPage() {
                                 {tab.label}
                                 {count > 0 && (
                                     <span className={cn(
-                                        "text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center",
+                                        "text-[10px] font-semibold px-1.5 py-0.5 rounded-full min-w-[18px] text-center",
                                         activeTab === tab.id ? "bg-white/20 text-white" : "bg-surface-dark/8 dark:bg-white/10 text-surface-dark/55 dark:text-white/40"
                                     )}>
                                         {count}
@@ -221,7 +221,7 @@ export default function EventsPage() {
                     {/* Create event shortcut */}
                     {user && (
                         <Link href="/events/create" className="ml-auto shrink-0">
-                            <button className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-accent text-white text-sm font-black border border-accent shadow-sm shadow-accent/20 hover:bg-accent/90 transition-all">
+                            <button className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-accent text-white text-sm font-semibold border border-accent shadow-sm shadow-accent/20 hover:bg-accent/90 transition-all">
                                 <Plus size={14} strokeWidth={3} /> New Event
                             </button>
                         </Link>
@@ -257,7 +257,7 @@ export default function EventsPage() {
                             <>
                                 {/* Section label when search or filter is active */}
                                 {(search || activeTab !== "all") && (
-                                    <p className="text-xs font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest mb-5">
+                                    <p className="text-xs font-semibold text-surface-dark/50 dark:text-white/35 uppercase tracking-wider mb-5">
                                         {filtered.length} result{filtered.length !== 1 ? "s" : ""}
                                     </p>
                                 )}
@@ -273,7 +273,7 @@ export default function EventsPage() {
                                         <button
                                             onClick={handleLoadMore}
                                             disabled={loadingMore}
-                                            className="flex items-center gap-2 px-8 py-3 rounded-full border border-surface-dark/12 dark:border-white/10 text-surface-dark/60 dark:text-white/60 text-sm font-black hover:border-accent/40 hover:text-accent transition-all disabled:opacity-50"
+                                            className="flex items-center gap-2 px-8 py-3 rounded-full border border-surface-dark/12 dark:border-white/10 text-surface-dark/60 dark:text-white/60 text-sm font-semibold hover:border-accent/40 hover:text-accent transition-all disabled:opacity-50"
                                         >
                                             {loadingMore
                                                 ? <><Loader2 className="animate-spin" size={16} /> Loading...</>
@@ -288,7 +288,7 @@ export default function EventsPage() {
                                 <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent mx-auto mb-4">
                                     <Calendar size={28} />
                                 </div>
-                                <h3 className="text-xl font-black text-surface-dark dark:text-white mb-2">
+                                <h3 className="text-xl font-bold text-surface-dark dark:text-white mb-2">
                                     {search ? `No results for "${search}"` : activeTab === "my" ? "No events yet" : "Nothing here yet"}
                                 </h3>
                                 <p className="text-sm text-surface-dark/60 dark:text-white/50 max-w-xs mx-auto mb-6 font-medium">
@@ -299,12 +299,12 @@ export default function EventsPage() {
                                         : "Check back soon or be the first to host one."}
                                 </p>
                                 {search ? (
-                                    <button onClick={() => setSearch("")} className="text-sm font-black text-accent hover:underline">
+                                    <button onClick={() => setSearch("")} className="text-sm font-semibold text-accent hover:underline">
                                         Clear search
                                     </button>
                                 ) : activeTab === "my" && user ? (
                                     <Link href="/events/create">
-                                        <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent text-white text-sm font-black mx-auto">
+                                        <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent text-white text-sm font-semibold mx-auto">
                                             <Plus size={14} /> Create your first event
                                         </button>
                                     </Link>

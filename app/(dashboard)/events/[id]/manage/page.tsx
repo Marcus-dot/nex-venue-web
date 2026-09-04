@@ -707,7 +707,7 @@ export default function EventManagePage() {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id as Tab)}
                                     className={cn(
-                                        "px-6 py-2.5 rounded-xl flex items-center gap-2 transition-all font-black text-sm whitespace-nowrap",
+                                        "px-6 py-2.5 rounded-xl flex items-center gap-2 transition-all font-semibold text-sm whitespace-nowrap",
                                         activeTab === tab.id
                                             ? "bg-white dark:bg-white/10 text-accent shadow-sm"
                                             : "text-surface-dark/55 dark:text-white/40 hover:text-surface-dark dark:hover:text-white"
@@ -723,7 +723,7 @@ export default function EventManagePage() {
                     <div className="grid gap-8">
                         {activeTab === "settings" && (
                             <GlassCard className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <h3 className="text-xl font-black text-surface-dark dark:text-white mb-8 flex items-center gap-2">
+                                <h3 className="text-xl font-bold text-surface-dark dark:text-white mb-8 flex items-center gap-2">
                                     <Settings size={22} className="text-accent" /> Event Settings
                                 </h3>
                                 <form onSubmit={handleUpdateSettings} className="space-y-6">
@@ -777,7 +777,7 @@ export default function EventManagePage() {
                                                 )}
                                             >
                                                 <Unlock size={18} />
-                                                <span className="font-black text-sm">Open</span>
+                                                <span className="font-semibold text-sm">Open</span>
                                                 <span className="text-xs font-medium opacity-80">Anyone can attend</span>
                                             </button>
                                             <button
@@ -789,13 +789,13 @@ export default function EventManagePage() {
                                                 )}
                                             >
                                                 <Lock size={18} />
-                                                <span className="font-black text-sm">Approval</span>
+                                                <span className="font-semibold text-sm">Approval</span>
                                                 <span className="text-xs font-medium opacity-80">You approve each request</span>
                                             </button>
                                         </div>
                                     </div>
                                     <div className="pt-4">
-                                        <Button type="submit" className="w-full py-4 text-lg font-black" disabled={saveLoading}>
+                                        <Button type="submit" className="w-full py-4 text-lg font-bold" disabled={saveLoading}>
                                             {saveLoading ? <Loader2 className="animate-spin mx-auto" size={24} /> : "Save Changes"}
                                         </Button>
                                     </div>
@@ -806,11 +806,11 @@ export default function EventManagePage() {
                         {activeTab === "speakers" && (
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 {/* Add / edit speaker */}
-                                <GlassCard className="!p-8 border-2 border-accent/20 relative overflow-hidden">
+                                <GlassCard className="p-8 border-2 border-accent/20 relative overflow-hidden">
                                     <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full -mr-32 -mt-32 blur-[100px]" />
                                     <div className="relative flex items-center justify-between mb-8">
                                         <div>
-                                            <h3 className="text-2xl font-black text-surface-dark dark:text-white flex items-center gap-3">
+                                            <h3 className="text-2xl font-bold text-surface-dark dark:text-white flex items-center gap-3">
                                                 <Mic size={26} className="text-accent" /> {editingSpeakerId ? "Edit Speaker" : "Add Speaker"}
                                             </h3>
                                             <p className="text-sm font-medium text-surface-dark/55 dark:text-white/40 mt-1">
@@ -915,12 +915,12 @@ export default function EventManagePage() {
                                 ) : (
                                     <div className="space-y-3">
                                         {speakerProfiles.map((sp, i) => (
-                                            <GlassCard key={sp.id} className="!p-4">
+                                            <GlassCard key={sp.id} className="p-4">
                                                 <div className="flex items-center gap-4">
                                                     <AvatarDisplay avatarUrl={sp.photoUrl ?? null} fullName={sp.name} size={52} />
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2 flex-wrap">
-                                                            <span className="font-black text-surface-dark dark:text-white truncate">{sp.name}</span>
+                                                            <span className="font-bold text-surface-dark dark:text-white truncate">{sp.name}</span>
                                                             {sp.linkedUserId && (
                                                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/10 text-accent text-[10px] font-bold uppercase tracking-wide">
                                                                     <Link2 size={10} /> Linked
@@ -990,7 +990,7 @@ export default function EventManagePage() {
                                                             <div className="flex items-center justify-between gap-3">
                                                                 <p className="text-sm font-medium text-surface-dark/60 dark:text-white/60">
                                                                     Linked to{" "}
-                                                                    <span className="font-black text-surface-dark dark:text-white">
+                                                                    <span className="font-bold text-surface-dark dark:text-white">
                                                                         {speakerCandidates.find((c) => c.uid === sp.linkedUserId)?.fullName ?? "an attendee"}
                                                                     </span>
                                                                     . Tapping their card in the app opens their profile.
@@ -1058,16 +1058,16 @@ export default function EventManagePage() {
                         {activeTab === "agenda" && (
                             <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 {/* Add New Session */}
-                                <GlassCard className="!p-8 border-2 border-accent/20 relative overflow-hidden">
+                                <GlassCard className="p-8 border-2 border-accent/20 relative overflow-hidden">
                                     <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full -mr-32 -mt-32 blur-[100px]" />
                                     <div className="relative flex items-center justify-between mb-10">
                                         <div>
-                                            <h3 className="text-2xl font-black text-surface-dark dark:text-white flex items-center gap-3">
+                                            <h3 className="text-2xl font-bold text-surface-dark dark:text-white flex items-center gap-3">
                                                 <Plus size={26} className="text-accent" /> {editingId ? "Edit Session" : "New Session"}
                                             </h3>
                                             <p className="text-sm font-medium text-surface-dark/55 dark:text-white/40 mt-1">{editingId ? "Update this session's details." : "Fill in the details to expand your event's timeline."}</p>
                                         </div>
-                                        <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-accent/10 rounded-full text-accent font-black text-[10px] uppercase tracking-widest border border-accent/20">
+                                        <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-accent/10 rounded-full text-accent font-semibold text-[10px] uppercase tracking-wider border border-accent/20">
                                             <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
                                             {editingId ? "Editing" : "Drafting Session"}
                                         </div>
@@ -1080,13 +1080,13 @@ export default function EventManagePage() {
                                                 <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
                                                     <Info size={18} />
                                                 </div>
-                                                <span className="font-black text-sm uppercase tracking-widest text-surface-dark/60 dark:text-white/60">Core Details</span>
+                                                <span className="font-semibold text-sm uppercase tracking-wider text-surface-dark/60 dark:text-white/60">Core Details</span>
                                                 <div className="flex-grow h-px bg-surface-dark/5 dark:bg-white/5" />
                                             </div>
 
                                             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
                                                 <div className="md:col-span-8 space-y-2">
-                                                    <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1">Session Title</label>
+                                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1">Session Title</label>
                                                     <Input
                                                         placeholder="e.g. Future of Event Tech Keynote"
                                                         value={newAgendaItem.title}
@@ -1097,11 +1097,11 @@ export default function EventManagePage() {
                                                 </div>
                                                 <div className="md:col-span-12 space-y-4">
                                                     <div className="flex items-center justify-between ml-1">
-                                                        <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/60 dark:text-white/40">Session Category</label>
+                                                        <label className="text-[11px] font-semibold uppercase tracking-wider text-surface-dark/60 dark:text-white/40">Session Category</label>
                                                         <button
                                                             type="button"
                                                             onClick={() => setIsCategoryPickerOpen(!isCategoryPickerOpen)}
-                                                            className="text-[10px] font-black uppercase tracking-widest text-accent hover:text-accent/80 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-accent/5"
+                                                            className="text-[10px] font-semibold uppercase tracking-wider text-accent hover:text-accent/80 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-accent/5"
                                                         >
                                                             {isCategoryPickerOpen ? "Close Selection" : "Change Category"}
                                                             <ChevronRight size={14} className={cn("transition-transform duration-300", isCategoryPickerOpen ? "-rotate-90" : "rotate-90")} />
@@ -1127,8 +1127,8 @@ export default function EventManagePage() {
                                                                     {React.createElement((CATEGORY_CONFIG[newAgendaItem.category as CategoryKey] || CATEGORY_CONFIG.other).icon, { size: 24 })}
                                                                 </div>
                                                                 <div>
-                                                                    <div className="text-[10px] font-black uppercase tracking-widest text-surface-dark/55 dark:text-white/40 mb-0.5">Selected Category</div>
-                                                                    <div className="text-sm font-black text-surface-dark dark:text-white uppercase tracking-wider">
+                                                                    <div className="text-[10px] font-semibold uppercase tracking-wider text-surface-dark/55 dark:text-white/40 mb-0.5">Selected Category</div>
+                                                                    <div className="text-sm font-semibold text-surface-dark dark:text-white uppercase tracking-wider">
                                                                         {(CATEGORY_CONFIG[newAgendaItem.category as CategoryKey] || CATEGORY_CONFIG.other).label}
                                                                     </div>
                                                                 </div>
@@ -1171,7 +1171,7 @@ export default function EventManagePage() {
                                                                                     <config.icon size={20} />
                                                                                 </div>
                                                                                 <span className={cn(
-                                                                                    "text-[10px] font-black uppercase tracking-widest",
+                                                                                    "text-[10px] font-semibold uppercase tracking-wider",
                                                                                     isSelected ? config.color : "text-surface-dark/55 dark:text-white/40"
                                                                                 )}>
                                                                                     {config.label}
@@ -1195,7 +1195,7 @@ export default function EventManagePage() {
 
                                             {/* Linked speakers (app accounts), supports panels */}
                                             <div className="space-y-3">
-                                                <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1 flex items-center gap-1.5"><Users size={13} /> Speakers on the app</label>
+                                                <label className="text-[11px] font-semibold uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1 flex items-center gap-1.5"><Users size={13} /> Speakers on the app</label>
                                                 {newAgendaItem.speakerIds.length > 0 && (
                                                     <div className="flex flex-wrap gap-2">
                                                         {newAgendaItem.speakerIds.map((uid) => {
@@ -1235,7 +1235,7 @@ export default function EventManagePage() {
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div className="space-y-2">
-                                                    <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1">Guest speaker (not on the app)</label>
+                                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1">Guest speaker (not on the app)</label>
                                                     <div className="relative">
                                                         <div className="absolute left-5 top-1/2 -translate-y-1/2 text-accent/50">
                                                             <Mic size={18} />
@@ -1249,7 +1249,7 @@ export default function EventManagePage() {
                                                     </div>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1">Location</label>
+                                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1">Location</label>
                                                     <div className="relative">
                                                         <div className="absolute left-5 top-1/2 -translate-y-1/2 text-accent/50">
                                                             <MapPin size={18} />
@@ -1271,7 +1271,7 @@ export default function EventManagePage() {
                                                 <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
                                                     <Clock size={18} />
                                                 </div>
-                                                <span className="font-black text-sm uppercase tracking-widest text-surface-dark/60 dark:text-white/60">Schedule & Limits</span>
+                                                <span className="font-semibold text-sm uppercase tracking-wider text-surface-dark/60 dark:text-white/60">Schedule & Limits</span>
                                                 <div className="flex-grow h-px bg-surface-dark/5 dark:bg-white/5" />
                                             </div>
 
@@ -1291,7 +1291,7 @@ export default function EventManagePage() {
                                                     />
                                                 </div>
                                                 <div className="md:col-span-4 space-y-2">
-                                                    <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1">Simultaneous Group</label>
+                                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1">Simultaneous Group</label>
                                                     <div className="relative">
                                                         <div className="absolute left-5 top-1/2 -translate-y-1/2 text-accent/50">
                                                             <Layers size={18} />
@@ -1308,7 +1308,7 @@ export default function EventManagePage() {
 
                                             <div className="flex flex-col md:flex-row gap-6">
                                                 <div className="flex-grow space-y-2">
-                                                    <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1">Attendee Capacity (Optional)</label>
+                                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1">Attendee Capacity (Optional)</label>
                                                     <Input
                                                         type="number"
                                                         placeholder="Unlimited"
@@ -1326,7 +1326,7 @@ export default function EventManagePage() {
                                                             onChange={(e) => setNewAgendaItem({ ...newAgendaItem, isBreak: e.target.checked })}
                                                         />
                                                         <div>
-                                                            <div className="text-[11px] font-black uppercase tracking-wider text-surface-dark/55 dark:text-white/40 group-hover:text-accent transition-colors">Is this a break?</div>
+                                                            <div className="text-[11px] font-semibold uppercase tracking-wider text-surface-dark/55 dark:text-white/40 group-hover:text-accent transition-colors">Is this a break?</div>
                                                             <div className="text-[9px] font-bold text-surface-dark/20 dark:text-white/20 -mt-0.5">Disables speaker fields</div>
                                                         </div>
                                                     </label>
@@ -1340,13 +1340,13 @@ export default function EventManagePage() {
                                                 <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
                                                     <FileText size={18} />
                                                 </div>
-                                                <span className="font-black text-sm uppercase tracking-widest text-surface-dark/60 dark:text-white/60">Session Narrative</span>
+                                                <span className="font-semibold text-sm uppercase tracking-wider text-surface-dark/60 dark:text-white/60">Session Narrative</span>
                                                 <div className="flex-grow h-px bg-surface-dark/5 dark:bg-white/5" />
                                             </div>
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                                 <div className="space-y-3">
-                                                    <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1 flex items-center gap-2">
+                                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1 flex items-center gap-2">
                                                         <Info size={14} /> Description
                                                     </label>
                                                     <textarea
@@ -1357,7 +1357,7 @@ export default function EventManagePage() {
                                                     />
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <label className="text-[11px] font-black uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1 flex items-center gap-2">
+                                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-surface-dark/60 dark:text-white/40 ml-1 flex items-center gap-2">
                                                         <Mic size={14} /> Speaker Bio
                                                     </label>
                                                     <textarea
@@ -1372,11 +1372,11 @@ export default function EventManagePage() {
 
                                         <div className="pt-4 border-t border-surface-dark/5 dark:border-white/5 flex gap-3">
                                             {editingId && (
-                                                <Button type="button" variant="ghost" onClick={resetAgendaForm} disabled={saveLoading} className="font-black py-7 text-lg bg-surface-dark/5 dark:bg-white/5 px-8">
+                                                <Button type="button" variant="ghost" onClick={resetAgendaForm} disabled={saveLoading} className="font-semibold py-7 text-lg bg-surface-dark/5 dark:bg-white/5 px-8">
                                                     Cancel
                                                 </Button>
                                             )}
-                                            <Button type="submit" disabled={saveLoading} className="flex-1 font-black py-7 text-xl shadow-2xl shadow-accent/20 transition-all active:scale-[0.98] group overflow-hidden relative">
+                                            <Button type="submit" disabled={saveLoading} className="flex-1 font-semibold py-7 text-xl shadow-2xl shadow-accent/20 transition-all active:scale-[0.98] group overflow-hidden relative">
                                                 <div className="absolute inset-0 bg-gradient-to-r from-accent to-accent-dark opacity-0 group-hover:opacity-10 transition-opacity" />
                                                 {saveLoading ? <Loader2 className="animate-spin mx-auto" size={32} /> : (
                                                     <span className="flex items-center justify-center gap-3">
@@ -1391,13 +1391,13 @@ export default function EventManagePage() {
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between mb-2">
                                         <div>
-                                            <h3 className="text-2xl font-black text-surface-dark dark:text-white px-2">Current Schedule</h3>
+                                            <h3 className="text-2xl font-bold text-surface-dark dark:text-white px-2">Current Schedule</h3>
                                             <p className="text-sm font-medium text-surface-dark/55 dark:text-white/40 px-2 mt-1">Live management of your event's timeline.</p>
                                         </div>
                                         {event.currentAgendaItem && (
                                             <button
                                                 onClick={() => handleSetGoLive(null)}
-                                                className="px-6 py-2 rounded-xl bg-red-500/10 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all border border-red-500/20"
+                                                className="px-6 py-2 rounded-xl bg-red-500/10 text-red-500 text-[10px] font-semibold uppercase tracking-wider hover:bg-red-500 hover:text-white transition-all border border-red-500/20"
                                             >
                                                 End Live Broadcast
                                             </button>
@@ -1410,7 +1410,7 @@ export default function EventManagePage() {
                                                 <div className="w-20 h-20 bg-accent/5 rounded-full flex items-center justify-center mx-auto mb-6 text-accent/20">
                                                     <Calendar size={40} />
                                                 </div>
-                                                <h4 className="text-xl font-black text-surface-dark dark:text-white">Empty Schedule</h4>
+                                                <h4 className="text-xl font-bold text-surface-dark dark:text-white">Empty Schedule</h4>
                                                 <p className="text-surface-dark/55 dark:text-white/40 font-medium max-w-xs mx-auto mt-2">Start adding sessions above to build your event's timeline.</p>
                                             </div>
                                         ) : (
@@ -1437,7 +1437,7 @@ export default function EventManagePage() {
                                                         <div key={isGroup ? `group-${firstItem.simultaneousGroupId}` : firstItem.id} className="relative">
                                                             {isGroup ? (
                                                                 <div className="space-y-3">
-                                                                    <div className="flex items-center gap-2 px-4 py-1.5 bg-accent/5 text-accent rounded-full w-fit text-[9px] font-black uppercase tracking-widest mb-2 ml-2">
+                                                                    <div className="flex items-center gap-2 px-4 py-1.5 bg-accent/5 text-accent rounded-full w-fit text-[9px] font-black uppercase tracking-wider mb-2 ml-2">
                                                                         <Layers size={12} /> Simultaneous Group: {firstItem.simultaneousGroupId}
                                                                     </div>
                                                                     <div className="grid gap-3 relative pl-6 border-l-2 border-accent/10 ml-2">
@@ -1478,10 +1478,10 @@ export default function EventManagePage() {
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <div className="flex items-center justify-between flex-wrap gap-3">
                                     <div>
-                                        <h3 className="text-xl font-black text-surface-dark dark:text-white">Check-in</h3>
+                                        <h3 className="text-xl font-bold text-surface-dark dark:text-white">Check-in</h3>
                                         <p className="text-sm text-surface-dark/55 dark:text-white/40 font-medium mt-0.5">Check attendees in at the door. Search a name, or scan their ticket QR in the mobile app.</p>
                                     </div>
-                                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-black">
+                                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">
                                         <UserCheck size={14} /> {checkedInUids.size} / {speakerCandidates.length} checked in
                                     </span>
                                 </div>
@@ -1489,8 +1489,8 @@ export default function EventManagePage() {
                                 <Input placeholder="Search attendees…" value={checkInSearch} onChange={(e) => setCheckInSearch(e.target.value)} className="h-12" />
 
                                 {speakerCandidates.length === 0 ? (
-                                    <GlassCard className="!p-16 text-center border-2 border-dashed border-surface-dark/8 dark:border-white/8">
-                                        <p className="font-black text-surface-dark/55 dark:text-white/40">No attendees yet</p>
+                                    <GlassCard className="p-16 text-center border-2 border-dashed border-surface-dark/8 dark:border-white/8">
+                                        <p className="font-bold text-surface-dark/55 dark:text-white/40">No attendees yet</p>
                                         <p className="text-sm text-surface-dark/45 dark:text-white/30 mt-1 font-medium">People will appear here once they join.</p>
                                     </GlassCard>
                                 ) : (
@@ -1501,7 +1501,7 @@ export default function EventManagePage() {
                                             .map((c) => {
                                                 const isIn = checkedInUids.has(c.uid);
                                                 return (
-                                                    <GlassCard key={c.uid} className="!p-4 flex items-center justify-between gap-3">
+                                                    <GlassCard key={c.uid} className="p-4 flex items-center justify-between gap-3">
                                                         <div className="flex items-center gap-3 min-w-0">
                                                             <AvatarDisplay avatarUrl={c.avatar} fullName={c.fullName} size={40} />
                                                             <div className="min-w-0">
@@ -1535,11 +1535,11 @@ export default function EventManagePage() {
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
                                 {/* Add staff directly */}
-                                <GlassCard className="!p-6">
+                                <GlassCard className="p-6">
                                     <div className="flex items-center gap-3 mb-1">
                                         <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center text-accent"><Users size={18} /></div>
                                         <div>
-                                            <h3 className="text-lg font-black text-surface-dark dark:text-white">Add staff</h3>
+                                            <h3 className="text-lg font-bold text-surface-dark dark:text-white">Add staff</h3>
                                             <p className="text-sm text-surface-dark/55 dark:text-white/40 font-medium">Promote a registered attendee to organiser, speaker, or exhibitor.</p>
                                         </div>
                                     </div>
@@ -1589,20 +1589,20 @@ export default function EventManagePage() {
                                     <div className="space-y-4">
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <h3 className="text-xl font-black text-surface-dark dark:text-white">Attendance Requests</h3>
+                                                <h3 className="text-xl font-bold text-surface-dark dark:text-white">Attendance Requests</h3>
                                                 <p className="text-sm text-surface-dark/55 dark:text-white/40 font-medium mt-0.5">People asking to attend this approval-only event</p>
                                             </div>
-                                            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-black">
+                                            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
                                                 {attendanceReqs.length} pending
                                             </span>
                                         </div>
                                         <div className="grid gap-3">
                                             {attendanceReqs.map((req) => (
-                                                <GlassCard key={req.id} className="!p-5">
+                                                <GlassCard key={req.id} className="p-5">
                                                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="font-black text-surface-dark dark:text-white truncate">{req.userName || "Someone"}</p>
+                                                            <p className="font-bold text-surface-dark dark:text-white truncate">{req.userName || "Someone"}</p>
                                                             {req.userPhone && <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50 truncate">{req.userPhone}</p>}
                                                         </div>
                                                         <div className="flex items-center gap-2 shrink-0">
@@ -1632,11 +1632,11 @@ export default function EventManagePage() {
                                 {/* Header row */}
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <h3 className="text-xl font-black text-surface-dark dark:text-white">Staff Applications</h3>
+                                        <h3 className="text-xl font-bold text-surface-dark dark:text-white">Staff Applications</h3>
                                         <p className="text-sm text-surface-dark/55 dark:text-white/40 font-medium mt-0.5">Review and approve role requests from attendees</p>
                                     </div>
                                     {requests.length > 0 && (
-                                        <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-black">
+                                        <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">
                                             <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
                                             {requests.length} pending
                                         </span>
@@ -1644,11 +1644,11 @@ export default function EventManagePage() {
                                 </div>
 
                                 {requests.length === 0 ? (
-                                    <GlassCard className="!p-16 text-center border-2 border-dashed border-surface-dark/8 dark:border-white/8">
+                                    <GlassCard className="p-16 text-center border-2 border-dashed border-surface-dark/8 dark:border-white/8">
                                         <div className="w-16 h-16 rounded-2xl bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-4">
                                             <CheckCircle2 size={28} className="text-surface-dark/20 dark:text-white/20" />
                                         </div>
-                                        <p className="font-black text-surface-dark/55 dark:text-white/40">All clear</p>
+                                        <p className="font-bold text-surface-dark/55 dark:text-white/40">All clear</p>
                                         <p className="text-sm text-surface-dark/45 dark:text-white/30 mt-1 font-medium">No pending applications right now.</p>
                                     </GlassCard>
                                 ) : (
@@ -1663,7 +1663,7 @@ export default function EventManagePage() {
                                             const roleStyle = roleColors[req.requestedRole] ?? roleColors.organiser;
 
                                             return (
-                                                <GlassCard key={req.id} className="!p-5 hover:border-accent/20 transition-all">
+                                                <GlassCard key={req.id} className="p-5 hover:border-accent/20 transition-all">
                                                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
 
                                                         {/* Avatar + identity */}
@@ -1678,12 +1678,12 @@ export default function EventManagePage() {
                                                                 <div className="flex items-center gap-2 flex-wrap">
                                                                     <Link
                                                                         href={`/profile/${req.userId}`}
-                                                                        className="font-black text-surface-dark dark:text-white hover:text-accent transition-colors"
+                                                                        className="font-bold text-surface-dark dark:text-white hover:text-accent transition-colors"
                                                                     >
                                                                         {req.userName}
                                                                     </Link>
                                                                     <span className={cn(
-                                                                        "px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border",
+                                                                        "px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border",
                                                                         roleStyle.bg, roleStyle.text, roleStyle.border
                                                                     )}>
                                                                         {req.requestedRole}
@@ -1713,21 +1713,21 @@ export default function EventManagePage() {
                                                         <div className="flex items-center gap-2 shrink-0">
                                                             <Link
                                                                 href={`/profile/${req.userId}`}
-                                                                className="px-3 py-2 rounded-xl text-xs font-black text-surface-dark/55 dark:text-white/40 hover:text-accent hover:bg-accent/5 border border-surface-dark/8 dark:border-white/8 hover:border-accent/20 transition-all"
+                                                                className="px-3 py-2 rounded-xl text-xs font-semibold text-surface-dark/55 dark:text-white/40 hover:text-accent hover:bg-accent/5 border border-surface-dark/8 dark:border-white/8 hover:border-accent/20 transition-all"
                                                             >
                                                                 View Profile
                                                             </Link>
                                                             <button
                                                                 disabled={actionLoading === req.id}
                                                                 onClick={() => handleReject(req.id, req.userName)}
-                                                                className="px-3 py-2 rounded-xl text-xs font-black text-red-400 hover:bg-red-500/10 border border-red-500/10 hover:border-red-500/30 transition-all disabled:opacity-40"
+                                                                className="px-3 py-2 rounded-xl text-xs font-semibold text-red-400 hover:bg-red-500/10 border border-red-500/10 hover:border-red-500/30 transition-all disabled:opacity-40"
                                                             >
                                                                 Decline
                                                             </button>
                                                             <button
                                                                 disabled={actionLoading === req.id}
                                                                 onClick={() => handleApprove(req)}
-                                                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black bg-accent text-white hover:bg-accent/90 shadow-sm shadow-accent/20 transition-all disabled:opacity-40"
+                                                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-accent text-white hover:bg-accent/90 shadow-sm shadow-accent/20 transition-all disabled:opacity-40"
                                                             >
                                                                 {actionLoading === req.id
                                                                     ? <Loader2 className="animate-spin" size={14} />
@@ -1746,7 +1746,7 @@ export default function EventManagePage() {
                                 {participants.length > 0 && user?.uid === event?.creatorId && (
                                     <div className="space-y-4">
                                         <div>
-                                            <h3 className="text-xl font-black text-surface-dark dark:text-white">Current Staff</h3>
+                                            <h3 className="text-xl font-bold text-surface-dark dark:text-white">Current Staff</h3>
                                             <p className="text-sm text-surface-dark/55 dark:text-white/40 font-medium mt-0.5">Approved members with active roles on this event</p>
                                         </div>
                                         <div className="grid gap-3">
@@ -1761,7 +1761,7 @@ export default function EventManagePage() {
                                                 const isCreator = event?.creatorId === part.id;
 
                                                 return (
-                                                    <GlassCard key={part.id} className="!p-5 transition-all">
+                                                    <GlassCard key={part.id} className="p-5 transition-all">
                                                         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                                                             <div className="flex items-center gap-4 flex-1 min-w-0">
                                                                 <AvatarDisplay
@@ -1774,18 +1774,18 @@ export default function EventManagePage() {
                                                                     <div className="flex items-center gap-2 flex-wrap">
                                                                         <Link
                                                                             href={`/profile/${part.id}`}
-                                                                            className="font-black text-surface-dark dark:text-white hover:text-accent transition-colors"
+                                                                            className="font-bold text-surface-dark dark:text-white hover:text-accent transition-colors"
                                                                         >
                                                                             {part.displayName}
                                                                         </Link>
                                                                         <span className={cn(
-                                                                            "px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border",
+                                                                            "px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border",
                                                                             roleStyle.bg, roleStyle.text, roleStyle.border
                                                                         )}>
                                                                             {part.role}
                                                                         </span>
                                                                         {isCreator && (
-                                                                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-accent/10 text-accent border border-accent/20">
+                                                                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-accent/10 text-accent border border-accent/20">
                                                                                 Creator
                                                                             </span>
                                                                         )}
@@ -1800,7 +1800,7 @@ export default function EventManagePage() {
                                                             <div className="flex items-center gap-2 shrink-0">
                                                                 <Link
                                                                     href={`/profile/${part.id}`}
-                                                                    className="px-3 py-2 rounded-xl text-xs font-black text-surface-dark/55 dark:text-white/40 hover:text-accent hover:bg-accent/5 border border-surface-dark/8 dark:border-white/8 hover:border-accent/20 transition-all"
+                                                                    className="px-3 py-2 rounded-xl text-xs font-semibold text-surface-dark/55 dark:text-white/40 hover:text-accent hover:bg-accent/5 border border-surface-dark/8 dark:border-white/8 hover:border-accent/20 transition-all"
                                                                 >
                                                                     View Profile
                                                                 </Link>
@@ -1808,7 +1808,7 @@ export default function EventManagePage() {
                                                                     <button
                                                                         disabled={actionLoading === part.id}
                                                                         onClick={() => handleRevoke(part)}
-                                                                        className="px-3 py-2 rounded-xl text-xs font-black text-red-400 hover:bg-red-500/10 border border-red-500/10 hover:border-red-500/30 transition-all disabled:opacity-40"
+                                                                        className="px-3 py-2 rounded-xl text-xs font-semibold text-red-400 hover:bg-red-500/10 border border-red-500/10 hover:border-red-500/30 transition-all disabled:opacity-40"
                                                                     >
                                                                         {actionLoading === part.id
                                                                             ? <Loader2 className="animate-spin" size={14} />
@@ -1872,22 +1872,22 @@ const AgendaManagementCard = ({ item, getStyles, onDelete, onStartLive, onEdit, 
                 isCurrent ? "bg-accent text-white shadow-lg shadow-accent/30" : `${styles.bg} ${styles.color}`
             )}>
                 <Clock size={24} strokeWidth={3} />
-                <span className="text-[11px] font-black mt-1 uppercase">{item.startTime}</span>
+                <span className="text-[11px] font-semibold mt-1 uppercase">{item.startTime}</span>
             </div>
 
             <div className="flex-grow">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <h4 className="text-xl font-black text-surface-dark dark:text-white group-hover:text-accent transition-colors">{item.title}</h4>
+                    <h4 className="text-xl font-bold text-surface-dark dark:text-white group-hover:text-accent transition-colors">{item.title}</h4>
                     {item.category && (
                         <span className={cn(
-                            "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2",
+                            "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider flex items-center gap-2",
                             isCurrent ? "bg-white/20 text-white" : `${styles.bg} ${styles.color} ${styles.border}`
                         )}>
                             {styles.icon} {styles.label}
                         </span>
                     )}
                     {isCurrent && (
-                        <span className="px-3 py-1 rounded-full bg-green-500 text-white text-[9px] font-black uppercase tracking-widest animate-pulse flex items-center gap-1">
+                        <span className="px-3 py-1 rounded-full bg-green-500 text-white text-[9px] font-black uppercase tracking-wider animate-pulse flex items-center gap-1">
                             <div className="w-1.5 h-1.5 rounded-full bg-white" /> Live Now
                         </span>
                     )}
@@ -1919,7 +1919,7 @@ const AgendaManagementCard = ({ item, getStyles, onDelete, onStartLive, onEdit, 
                     onClick={onStartLive}
                     disabled={isCurrent}
                     className={cn(
-                        "px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all",
+                        "px-6 py-3 rounded-2xl font-semibold text-xs uppercase tracking-wider transition-all",
                         isCurrent
                             ? "bg-green-500/20 text-green-500 cursor-default"
                             : "bg-surface-dark dark:bg-white text-white dark:text-surface-dark hover:bg-accent hover:text-white dark:hover:bg-accent shadow-lg shadow-black/10"

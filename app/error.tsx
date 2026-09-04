@@ -20,12 +20,12 @@ export default function ErrorBoundary({
   return (
     <div className="min-h-screen bg-background dark:bg-[#0f101e] flex flex-col items-center justify-center p-8">
       <div className="max-w-md w-full">
-        <GlassCard className="!p-10 text-center border-2 border-red-500/20 bg-red-500/5 shadow-2xl shadow-red-500/10">
+        <GlassCard className="p-10 text-center border-2 border-red-500/20 bg-red-500/5 shadow-2xl shadow-red-500/10">
           <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500">
             <AlertCircle size={40} className="animate-pulse" />
           </div>
           
-          <h2 className="text-3xl font-black text-surface-dark dark:text-white mb-4 tracking-tight">System Fault</h2>
+          <h2 className="text-3xl font-bold text-surface-dark dark:text-white mb-4 tracking-tight">System Fault</h2>
 
           <p className="text-surface-dark/60 dark:text-white/60 font-medium mb-8">
             We encountered an unexpected issue while trying to render this screen. Our team has been notified.
@@ -33,7 +33,7 @@ export default function ErrorBoundary({
 
           <Button 
             onClick={() => reset()} 
-            className="w-full !py-4 text-lg gap-2"
+            className="w-full py-4 text-lg gap-2"
           >
             <RefreshCcw size={20} /> Try to Recover
           </Button>

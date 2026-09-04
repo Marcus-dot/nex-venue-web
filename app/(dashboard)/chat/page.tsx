@@ -64,11 +64,11 @@ function ChatPageInner() {
                     onBack={() => setSelectedChat(null)}
                 />
             ) : (
-                <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-white dark:bg-gray-950 px-8 text-center">
+                <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-white dark:bg-[#0f101e] px-8 text-center">
                     <div className="w-24 h-24 bg-accent/10 rounded-3xl flex items-center justify-center mb-6">
                         <Image src="/nexvenue-logo.png" alt="NexVenue" width={48} height={48} className="rounded-2xl" />
                     </div>
-                    <h2 className="text-2xl font-black text-surface-dark dark:text-white mb-1">NexVenue Messenger</h2>
+                    <h2 className="text-2xl font-bold text-surface-dark dark:text-white mb-1">NexVenue Messenger</h2>
                     <p className="font-medium text-surface-dark/55 dark:text-white/45 max-w-xs">
                         Pick a conversation from the left to start chatting, or open an event chat from its page.
                     </p>

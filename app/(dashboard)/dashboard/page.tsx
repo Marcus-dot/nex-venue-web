@@ -84,12 +84,12 @@ export default function DashboardPage() {
 
                     <div className="flex items-center gap-3">
                         <Link href="/analytics">
-                            <Button variant="outline" size="lg" className="h-14 px-6 text-lg font-black gap-2">
+                            <Button variant="outline" size="lg" className="h-14 px-6 text-lg gap-2">
                                 <BarChart3 size={22} /> Analytics
                             </Button>
                         </Link>
                         <Link href="/events/create">
-                            <Button size="lg" className="h-14 px-8 text-lg font-black shadow-lg shadow-accent/20">
+                            <Button size="lg" className="h-14 px-8 text-lg shadow-lg shadow-accent/20">
                                 <Plus className="mr-2" size={24} /> Create Event
                             </Button>
                         </Link>
@@ -98,14 +98,14 @@ export default function DashboardPage() {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <GlassCard className="!p-8">
+                    <GlassCard className="p-8">
                         <div className="flex items-center justify-between mb-4">
                             <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
                                 <Calendar size={24} />
                             </div>
-                            <div className="text-[10px] font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest">Events Hosted</div>
+                            <div className="text-[10px] font-semibold text-surface-dark/50 dark:text-white/35 uppercase tracking-wider">Events Hosted</div>
                         </div>
-                        <div className="text-4xl font-black text-surface-dark dark:text-white">{events.length}</div>
+                        <div className="text-4xl font-bold text-surface-dark dark:text-white">{events.length}</div>
                         <div className="text-xs font-bold text-surface-dark/55 dark:text-white/40 mt-1">
                             {distinctLocations > 0
                                 ? `Across ${distinctLocations} location${distinctLocations === 1 ? "" : "s"}`
@@ -113,25 +113,25 @@ export default function DashboardPage() {
                         </div>
                     </GlassCard>
 
-                    <GlassCard className="!p-8">
+                    <GlassCard className="p-8">
                         <div className="flex items-center justify-between mb-4">
                             <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
                                 <Users size={24} />
                             </div>
-                            <div className="text-[10px] font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest">Total Reach</div>
+                            <div className="text-[10px] font-semibold text-surface-dark/50 dark:text-white/35 uppercase tracking-wider">Total Reach</div>
                         </div>
-                        <div className="text-4xl font-black text-surface-dark dark:text-white">{totalAttendees}</div>
+                        <div className="text-4xl font-bold text-surface-dark dark:text-white">{totalAttendees}</div>
                         <div className="text-xs font-bold text-surface-dark/55 dark:text-white/40 mt-1">Attendees across your events</div>
                     </GlassCard>
 
-                    <GlassCard className="!p-8">
+                    <GlassCard className="p-8">
                         <div className="flex items-center justify-between mb-4">
                             <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500">
                                 <TrendingUp size={24} />
                             </div>
-                            <div className="text-[10px] font-black text-surface-dark/45 dark:text-white/30 uppercase tracking-widest">Avg. Turnout</div>
+                            <div className="text-[10px] font-semibold text-surface-dark/50 dark:text-white/35 uppercase tracking-wider">Avg. Turnout</div>
                         </div>
-                        <div className="text-4xl font-black text-surface-dark dark:text-white">{avgPerEvent}</div>
+                        <div className="text-4xl font-bold text-surface-dark dark:text-white">{avgPerEvent}</div>
                         <div className="text-xs font-bold text-surface-dark/55 dark:text-white/40 mt-1">Attendees per event</div>
                     </GlassCard>
                 </div>
@@ -139,7 +139,7 @@ export default function DashboardPage() {
                 {/* My Events Table/List */}
                 <div className="space-y-6">
                     <div className="flex items-center justify-between px-2">
-                        <h3 className="text-2xl font-black text-surface-dark dark:text-white">Your Events</h3>
+                        <h3 className="text-2xl font-bold text-surface-dark dark:text-white">Your Events</h3>
                         {events.length > 0 && (
                             <Link href="/analytics">
                                 <Button variant="ghost" size="sm" className="font-bold text-accent">View analytics</Button>
@@ -152,16 +152,16 @@ export default function DashboardPage() {
                             <div className="text-surface-dark/20 dark:text-white/20 mb-6">
                                 <Calendar size={64} className="mx-auto" />
                             </div>
-                            <h4 className="text-xl font-black text-surface-dark dark:text-white mb-2">No events created yet</h4>
+                            <h4 className="text-xl font-bold text-surface-dark dark:text-white mb-2">No events created yet</h4>
                             <p className="text-surface-dark/60 dark:text-white/60 mb-8 max-w-xs mx-auto">Create your first event to start managing an agenda, attendees, and live Q&amp;A.</p>
                             <Link href="/events/create">
-                                <Button className="font-black gap-2"><Plus size={18} strokeWidth={3} /> Create Event</Button>
+                                <Button className="gap-2"><Plus size={18} strokeWidth={3} /> Create Event</Button>
                             </Link>
                         </GlassCard>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                             {events.map((event) => (
-                                <GlassCard key={event.id} className="!p-0 overflow-hidden flex flex-col group">
+                                <GlassCard key={event.id} className="p-0 overflow-hidden flex flex-col group">
                                     {/* Cover */}
                                     <div className="relative h-44 w-full overflow-hidden">
                                         {event.imageUrl ? (
@@ -177,14 +177,14 @@ export default function DashboardPage() {
                                                 <Calendar size={40} />
                                             </div>
                                         )}
-                                        <span className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-white/90 dark:bg-gray-900/85 backdrop-blur-sm text-[11px] font-black text-surface-dark dark:text-white">
+                                        <span className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-white/90 dark:bg-[#171a2e]/85 backdrop-blur-sm text-[11px] font-semibold text-surface-dark dark:text-white">
                                             {formatDate(event.date)}
                                         </span>
                                     </div>
 
                                     {/* Body */}
                                     <div className="flex flex-col flex-grow p-5 gap-3">
-                                        <h4 className="text-lg font-black text-surface-dark dark:text-white line-clamp-1 group-hover:text-accent transition-colors">
+                                        <h4 className="text-lg font-bold text-surface-dark dark:text-white line-clamp-1 group-hover:text-accent transition-colors">
                                             {event.title}
                                         </h4>
                                         <div className="flex items-center gap-4 text-sm font-bold text-surface-dark/55 dark:text-white/40">

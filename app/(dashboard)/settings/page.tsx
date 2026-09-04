@@ -295,14 +295,14 @@ export default function SettingsPage() {
                     <p className="text-surface-dark/60 dark:text-white/60 font-medium">Manage your app experience, notifications, and privacy.</p>
                 </div>
 
-                <GlassCard className="!p-8 space-y-8">
+                <GlassCard className="p-8 space-y-8">
                     {/* Notifications */}
                     <div>
                         <div className="flex items-center gap-3 mb-6 pb-4 border-b border-surface-dark/10 dark:border-white/10">
                             <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
                                 <Bell size={20} />
                             </div>
-                            <h2 className="text-xl font-black text-surface-dark dark:text-white">Notifications</h2>
+                            <h2 className="text-xl font-bold text-surface-dark dark:text-white">Notifications</h2>
                         </div>
                         <div className="space-y-6 pl-2">
                             <div className="flex items-center justify-between">
@@ -328,7 +328,7 @@ export default function SettingsPage() {
                             <div className="w-10 h-10 rounded-xl bg-surface-dark/5 dark:bg-white/5 flex items-center justify-center text-surface-dark dark:text-white">
                                 <Moon size={20} />
                             </div>
-                            <h2 className="text-xl font-black text-surface-dark dark:text-white">Appearance</h2>
+                            <h2 className="text-xl font-bold text-surface-dark dark:text-white">Appearance</h2>
                         </div>
                         <div className="space-y-6 pl-2">
                             <div className="flex items-center justify-between">
@@ -347,7 +347,7 @@ export default function SettingsPage() {
                             <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
                                 <Shield size={20} />
                             </div>
-                            <h2 className="text-xl font-black text-surface-dark dark:text-white">Privacy & Security</h2>
+                            <h2 className="text-xl font-bold text-surface-dark dark:text-white">Privacy & Security</h2>
                         </div>
                         <div className="space-y-6 pl-2">
                             <div className="flex items-center justify-between">
@@ -364,7 +364,7 @@ export default function SettingsPage() {
                                     <Ban size={16} className="text-surface-dark/55 dark:text-white/40" />
                                     <h4 className="font-bold text-surface-dark dark:text-white">Blocked Users</h4>
                                     {blocked.length > 0 && (
-                                        <span className="text-xs font-black text-surface-dark/55 dark:text-white/40">{blocked.length}</span>
+                                        <span className="text-xs font-semibold text-surface-dark/55 dark:text-white/40">{blocked.length}</span>
                                     )}
                                 </div>
                                 {blockedLoading ? (
@@ -399,7 +399,7 @@ export default function SettingsPage() {
                             <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
                                 <KeyRound size={20} />
                             </div>
-                            <h2 className="text-xl font-black text-surface-dark dark:text-white">Sign-in Methods</h2>
+                            <h2 className="text-xl font-bold text-surface-dark dark:text-white">Sign-in Methods</h2>
                         </div>
                         <div className="space-y-4 pl-2">
                             {/* Phone */}
@@ -462,7 +462,7 @@ export default function SettingsPage() {
                                 <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500">
                                     <Shield size={20} />
                                 </div>
-                                <h2 className="text-xl font-black text-surface-dark dark:text-white">Admin Access</h2>
+                                <h2 className="text-xl font-bold text-surface-dark dark:text-white">Admin Access</h2>
                             </div>
                             <div className="pl-2">
                                 {adminRequest === undefined ? (
@@ -497,7 +497,7 @@ export default function SettingsPage() {
                     {/* Danger Zone */}
                     <div className="pt-12">
                         <div className="p-6 rounded-2xl border border-red-500/20 bg-red-500/5 space-y-4">
-                            <h3 className="font-black text-red-600 flex items-center gap-2">
+                            <h3 className="font-bold text-red-600 flex items-center gap-2">
                                 <Trash2 size={20} /> Danger Zone
                             </h3>
                             <p className="text-sm font-medium text-surface-dark/70 dark:text-white/70">

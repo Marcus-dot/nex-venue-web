@@ -165,13 +165,13 @@ body {
   filter: url(#ink-turb) blur(56px);
   will-change: transform;
 }
-.ink-blob-1 { width: 58vw; height: 58vw; top: -12%; left: -10%; background: radial-gradient(circle at 40% 40%, rgba(232,92,41,0.32), transparent 68%); animation: ink-drift-1 34s ease-in-out infinite; }
-.ink-blob-2 { width: 50vw; height: 50vw; top: 18%; right: -12%; background: radial-gradient(circle at 50% 50%, rgba(34,37,81,0.20), transparent 66%); animation: ink-drift-2 44s ease-in-out infinite; }
-.ink-blob-3 { width: 44vw; height: 44vw; bottom: -14%; left: 22%; background: radial-gradient(circle at 50% 50%, rgba(232,92,41,0.16), transparent 66%); animation: ink-drift-3 52s ease-in-out infinite; }
+.ink-blob-1 { width: 58vw; height: 58vw; top: -12%; left: -10%; background: radial-gradient(circle at 40% 40%, rgba(232,92,41,0.12), transparent 68%); animation: ink-drift-1 34s ease-in-out infinite; }
+.ink-blob-2 { width: 50vw; height: 50vw; top: 18%; right: -12%; background: radial-gradient(circle at 50% 50%, rgba(34,37,81,0.09), transparent 66%); animation: ink-drift-2 44s ease-in-out infinite; }
+.ink-blob-3 { width: 44vw; height: 44vw; bottom: -14%; left: 22%; background: radial-gradient(circle at 50% 50%, rgba(232,92,41,0.06), transparent 66%); animation: ink-drift-3 52s ease-in-out infinite; }
 
-.dark .ink-blob-1 { background: radial-gradient(circle at 40% 40%, rgba(232,92,41,0.30), transparent 68%); }
-.dark .ink-blob-2 { background: radial-gradient(circle at 50% 50%, rgba(62,68,145,0.34), transparent 66%); }
-.dark .ink-blob-3 { background: radial-gradient(circle at 50% 50%, rgba(232,92,41,0.15), transparent 66%); }
+.dark .ink-blob-1 { background: radial-gradient(circle at 40% 40%, rgba(232,92,41,0.11), transparent 68%); }
+.dark .ink-blob-2 { background: radial-gradient(circle at 50% 50%, rgba(62,68,145,0.15), transparent 66%); }
+.dark .ink-blob-3 { background: radial-gradient(circle at 50% 50%, rgba(232,92,41,0.06), transparent 66%); }
 
 @media (prefers-reduced-motion: reduce) {
   .ink-blob { animation: none !important; }

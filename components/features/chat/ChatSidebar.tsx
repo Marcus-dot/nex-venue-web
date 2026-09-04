@@ -59,9 +59,9 @@ export const ChatSidebar = ({ onSelect, selectedId }: ChatSidebarProps) => {
         : conversations;
 
     return (
-        <div className="w-full md:w-80 h-full border-r border-surface-dark/5 dark:border-white/5 flex flex-col bg-white dark:bg-gray-950">
+        <div className="w-full md:w-80 h-full border-r border-surface-dark/5 dark:border-white/5 flex flex-col bg-white dark:bg-[#0f101e]">
             <div className="p-6 space-y-4">
-                <h2 className="text-2xl font-black text-surface-dark dark:text-white">Messages</h2>
+                <h2 className="text-2xl font-bold text-surface-dark dark:text-white">Messages</h2>
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-dark/45 dark:text-white/30" size={16} />
                     <input
@@ -74,7 +74,7 @@ export const ChatSidebar = ({ onSelect, selectedId }: ChatSidebarProps) => {
             </div>
 
             <div className="flex-1 overflow-y-auto px-4 space-y-2 pb-6">
-                <div className="text-[10px] uppercase tracking-widest font-black text-surface-dark/45 dark:text-white/30 ml-2 mb-2">Direct Chats</div>
+                <div className="text-[10px] uppercase tracking-wider font-bold text-surface-dark/45 dark:text-white/30 ml-2 mb-2">Direct Chats</div>
 
                 {filtered.length === 0 && (
                     <div className="text-center py-10 text-surface-dark/45 dark:text-white/40">
@@ -99,23 +99,23 @@ export const ChatSidebar = ({ onSelect, selectedId }: ChatSidebarProps) => {
                         >
                             <div className="relative">
                                 <div className={cn(
-                                    "w-12 h-12 rounded-full flex items-center justify-center font-black text-lg",
+                                    "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg",
                                     isSelected ? "bg-white/20" : "bg-accent/10 text-accent"
                                 )}>
                                     {info.name[0]}
                                 </div>
                                 {info.id && presence[info.id]?.isOnline && (
-                                    <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white dark:border-gray-950" />
+                                    <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white dark:border-[#0f101e]" />
                                 )}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <div className="font-black truncate">{info.name}</div>
+                                <div className="font-bold truncate">{info.name}</div>
                                 <div className={cn(
                                     "text-xs truncate",
                                     isSelected ? "text-white/70" : "text-surface-dark/55 dark:text-white/40 font-medium"
                                 )}>
                                     {conv.typingIndicator?.[recipientId!] && (Date.now() - conv.typingIndicator[recipientId!] < 3000) ? (
-                                        <span className={cn("font-black italic", isSelected ? "text-white/90" : "text-accent")}>Typing...</span>
+                                        <span className={cn("font-bold italic", isSelected ? "text-white/90" : "text-accent")}>Typing...</span>
                                     ) : (
                                         conv.lastMessage?.message || "No messages yet"
                                     )}

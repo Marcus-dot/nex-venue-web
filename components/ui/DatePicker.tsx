@@ -101,12 +101,12 @@ export const DatePicker = ({ value, onChange, label, className }: DatePickerProp
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         className="absolute z-50 mt-2 w-full min-w-[320px] left-0 md:left-auto md:right-0"
                     >
-                        <GlassCard className="!p-6 shadow-2xl border-white/40">
+                        <GlassCard className="p-6 shadow-2xl border-white/40">
                             <div className="flex items-center justify-between mb-6">
                                 <button type="button" onClick={handlePrevMonth} className="p-2 rounded-lg hover:bg-surface-dark/5 dark:hover:bg-white/5 text-surface-dark/55 dark:text-white/40">
                                     <ChevronLeft size={20} />
                                 </button>
-                                <div className="text-lg font-black text-surface-dark dark:text-white">
+                                <div className="text-lg font-bold text-surface-dark dark:text-white">
                                     {monthNames[currentMonth]} {currentYear}
                                 </div>
                                 <button type="button" onClick={handleNextMonth} className="p-2 rounded-lg hover:bg-surface-dark/5 dark:hover:bg-white/5 text-surface-dark/55 dark:text-white/40">
@@ -116,7 +116,7 @@ export const DatePicker = ({ value, onChange, label, className }: DatePickerProp
 
                             <div className="grid grid-cols-7 gap-1 mb-2">
                                 {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
-                                    <div key={day} className="h-10 w-10 flex items-center justify-center text-[10px] font-black uppercase text-surface-dark/20 dark:text-white/20 tracking-wider">
+                                    <div key={day} className="h-10 w-10 flex items-center justify-center text-[10px] font-semibold uppercase text-surface-dark/20 dark:text-white/20 tracking-wider">
                                         {day}
                                     </div>
                                 ))}

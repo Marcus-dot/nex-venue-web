@@ -131,11 +131,11 @@ export default function AnalyticsPage() {
                 </div>
 
                 {rows.length === 0 ? (
-                    <GlassCard className="!p-16 text-center">
+                    <GlassCard className="p-16 text-center">
                         <BarChart3 size={40} className="mx-auto text-surface-dark/20 dark:text-white/20 mb-4" />
-                        <p className="font-black text-surface-dark/60 dark:text-white/50">No events yet</p>
+                        <p className="font-bold text-surface-dark/60 dark:text-white/50">No events yet</p>
                         <p className="text-sm text-surface-dark/55 dark:text-white/40 mt-1 font-medium">Host an event and its analytics will appear here.</p>
-                        <Link href="/events/create" className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 rounded-xl bg-accent text-white text-sm font-black">Create Event</Link>
+                        <Link href="/events/create" className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 rounded-xl bg-accent text-white text-sm font-semibold">Create Event</Link>
                     </GlassCard>
                 ) : (
                     <>
@@ -150,8 +150,8 @@ export default function AnalyticsPage() {
                         </div>
 
                         {/* Attendees by event */}
-                        <GlassCard className="!p-8 mb-8">
-                            <h2 className="text-xl font-black text-surface-dark dark:text-white mb-6">Attendees by event</h2>
+                        <GlassCard className="p-8 mb-8">
+                            <h2 className="text-xl font-bold text-surface-dark dark:text-white mb-6">Attendees by event</h2>
                             <div className="space-y-4">
                                 {[...rows].sort((a, b) => b.attendees - a.attendees).map((r) => (
                                     <div key={r.id}>
@@ -168,21 +168,21 @@ export default function AnalyticsPage() {
                         </GlassCard>
 
                         {/* Per-event comparison */}
-                        <GlassCard className="!p-0 overflow-hidden">
+                        <GlassCard className="p-0 overflow-hidden">
                             <div className="px-8 py-6 border-b border-surface-dark/5 dark:border-white/5">
-                                <h2 className="text-xl font-black text-surface-dark dark:text-white">Event breakdown</h2>
+                                <h2 className="text-xl font-bold text-surface-dark dark:text-white">Event breakdown</h2>
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
                                     <thead>
-                                        <tr className="text-left text-[11px] font-black uppercase tracking-wider text-surface-dark/55 dark:text-white/40 border-b border-surface-dark/5 dark:border-white/5">
+                                        <tr className="text-left text-[11px] font-semibold uppercase tracking-wider text-surface-dark/55 dark:text-white/40 border-b border-surface-dark/5 dark:border-white/5">
                                             <th className="px-8 py-3 font-black">Event</th>
-                                            <th className="px-4 py-3 font-black text-right">Attendees</th>
-                                            <th className="px-4 py-3 font-black text-right">Checked in</th>
-                                            <th className="px-4 py-3 font-black text-right">Q&amp;A</th>
-                                            <th className="px-4 py-3 font-black text-right">Polls</th>
-                                            <th className="px-4 py-3 font-black text-right">Rating</th>
-                                            <th className="px-8 py-3 font-black text-right">Report</th>
+                                            <th className="px-4 py-3 font-bold text-right">Attendees</th>
+                                            <th className="px-4 py-3 font-bold text-right">Checked in</th>
+                                            <th className="px-4 py-3 font-bold text-right">Q&amp;A</th>
+                                            <th className="px-4 py-3 font-bold text-right">Polls</th>
+                                            <th className="px-4 py-3 font-bold text-right">Rating</th>
+                                            <th className="px-8 py-3 font-bold text-right">Report</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -191,16 +191,16 @@ export default function AnalyticsPage() {
                                             return (
                                                 <tr key={r.id} className="border-b border-surface-dark/5 dark:border-white/5 last:border-0 hover:bg-surface-dark/[0.02] dark:hover:bg-white/[0.02]">
                                                     <td className="px-8 py-4">
-                                                        <div className="font-black text-surface-dark dark:text-white truncate max-w-xs">{r.title}</div>
+                                                        <div className="font-bold text-surface-dark dark:text-white truncate max-w-xs">{r.title}</div>
                                                         <div className="text-xs font-medium text-surface-dark/55 dark:text-white/40">{r.date}</div>
                                                     </td>
-                                                    <td className="px-4 py-4 text-right font-black text-surface-dark dark:text-white tabular-nums">{r.attendees}</td>
+                                                    <td className="px-4 py-4 text-right font-bold text-surface-dark dark:text-white tabular-nums">{r.attendees}</td>
                                                     <td className="px-4 py-4 text-right font-bold text-surface-dark/70 dark:text-white/70 tabular-nums">{r.checkedIn}<span className="text-surface-dark/45 dark:text-white/30"> ({rate}%)</span></td>
                                                     <td className="px-4 py-4 text-right font-bold text-surface-dark/70 dark:text-white/70 tabular-nums">{r.questions}</td>
                                                     <td className="px-4 py-4 text-right font-bold text-surface-dark/70 dark:text-white/70 tabular-nums">{r.polls}</td>
                                                     <td className="px-4 py-4 text-right">
                                                         {r.ratingCount ? (
-                                                            <span className="inline-flex items-center gap-1 font-black text-accent tabular-nums"><Star size={12} className="fill-accent" /> {r.ratingAvg.toFixed(1)}</span>
+                                                            <span className="inline-flex items-center gap-1 font-bold text-accent tabular-nums"><Star size={12} className="fill-accent" /> {r.ratingAvg.toFixed(1)}</span>
                                                         ) : <span className="text-surface-dark/45 dark:text-white/30">, </span>}
                                                     </td>
                                                     <td className="px-8 py-4 text-right">
@@ -224,9 +224,9 @@ export default function AnalyticsPage() {
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
     return (
-        <GlassCard className="!p-5">
+        <GlassCard className="p-5">
             <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-3">{icon}</div>
-            <div className="text-2xl font-black text-surface-dark dark:text-white tabular-nums">{value}</div>
+            <div className="text-2xl font-bold text-surface-dark dark:text-white tabular-nums">{value}</div>
             <div className="text-[11px] font-bold text-surface-dark/60 dark:text-white/50 mt-0.5 uppercase tracking-wider">{label}</div>
         </GlassCard>
     );

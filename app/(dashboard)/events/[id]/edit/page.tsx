@@ -363,7 +363,7 @@ export default function EditEventPage() {
                 <div className="mt-16">
                     <div className="flex items-center justify-between mb-8">
                         <div>
-                            <h2 className="text-3xl font-black text-surface-dark dark:text-white">Event Schedule</h2>
+                            <h2 className="text-3xl font-bold text-surface-dark dark:text-white">Event Schedule</h2>
                             <p className="text-surface-dark/60 dark:text-white/60 font-medium mt-1">Manage the agenda and session details.</p>
                         </div>
                         <Button onClick={() => openAgendaModal()} className="font-bold">
@@ -378,18 +378,18 @@ export default function EditEventPage() {
                             </GlassCard>
                         ) : (
                             agenda.map((item) => (
-                                <GlassCard key={item.id} className={`!p-5 flex flex-col md:flex-row md:items-center justify-between gap-6 ${event.currentAgendaItem === item.id ? 'border-green-500 ring-2 ring-green-500/10' : ''}`}>
+                                <GlassCard key={item.id} className={`p-5 flex flex-col md:flex-row md:items-center justify-between gap-6 ${event.currentAgendaItem === item.id ? 'border-green-500 ring-2 ring-green-500/10' : ''}`}>
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <span className="text-sm font-black text-accent">{item.startTime} - {item.endTime}</span>
+                                            <span className="text-sm font-semibold text-accent">{item.startTime} - {item.endTime}</span>
                                             {item.category && (
-                                                <span className="px-2 py-0.5 rounded bg-surface-dark/5 dark:bg-white/5 text-[10px] font-black uppercase text-surface-dark/60 dark:text-white/60">{item.category}</span>
+                                                <span className="px-2 py-0.5 rounded bg-surface-dark/5 dark:bg-white/5 text-[10px] font-semibold uppercase text-surface-dark/60 dark:text-white/60">{item.category}</span>
                                             )}
                                             {event.currentAgendaItem === item.id && (
-                                                <span className="px-2 py-0.5 rounded bg-green-500 text-white text-[10px] font-black uppercase animate-pulse">Live Now</span>
+                                                <span className="px-2 py-0.5 rounded bg-green-500 text-white text-[10px] font-semibold uppercase animate-pulse">Live Now</span>
                                             )}
                                         </div>
-                                        <h4 className="text-xl font-black text-surface-dark dark:text-white">{item.title}</h4>
+                                        <h4 className="text-xl font-bold text-surface-dark dark:text-white">{item.title}</h4>
                                         <div className="flex flex-wrap gap-4 mt-2 text-sm font-bold text-surface-dark/60 dark:text-white/50">
                                             {item.speaker && <span>🗣️ {item.speaker}</span>}
                                             {item.location && <span>📍 {item.location}</span>}
@@ -421,7 +421,7 @@ export default function EditEventPage() {
                 {showAgendaModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 dark:bg-black/60 backdrop-blur-sm p-4">
                         <GlassCard className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                            <h3 className="text-2xl font-black text-surface-dark dark:text-white mb-6">
+                            <h3 className="text-2xl font-bold text-surface-dark dark:text-white mb-6">
                                 {editingAgendaId ? "Edit Session" : "Add Session"}
                             </h3>
                             <form onSubmit={handleSaveAgenda} className="space-y-4">

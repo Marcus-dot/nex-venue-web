@@ -23,11 +23,11 @@ export function TicketModal({ isOpen, onClose, eventId, eventTitle, attendeeName
                     <QRCodeSVG value={buildCheckInPayload(eventId, uid)} size={220} bgColor="#ffffff" fgColor="#111827" level="M" />
                 </div>
                 <div>
-                    <p className="text-xl font-black text-surface-dark dark:text-white">{attendeeName}</p>
+                    <p className="text-xl font-bold text-surface-dark dark:text-white">{attendeeName}</p>
                     <p className="text-sm font-medium text-surface-dark/60 dark:text-white/50 mt-1">{eventTitle}</p>
                 </div>
                 {checkedIn ? (
-                    <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-black">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-semibold">
                         <CheckCircle2 size={16} /> Checked in
                     </span>
                 ) : (

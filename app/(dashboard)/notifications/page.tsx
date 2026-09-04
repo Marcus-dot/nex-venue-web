@@ -128,7 +128,7 @@ export default function NotificationsPage() {
                             <GlassCard
                                 key={notification.id}
                                 className={cn(
-                                    "!p-0 overflow-hidden cursor-pointer transition-all hover:translate-x-1",
+                                    "p-0 overflow-hidden cursor-pointer transition-all hover:translate-x-1",
                                     !notification.read ? "bg-accent/5 dark:bg-accent/10 border border-accent/20" : ""
                                 )}
                                 onClick={() => handleNotificationClick(notification)}
@@ -139,10 +139,10 @@ export default function NotificationsPage() {
                                     </div>
                                     <div className="flex-1 min-w-0 pt-0.5">
                                         <div className="flex items-start justify-between gap-2 mb-1">
-                                            <h4 className={cn("text-base truncate", !notification.read ? "font-black text-surface-dark dark:text-white" : "font-bold text-surface-dark/70 dark:text-white/70")}>
+                                            <h4 className={cn("text-base truncate", !notification.read ? "font-bold text-surface-dark dark:text-white" : "font-bold text-surface-dark/70 dark:text-white/70")}>
                                                 {notification.title}
                                             </h4>
-                                            <div className="text-[10px] font-black uppercase text-surface-dark/45 dark:text-white/30 whitespace-nowrap pt-1">
+                                            <div className="text-[10px] font-semibold uppercase text-surface-dark/45 dark:text-white/30 whitespace-nowrap pt-1">
                                                 {new Date(notification.createdAt).toLocaleDateString()}
                                             </div>
                                         </div>

@@ -292,7 +292,7 @@ function AgendaCard({ item, status, eventId, guestId }: { item: AgendaItem; stat
                                     animate={{ opacity: [1, 0.3, 1] }}
                                     transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut" }}
                                 />
-                                <span className="text-xs font-black uppercase" style={{ color: accent, letterSpacing: "0.04em" }}>Live</span>
+                                <span className="text-xs font-semibold uppercase" style={{ color: accent, letterSpacing: "0.04em" }}>Live</span>
                             </div>
                         ) : null}
                         <span className="text-xs font-bold tabular-nums block"
@@ -657,7 +657,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                         </div>
                     )}
 
-                    <h1 className="text-white font-black mb-3" style={{ fontSize: "clamp(1.4rem, 5vw, 2rem)", lineHeight: 1.2 }}>
+                    <h1 className="text-white font-bold mb-3" style={{ fontSize: "clamp(1.4rem, 5vw, 2rem)", lineHeight: 1.2 }}>
                         {event.title}
                     </h1>
                     <div className="flex flex-col gap-1.5 mb-3">
@@ -704,7 +704,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                             <span className="flex items-center gap-1.5">
                                 Polls
                                 {polls.length > 0 && (
-                                    <span className="text-xs font-black w-4 h-4 rounded-full flex items-center justify-center"
+                                    <span className="text-xs font-semibold w-4 h-4 rounded-full flex items-center justify-center"
                                         style={{ background: accent, color: "white", fontSize: 10 }}>
                                         {polls.length}
                                     </span>
@@ -749,7 +749,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                                             {/* Day heading */}
                                             <div className="flex items-center gap-3 mb-4">
                                                 <div className="flex items-baseline gap-2">
-                                                    <h2 className="font-black text-lg"
+                                                    <h2 className="font-bold text-lg"
                                                         style={{ color: isPastDay ? "rgba(255,255,255,0.3)" : "white" }}>
                                                         {weekday}
                                                     </h2>
@@ -963,7 +963,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ eventId:
                         {/* Approved questions */}
                         {questions.length > 0 && (
                             <div>
-                                <p className="text-xs font-semibold uppercase tracking-widest mb-3"
+                                <p className="text-xs font-semibold uppercase tracking-wider mb-3"
                                     style={{ color: "rgba(255,255,255,0.25)", letterSpacing: "0.1em" }}>
                                     Live questions · {questions.length}
                                 </p>

@@ -181,7 +181,7 @@ export default function CreateEventPage() {
                                     )}
                                 >
                                     <Unlock size={18} />
-                                    <span className="font-black text-sm">Open</span>
+                                    <span className="font-semibold text-sm">Open</span>
                                     <span className="text-xs font-medium opacity-80">Anyone can attend</span>
                                 </button>
                                 <button
@@ -193,7 +193,7 @@ export default function CreateEventPage() {
                                     )}
                                 >
                                     <Lock size={18} />
-                                    <span className="font-black text-sm">Approval</span>
+                                    <span className="font-semibold text-sm">Approval</span>
                                     <span className="text-xs font-medium opacity-80">You approve each request</span>
                                 </button>
                             </div>
