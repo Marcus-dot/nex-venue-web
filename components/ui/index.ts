@@ -1,7 +1,6 @@
 export * from "./Button";
 export * from "./DatePicker";
 export * from "./GlassCard";
-export * from "./HeroScene";
 export * from "./Input";
 export * from "./Modal";
 export * from "./SmoothScroll";

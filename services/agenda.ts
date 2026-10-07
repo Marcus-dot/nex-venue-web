@@ -19,7 +19,7 @@ import { AgendaItem } from "@/types/agenda";
 // Helper function to convert date + time to sortable timestamp (copied logic from mobile)
 const parseDateTime = (date: string, time: string): number => {
     try {
-        let parsedDate = new Date(date);
+        const parsedDate = new Date(date);
         const timeStr = time.toLowerCase().replace(/\s+/g, '');
         let hours = 0;
         let minutes = 0;
