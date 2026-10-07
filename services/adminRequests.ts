@@ -7,6 +7,7 @@ import {
     query,
     where,
     onSnapshot,
+    runTransaction,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 
@@ -87,14 +88,16 @@ export const adminRequestService = {
 
     // Approve: promote the user to admin + mark the request approved.
     approveRequest: async (request: AdminRequest, reviewerUid: string): Promise<void> => {
-        await Promise.all([
-            updateDoc(doc(db, "users", request.userId), { role: "admin" }),
-            updateDoc(doc(db, "adminRequests", request.id), {
+        // Atomic: promote the user to admin and mark the request approved together,
+        // so a partial failure can't grant admin without an audit trail (or vice versa).
+        await runTransaction(db, async (tx) => {
+            tx.update(doc(db, "users", request.userId), { role: "admin" });
+            tx.update(doc(db, "adminRequests", request.id), {
                 status: "approved",
                 reviewedAt: Date.now(),
                 reviewedBy: reviewerUid,
-            }),
-        ]);
+            });
+        });
     },
 
     // Reject: mark the request rejected.

@@ -16,7 +16,8 @@ import {
     onSnapshot,
     startAfter,
     DocumentSnapshot,
-    setDoc
+    setDoc,
+    runTransaction
 } from "firebase/firestore";
 import { Event, RoleRequest, EventParticipant, EventRole } from "@/types/events";
 
@@ -150,16 +151,17 @@ export const eventService = {
     joinEvent: async (eventId: string, userId: string): Promise<void> => {
         try {
             const eventRef = doc(db, "events", eventId);
-            // Enforce capacity cap (if set) — can't exceed maxAttendees
-            const snap = await getDoc(eventRef);
-            const data = snap.data();
-            const attendees: string[] = data?.attendees ?? [];
-            const max: number | undefined = data?.maxAttendees;
-            if (max && attendees.length >= max && !attendees.includes(userId)) {
-                throw Object.assign(new Error("This event is at full capacity."), { code: "event_full" });
-            }
-            await updateDoc(eventRef, {
-                attendees: arrayUnion(userId)
+            // Transaction so the capacity check reads the live count and the join is
+            // atomic — two people can't both take the last spot and exceed maxAttendees.
+            await runTransaction(db, async (tx) => {
+                const snap = await tx.get(eventRef);
+                const data = snap.data();
+                const attendees: string[] = data?.attendees ?? [];
+                const max: number | undefined = data?.maxAttendees;
+                if (max && attendees.length >= max && !attendees.includes(userId)) {
+                    throw Object.assign(new Error("This event is at full capacity."), { code: "event_full" });
+                }
+                tx.update(eventRef, { attendees: arrayUnion(userId) });
             });
         } catch (error) {
             console.error("Error joining event:", error);
@@ -244,12 +246,6 @@ export const eventService = {
             };
 
             const arrayField = fieldMap[request.requestedRole];
-            await updateDoc(eventRef, {
-                [arrayField]: arrayUnion(request.userId),
-                attendees: arrayUnion(request.userId) // Ensure they are attendees too
-            });
-
-            // 2. Create the participant profile metadata record
             const participantRef = doc(db, "events", request.eventId, "participants", request.userId);
             const rawParticipant = {
                 id: request.userId,
@@ -265,10 +261,17 @@ export const eventService = {
             const participantData = Object.fromEntries(
                 Object.entries(rawParticipant).filter(([, v]) => v !== undefined)
             );
-            await setDoc(participantRef, participantData);
 
-            // 3. Update request status
-            await updateDoc(requestRef, { status: 'approved' });
+            // Atomic: grant the role + attendee membership, write the participant
+            // record, and mark the request approved together — no half-applied approvals.
+            await runTransaction(db, async (tx) => {
+                tx.update(eventRef, {
+                    [arrayField]: arrayUnion(request.userId),
+                    attendees: arrayUnion(request.userId) // Ensure they are attendees too
+                });
+                tx.set(participantRef, participantData);
+                tx.update(requestRef, { status: 'approved' });
+            });
         } catch (error) {
             console.error("Error approving role request:", error);
             throw error;
@@ -290,10 +293,6 @@ export const eventService = {
                 speaker: "speakers",
                 exhibitor: "exhibitors",
             };
-            await updateDoc(doc(db, "events", eventId), {
-                [fieldMap[role]]: arrayUnion(userId),
-                attendees: arrayUnion(userId),
-            });
             const raw = {
                 id: userId,
                 eventId,
@@ -308,7 +307,15 @@ export const eventService = {
             const participantData = Object.fromEntries(
                 Object.entries(raw).filter(([, v]) => v !== undefined)
             );
-            await setDoc(doc(db, "events", eventId, "participants", userId), participantData);
+            // Atomic: grant the role + attendee membership and write the participant
+            // record together, so a promoted user always has a matching staff record.
+            await runTransaction(db, async (tx) => {
+                tx.update(doc(db, "events", eventId), {
+                    [fieldMap[role]]: arrayUnion(userId),
+                    attendees: arrayUnion(userId),
+                });
+                tx.set(doc(db, "events", eventId, "participants", userId), participantData);
+            });
         } catch (error) {
             console.error("Error assigning role:", error);
             throw error;

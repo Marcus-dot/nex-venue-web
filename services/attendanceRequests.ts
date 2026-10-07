@@ -4,12 +4,12 @@ import {
     doc,
     addDoc,
     updateDoc,
-    getDoc,
     getDocs,
     query,
     where,
     onSnapshot,
     arrayUnion,
+    runTransaction,
 } from "firebase/firestore";
 import type { AttendanceRequest } from "@/types/events";
 
@@ -104,18 +104,20 @@ export const attendanceRequestService = {
         const eventRef = doc(db, "events", request.eventId);
         const requestRef = doc(db, "attendanceRequests", request.id);
 
-        const eventSnap = await getDoc(eventRef);
-        const eventData = eventSnap.data();
-        const attendees: string[] = eventData?.attendees ?? [];
-        const max: number | undefined = eventData?.maxAttendees;
-        if (max && attendees.length >= max && !attendees.includes(request.userId)) {
-            throw Object.assign(new Error("This event is at full capacity."), { code: "event_full" });
-        }
-
-        await Promise.all([
-            updateDoc(eventRef, { attendees: arrayUnion(request.userId) }),
-            updateDoc(requestRef, { status: "approved" }),
-        ]);
+        // Transaction so the capacity check and both writes are atomic: concurrent
+        // approvals can't exceed maxAttendees, and we never add the attendee while
+        // leaving the request pending (or vice versa).
+        await runTransaction(db, async (tx) => {
+            const eventSnap = await tx.get(eventRef);
+            const eventData = eventSnap.data();
+            const attendees: string[] = eventData?.attendees ?? [];
+            const max: number | undefined = eventData?.maxAttendees;
+            if (max && attendees.length >= max && !attendees.includes(request.userId)) {
+                throw Object.assign(new Error("This event is at full capacity."), { code: "event_full" });
+            }
+            tx.update(eventRef, { attendees: arrayUnion(request.userId) });
+            tx.update(requestRef, { status: "approved" });
+        });
     },
 
     /** Reject: mark the request rejected. */
