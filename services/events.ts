@@ -133,8 +133,10 @@ export const eventService = {
 
     deleteEvent: async (id: string): Promise<void> => {
         try {
-            // Note: In a real app we'd also need to delete associated subcollections (agenda, messages)
-            // and maybe imagery from Storage. This is a basic document delete.
+            // Deleting the event document is enough: the onEventDeleted Cloud Function
+            // (shared Firebase project) cascades all related data server-side — agendas,
+            // role/attendance requests, questions, checkIns, polls, ratings, chat
+            // messages, participants and the chat room. No client-side fan-out needed.
             const eventRef = doc(db, "events", id);
             await deleteDoc(eventRef);
         } catch (error) {
