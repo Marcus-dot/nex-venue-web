@@ -48,10 +48,10 @@ export const Modal = ({ isOpen, onClose, title, children, size = "default", body
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
                         transition={{ duration: 0.3, ease: "easeOut" }}
-                        className={`relative w-full z-10 ${size === "wide" ? "max-w-5xl" : "max-w-lg"}`}
+                        className={`relative w-full z-10 ${size === "wide" ? "max-w-6xl" : "max-w-lg"}`}
                     >
-                        <GlassCard className="overflow-hidden border-2 border-white/20 dark:border-white/5 shadow-2xl">
-                            <div className="p-6 border-b border-surface-dark/5 dark:border-white/5 flex items-center justify-between">
+                        <GlassCard className={`overflow-hidden border-2 border-white/20 dark:border-white/5 shadow-2xl flex flex-col ${size === "wide" ? "max-h-[88vh]" : "max-h-[90vh]"}`}>
+                            <div className="shrink-0 p-6 border-b border-surface-dark/5 dark:border-white/5 flex items-center justify-between">
                                 <h3 className="text-2xl font-bold text-surface-dark dark:text-white tracking-tight">
                                     {title}
                                 </h3>
@@ -62,7 +62,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = "default", body
                                     <X size={20} />
                                 </button>
                             </div>
-                            <div className={bodyClassName}>
+                            <div className={`flex-1 min-h-0 ${size === "wide" ? "overflow-y-auto md:overflow-hidden" : "overflow-y-auto"} ${bodyClassName}`}>
                                 {children}
                             </div>
                         </GlassCard>

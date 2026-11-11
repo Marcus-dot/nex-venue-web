@@ -620,25 +620,29 @@ export default function EventDetailsClient() {
                 bodyClassName="p-0"
             >
                 {selectedSpeaker && (
-                    <div className="grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-                        {/* Photo side */}
-                        <div className="relative bg-accent/10 min-h-[280px] md:min-h-[480px] flex items-center justify-center overflow-hidden">
+                    <div className="md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:h-full">
+                        {/* Photo side — fills its half, same height as the bio panel */}
+                        <div className="relative bg-accent/10 h-72 md:h-full flex items-center justify-center overflow-hidden">
                             {selectedSpeaker.photoUrl
-                                ? <img src={selectedSpeaker.photoUrl} alt={selectedSpeaker.name} className="w-full h-full object-cover" />
+                                ? <img src={selectedSpeaker.photoUrl} alt={selectedSpeaker.name} className="w-full h-full object-cover object-top" />
                                 : <span className="text-accent font-bold text-8xl">{selectedSpeaker.name[0] || "?"}</span>}
                         </div>
-                        {/* Bio side */}
-                        <div className="p-8 md:p-12 flex flex-col max-h-[60vh] md:max-h-[72vh] overflow-y-auto">
-                            <div className="text-3xl md:text-5xl font-bold text-surface-dark dark:text-white leading-tight">
-                                {selectedSpeaker.name}
+                        {/* Bio side — scrolls on its own, header stays put */}
+                        <div className="flex flex-col md:h-full md:min-h-0">
+                            <div className="shrink-0 px-8 pt-8 md:px-12 md:pt-12">
+                                <div className="text-3xl md:text-5xl font-bold text-surface-dark dark:text-white leading-tight">
+                                    {selectedSpeaker.name}
+                                </div>
+                                <div className="mt-3 text-base md:text-2xl font-bold text-accent uppercase tracking-wider">
+                                    {selectedSpeaker.subtitle}
+                                </div>
+                                <div className="mt-6 h-1.5 w-24 bg-accent/40 rounded-full" />
                             </div>
-                            <div className="mt-3 text-base md:text-2xl font-bold text-accent uppercase tracking-wider">
-                                {selectedSpeaker.subtitle}
+                            <div className="px-8 pb-8 md:px-12 md:pb-12 md:flex-1 md:min-h-0 md:overflow-y-auto">
+                                <p className="mt-6 text-lg md:text-2xl text-surface-dark/80 dark:text-white/80 font-medium leading-relaxed whitespace-pre-line">
+                                    {selectedSpeaker.bio || "No bio provided."}
+                                </p>
                             </div>
-                            <div className="mt-6 h-1.5 w-24 bg-accent/40 rounded-full shrink-0" />
-                            <p className="mt-6 text-lg md:text-2xl text-surface-dark/80 dark:text-white/80 font-medium leading-relaxed whitespace-pre-line">
-                                {selectedSpeaker.bio || "No bio provided."}
-                            </p>
                         </div>
                     </div>
                 )}
