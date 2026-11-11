@@ -50,7 +50,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = "default", body
                         transition={{ duration: 0.3, ease: "easeOut" }}
                         className={`relative w-full z-10 ${size === "wide" ? "max-w-6xl" : "max-w-lg"}`}
                     >
-                        <GlassCard className={`overflow-hidden border-2 border-white/20 dark:border-white/5 shadow-2xl flex flex-col ${size === "wide" ? "max-h-[88vh]" : "max-h-[90vh]"}`}>
+                        <GlassCard className={`overflow-hidden border-2 border-white/20 dark:border-white/5 shadow-2xl flex flex-col ${size === "wide" ? "h-[86vh]" : "max-h-[90vh]"}`}>
                             <div className="shrink-0 p-6 border-b border-surface-dark/5 dark:border-white/5 flex items-center justify-between">
                                 <h3 className="text-2xl font-bold text-surface-dark dark:text-white tracking-tight">
                                     {title}
