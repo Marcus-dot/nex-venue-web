@@ -10,9 +10,13 @@ interface ModalProps {
     onClose: () => void;
     title: string;
     children: React.ReactNode;
+    /** "default" (max-w-lg) for normal dialogs, "wide" (max-w-5xl) for projector-friendly content. */
+    size?: "default" | "wide";
+    /** Override the body wrapper classes — pass "" / "p-0" for full-bleed layouts. */
+    bodyClassName?: string;
 }
 
-export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
+export const Modal = ({ isOpen, onClose, title, children, size = "default", bodyClassName = "p-8" }: ModalProps) => {
     // Prevent scrolling when modal is open
     useEffect(() => {
         if (isOpen) {
@@ -44,7 +48,7 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
                         transition={{ duration: 0.3, ease: "easeOut" }}
-                        className="relative w-full max-w-lg z-10"
+                        className={`relative w-full z-10 ${size === "wide" ? "max-w-5xl" : "max-w-lg"}`}
                     >
                         <GlassCard className="overflow-hidden border-2 border-white/20 dark:border-white/5 shadow-2xl">
                             <div className="p-6 border-b border-surface-dark/5 dark:border-white/5 flex items-center justify-between">
@@ -58,7 +62,7 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
                                     <X size={20} />
                                 </button>
                             </div>
-                            <div className="p-8">
+                            <div className={bodyClassName}>
                                 {children}
                             </div>
                         </GlassCard>

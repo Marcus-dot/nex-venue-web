@@ -611,28 +611,35 @@ export default function EventDetailsClient() {
                 </div>
             </main>
 
-            {/* Speaker profile modal, full bio */}
+            {/* Speaker spotlight modal — wide, projector-friendly: photo one side, bio the other */}
             <Modal
                 isOpen={!!selectedSpeaker}
                 onClose={() => setSelectedSpeaker(null)}
-                title="Speaker"
+                title="Featured Speaker"
+                size="wide"
+                bodyClassName="p-0"
             >
                 {selectedSpeaker && (
-                    <div>
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-3xl overflow-hidden shrink-0">
-                                {selectedSpeaker.photoUrl
-                                    ? <img src={selectedSpeaker.photoUrl} alt={selectedSpeaker.name} className="w-full h-full object-cover" />
-                                    : (selectedSpeaker.name[0] || "?")}
-                            </div>
-                            <div className="min-w-0">
-                                <div className="text-2xl font-bold text-surface-dark dark:text-white">{selectedSpeaker.name}</div>
-                                <div className="text-sm font-bold text-accent uppercase tracking-wider">{selectedSpeaker.subtitle}</div>
-                            </div>
+                    <div className="grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+                        {/* Photo side */}
+                        <div className="relative bg-accent/10 min-h-[280px] md:min-h-[480px] flex items-center justify-center overflow-hidden">
+                            {selectedSpeaker.photoUrl
+                                ? <img src={selectedSpeaker.photoUrl} alt={selectedSpeaker.name} className="w-full h-full object-cover" />
+                                : <span className="text-accent font-bold text-8xl">{selectedSpeaker.name[0] || "?"}</span>}
                         </div>
-                        <p className="text-surface-dark/70 dark:text-white/70 font-medium leading-relaxed whitespace-pre-line">
-                            {selectedSpeaker.bio || "No bio provided."}
-                        </p>
+                        {/* Bio side */}
+                        <div className="p-8 md:p-12 flex flex-col max-h-[60vh] md:max-h-[72vh] overflow-y-auto">
+                            <div className="text-3xl md:text-5xl font-bold text-surface-dark dark:text-white leading-tight">
+                                {selectedSpeaker.name}
+                            </div>
+                            <div className="mt-3 text-base md:text-2xl font-bold text-accent uppercase tracking-wider">
+                                {selectedSpeaker.subtitle}
+                            </div>
+                            <div className="mt-6 h-1.5 w-24 bg-accent/40 rounded-full shrink-0" />
+                            <p className="mt-6 text-lg md:text-2xl text-surface-dark/80 dark:text-white/80 font-medium leading-relaxed whitespace-pre-line">
+                                {selectedSpeaker.bio || "No bio provided."}
+                            </p>
+                        </div>
                     </div>
                 )}
             </Modal>
