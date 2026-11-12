@@ -30,6 +30,7 @@ import {
     Mic,
     Store,
     QrCode,
+    Crown,
     type LucideIcon
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -75,7 +76,7 @@ export default function EventDetailsClient() {
     const [showTicket, setShowTicket] = useState(false);
     const [checkedIn, setCheckedIn] = useState(false);
     const [attendeePreviews, setAttendeePreviews] = useState<UserSummary[]>([]);
-    const [selectedSpeaker, setSelectedSpeaker] = useState<{ key: string; name: string; subtitle: string; photoUrl?: string; bio?: string } | null>(null);
+    const [selectedSpeaker, setSelectedSpeaker] = useState<{ key: string; name: string; subtitle: string; photoUrl?: string; bio?: string; badge?: string } | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -181,6 +182,7 @@ export default function EventDetailsClient() {
             subtitle: [sp.title, sp.company].filter(Boolean).join(" · ") || "Guest Speaker",
             photoUrl: sp.photoUrl,
             bio: sp.bioShort || sp.bio,
+            badge: sp.badge,
         }));
         const fromAccounts = participants
             .filter(p => p.role === "speaker" && !covered(p))
@@ -620,10 +622,10 @@ export default function EventDetailsClient() {
                 bodyClassName="p-0"
             >
                 {selectedSpeaker && (
-                    <div className="md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:h-full">
+                    <div className={`md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:h-full ${selectedSpeaker.badge ? "bg-gradient-to-br from-amber-400/[0.06] via-transparent to-transparent" : ""}`}>
                         {/* Photo side — rounded, framed portrait that fills its half */}
                         <div className="h-72 p-4 sm:p-6 md:h-full md:p-8 lg:p-10">
-                            <div className="relative h-full w-full overflow-hidden rounded-3xl bg-accent/10 shadow-xl ring-1 ring-black/5 dark:ring-white/10 flex items-center justify-center">
+                            <div className={`relative h-full w-full overflow-hidden rounded-3xl bg-accent/10 shadow-xl flex items-center justify-center ${selectedSpeaker.badge ? "ring-2 ring-amber-400/60" : "ring-1 ring-black/5 dark:ring-white/10"}`}>
                                 {selectedSpeaker.photoUrl
                                     ? <img src={selectedSpeaker.photoUrl} alt={selectedSpeaker.name} className="w-full h-full object-cover object-top" />
                                     : <span className="text-accent font-bold text-9xl">{selectedSpeaker.name[0] || "?"}</span>}
@@ -632,8 +634,15 @@ export default function EventDetailsClient() {
                         {/* Bio side — scrolls on its own, header stays put */}
                         <div className="flex flex-col md:h-full md:min-h-0">
                             <div className="shrink-0 px-8 pt-6 md:px-12 md:pt-12 lg:pr-16">
-                                <div className="inline-flex items-center rounded-xl bg-[#0a1230] px-3.5 py-2 shadow-sm ring-1 ring-black/5">
-                                    <img src="/gtc26-logo.png" alt="Gralix Tech Conference 2026" className="h-6 md:h-8 w-auto" />
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <div className="inline-flex items-center rounded-xl bg-[#0a1230] px-3.5 py-2 shadow-sm ring-1 ring-black/5">
+                                        <img src="/gtc26-logo.png" alt="Gralix Tech Conference 2026" className="h-6 md:h-8 w-auto" />
+                                    </div>
+                                    {selectedSpeaker.badge && (
+                                        <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-sm md:text-base font-bold uppercase tracking-wider text-amber-600 dark:text-amber-300">
+                                            <Crown size={16} className="shrink-0" /> {selectedSpeaker.badge}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="mt-5 text-4xl md:text-6xl lg:text-7xl font-bold text-surface-dark dark:text-white leading-[1.05] tracking-tight">
                                     {selectedSpeaker.name}
@@ -641,7 +650,7 @@ export default function EventDetailsClient() {
                                 <div className="mt-4 text-lg md:text-3xl font-bold text-accent uppercase tracking-wider">
                                     {selectedSpeaker.subtitle}
                                 </div>
-                                <div className="mt-6 h-1.5 w-28 bg-accent/40 rounded-full" />
+                                <div className={`mt-6 h-1.5 w-28 rounded-full ${selectedSpeaker.badge ? "bg-amber-400/70" : "bg-accent/40"}`} />
                             </div>
                             <div className="px-8 pb-8 md:px-12 md:pb-14 lg:pr-16 md:flex-1 md:min-h-0 md:overflow-y-auto">
                                 <p className="mt-6 text-xl md:text-3xl lg:text-[2rem] text-surface-dark/80 dark:text-white/80 font-medium leading-relaxed md:leading-relaxed whitespace-pre-line">

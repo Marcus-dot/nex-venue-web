@@ -35,6 +35,7 @@ export interface SpeakerProfile {
     company?: string;
     bio?: string;
     bioShort?: string;             // condensed, no-scroll version shown in the projector spotlight
+    badge?: string;                // optional distinction shown in the spotlight, e.g. "Guest of Honour"
     photoUrl?: string;             // Firebase Storage URL
     order?: number;                // display order (ascending)
     linkedUserId?: string | null;  // links this card to a real user account
