@@ -616,30 +616,32 @@ export default function EventDetailsClient() {
                 isOpen={!!selectedSpeaker}
                 onClose={() => setSelectedSpeaker(null)}
                 title="Featured Speaker"
-                size="wide"
+                size="full"
                 bodyClassName="p-0"
             >
                 {selectedSpeaker && (
                     <div className="md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:h-full">
-                        {/* Photo side — fills its half, same height as the bio panel */}
-                        <div className="relative bg-accent/10 h-72 md:h-full flex items-center justify-center overflow-hidden">
-                            {selectedSpeaker.photoUrl
-                                ? <img src={selectedSpeaker.photoUrl} alt={selectedSpeaker.name} className="w-full h-full object-cover object-top" />
-                                : <span className="text-accent font-bold text-8xl">{selectedSpeaker.name[0] || "?"}</span>}
+                        {/* Photo side — rounded, framed portrait that fills its half */}
+                        <div className="h-72 p-4 sm:p-6 md:h-full md:p-8 lg:p-10">
+                            <div className="relative h-full w-full overflow-hidden rounded-3xl bg-accent/10 shadow-xl ring-1 ring-black/5 dark:ring-white/10 flex items-center justify-center">
+                                {selectedSpeaker.photoUrl
+                                    ? <img src={selectedSpeaker.photoUrl} alt={selectedSpeaker.name} className="w-full h-full object-cover object-top" />
+                                    : <span className="text-accent font-bold text-9xl">{selectedSpeaker.name[0] || "?"}</span>}
+                            </div>
                         </div>
                         {/* Bio side — scrolls on its own, header stays put */}
                         <div className="flex flex-col md:h-full md:min-h-0">
-                            <div className="shrink-0 px-8 pt-8 md:px-12 md:pt-12">
-                                <div className="text-3xl md:text-5xl font-bold text-surface-dark dark:text-white leading-tight">
+                            <div className="shrink-0 px-8 pt-6 md:px-12 md:pt-14 lg:pr-16">
+                                <div className="text-4xl md:text-6xl lg:text-7xl font-bold text-surface-dark dark:text-white leading-[1.05] tracking-tight">
                                     {selectedSpeaker.name}
                                 </div>
-                                <div className="mt-3 text-base md:text-2xl font-bold text-accent uppercase tracking-wider">
+                                <div className="mt-4 text-lg md:text-3xl font-bold text-accent uppercase tracking-wider">
                                     {selectedSpeaker.subtitle}
                                 </div>
-                                <div className="mt-6 h-1.5 w-24 bg-accent/40 rounded-full" />
+                                <div className="mt-6 h-1.5 w-28 bg-accent/40 rounded-full" />
                             </div>
-                            <div className="px-8 pb-8 md:px-12 md:pb-12 md:flex-1 md:min-h-0 md:overflow-y-auto">
-                                <p className="mt-6 text-lg md:text-2xl text-surface-dark/80 dark:text-white/80 font-medium leading-relaxed whitespace-pre-line">
+                            <div className="px-8 pb-8 md:px-12 md:pb-14 lg:pr-16 md:flex-1 md:min-h-0 md:overflow-y-auto">
+                                <p className="mt-6 text-xl md:text-3xl lg:text-[2rem] text-surface-dark/80 dark:text-white/80 font-medium leading-relaxed md:leading-relaxed whitespace-pre-line">
                                     {selectedSpeaker.bio || "No bio provided."}
                                 </p>
                             </div>
