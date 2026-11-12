@@ -22,7 +22,7 @@ interface Question {
 
 function UpvoteIcon() {
     return (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
             <path d="M8 2L14 9H10V14H6V9H2L8 2Z" />
         </svg>
     );
@@ -98,20 +98,20 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                 <div className="flex items-center gap-4">
                     {/* Logo dot */}
                     <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ background: "#e85c29", boxShadow: "0 0 12px #e85c29" }}
+                        className="w-4 h-4 rounded-full"
+                        style={{ background: "#e85c29", boxShadow: "0 0 14px #e85c29" }}
                     />
-                    <span className="text-white font-semibold text-lg tracking-wide">
+                    <span className="text-white font-semibold text-3xl md:text-4xl tracking-wide">
                         Live Q&amp;A
                     </span>
                 </div>
-                <div className="flex items-center gap-6">
-                    <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}>
+                <div className="flex items-center gap-8">
+                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 22 }}>
                         {questions.length} question{questions.length !== 1 ? "s" : ""} queued
                     </span>
                     <span
-                        className="text-sm font-medium tabular-nums"
-                        style={{ color: "rgba(255,255,255,0.3)" }}
+                        className="text-2xl md:text-3xl font-medium tabular-nums"
+                        style={{ color: "rgba(255,255,255,0.35)" }}
                     >
                         {clock}
                     </span>
@@ -133,8 +133,8 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                                     <path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </div>
-                            <p className="text-white text-xl font-semibold mb-2">Waiting for questions</p>
-                            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14 }}>
+                            <p className="text-white text-4xl md:text-5xl font-semibold mb-3">Waiting for questions</p>
+                            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 24 }}>
                                 Approved questions will appear here in real time
                             </p>
                         </div>
@@ -152,7 +152,7 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -16 }}
                                     transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                                    className="rounded-2xl p-8 relative overflow-hidden"
+                                    className="rounded-2xl p-10 md:p-12 relative overflow-hidden"
                                     style={{
                                         background: "linear-gradient(135deg, rgba(232,92,41,0.12) 0%, rgba(232,92,41,0.04) 100%)",
                                         border: "1px solid rgba(232,92,41,0.25)",
@@ -168,15 +168,15 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                                     />
 
                                     {/* Now answering label */}
-                                    <div className="flex items-center gap-2 mb-5">
+                                    <div className="flex items-center gap-3 mb-6">
                                         <motion.div
-                                            className="w-2 h-2 rounded-full"
+                                            className="w-3 h-3 rounded-full"
                                             style={{ background: "#e85c29" }}
                                             animate={{ opacity: [1, 0.3, 1] }}
                                             transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
                                         />
                                         <span
-                                            className="text-xs font-semibold uppercase tracking-wider"
+                                            className="text-xl md:text-2xl font-semibold uppercase tracking-wider"
                                             style={{ color: "#e85c29", letterSpacing: "0.12em" }}
                                         >
                                             {spotlight.status === "answered" ? "Answered" : "Now answering"}
@@ -185,23 +185,23 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
 
                                     {/* Question text */}
                                     <p
-                                        className="text-white leading-snug mb-6"
-                                        style={{ fontSize: "clamp(1.5rem, 3vw, 2.4rem)", fontWeight: 600, lineHeight: 1.3 }}
+                                        className="text-white mb-8"
+                                        style={{ fontSize: "clamp(2.75rem, 5.2vw, 5rem)", fontWeight: 600, lineHeight: 1.2 }}
                                     >
                                         {spotlight.text}
                                     </p>
 
                                     {/* Meta row */}
-                                    <div className="flex items-center gap-4 flex-wrap">
+                                    <div className="flex items-center gap-5 flex-wrap">
                                         <span
-                                            className="text-sm font-medium"
-                                            style={{ color: "rgba(255,255,255,0.5)" }}
+                                            className="text-2xl md:text-3xl font-medium"
+                                            style={{ color: "rgba(255,255,255,0.6)" }}
                                         >
                                             {spotlight.isAnonymous ? "Anonymous" : spotlight.authorName}
                                         </span>
                                         {spotlight.directedTo && (
                                             <span
-                                                className="text-sm font-semibold px-3 py-0.5 rounded-full"
+                                                className="text-xl md:text-2xl font-semibold px-4 py-1 rounded-full"
                                                 style={{ background: "rgba(232,92,41,0.15)", color: "#e85c29" }}
                                             >
                                                 → {spotlight.directedTo}
@@ -209,7 +209,7 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                                         )}
                                         {(spotlight.upvotes?.length ?? 0) > 0 && (
                                             <span
-                                                className="flex items-center gap-1.5 text-sm font-semibold"
+                                                className="flex items-center gap-2 text-2xl md:text-3xl font-semibold"
                                                 style={{ color: "#e85c29" }}
                                             >
                                                 <UpvoteIcon />
@@ -225,12 +225,12 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                         {queue.length > 0 && (
                             <div>
                                 <p
-                                    className="text-xs font-semibold uppercase tracking-wider mb-4"
-                                    style={{ color: "rgba(255,255,255,0.25)", letterSpacing: "0.12em" }}
+                                    className="text-lg md:text-xl font-semibold uppercase tracking-wider mb-5"
+                                    style={{ color: "rgba(255,255,255,0.3)", letterSpacing: "0.12em" }}
                                 >
                                     Up next
                                 </p>
-                                <div className="flex flex-col gap-3 overflow-y-auto" style={{ maxHeight: "38vh" }}>
+                                <div className="flex flex-col gap-4 overflow-y-auto" style={{ maxHeight: "42vh" }}>
                                     <AnimatePresence initial={false}>
                                         {queue.map((q, i) => (
                                             <motion.div
@@ -239,7 +239,7 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                                                 animate={{ opacity: 1, x: 0 }}
                                                 exit={{ opacity: 0, x: 12 }}
                                                 transition={{ duration: 0.3, delay: i * 0.04, ease: "easeOut" }}
-                                                className="flex items-start gap-4 rounded-xl px-5 py-4 cursor-pointer group"
+                                                className="flex items-start gap-5 rounded-xl px-7 py-5 cursor-pointer group"
                                                 style={{
                                                     background: "rgba(255,255,255,0.03)",
                                                     border: "1px solid rgba(255,255,255,0.06)",
@@ -255,23 +255,23 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                                             >
                                                 {/* Index */}
                                                 <span
-                                                    className="text-sm font-bold tabular-nums mt-0.5 w-5 shrink-0 text-center"
-                                                    style={{ color: "rgba(255,255,255,0.2)" }}
+                                                    className="text-2xl md:text-3xl font-bold tabular-nums mt-1 w-9 shrink-0 text-center"
+                                                    style={{ color: "rgba(255,255,255,0.25)" }}
                                                 >
                                                     {i + 2}
                                                 </span>
 
                                                 <p
-                                                    className="text-white flex-1 leading-snug"
-                                                    style={{ fontSize: 15, fontWeight: 400, opacity: 0.75 }}
+                                                    className="text-white flex-1"
+                                                    style={{ fontSize: "clamp(1.35rem, 2vw, 1.9rem)", fontWeight: 500, lineHeight: 1.3, opacity: 0.82 }}
                                                 >
                                                     {q.text}
                                                 </p>
 
-                                                <div className="flex items-center gap-3 shrink-0 mt-0.5">
+                                                <div className="flex items-center gap-4 shrink-0 mt-1">
                                                     {q.status === "answered" && (
                                                         <span
-                                                            className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                                                            className="text-base md:text-lg font-semibold px-3 py-1 rounded-full"
                                                             style={{ background: "rgba(16,185,129,0.15)", color: "#10b981" }}
                                                         >
                                                             Answered
@@ -279,22 +279,22 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                                                     )}
                                                     {(q.upvotes?.length ?? 0) > 0 && (
                                                         <span
-                                                            className="flex items-center gap-1 text-xs font-semibold"
-                                                            style={{ color: "rgba(232,92,41,0.7)" }}
+                                                            className="flex items-center gap-1.5 text-lg md:text-xl font-semibold"
+                                                            style={{ color: "rgba(232,92,41,0.75)" }}
                                                         >
                                                             <UpvoteIcon />
                                                             {q.upvotes.length}
                                                         </span>
                                                     )}
                                                     <span
-                                                        className="text-xs"
-                                                        style={{ color: "rgba(255,255,255,0.25)" }}
+                                                        className="text-lg md:text-xl"
+                                                        style={{ color: "rgba(255,255,255,0.35)" }}
                                                     >
                                                         {q.isAnonymous ? "Anonymous" : q.authorName}
                                                     </span>
                                                     {q.directedTo && (
                                                         <span
-                                                            className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                                                            className="text-base md:text-lg font-semibold px-3 py-1 rounded-full"
                                                             style={{ background: "rgba(232,92,41,0.12)", color: "#e85c29" }}
                                                         >
                                                             → {q.directedTo}
@@ -316,12 +316,12 @@ export default function QADisplayPage({ params }: { params: Promise<{ eventId: s
                 className="px-10 py-4 flex items-center justify-between border-t"
                 style={{ borderColor: "rgba(255,255,255,0.05)" }}
             >
-                <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 12 }}>
-                    Scan the QR code to submit questions
+                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 18 }}>
+                    Please share your questions or comments via the app
                 </span>
                 <div className="flex items-center gap-6">
                     <PoweredByGralix tone="light" />
-                    <span style={{ color: "rgba(255,255,255,0.1)", fontSize: 12, fontWeight: 600, letterSpacing: "0.05em" }}>
+                    <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 15, fontWeight: 600, letterSpacing: "0.05em" }}>
                         NEXVENUE
                     </span>
                 </div>
