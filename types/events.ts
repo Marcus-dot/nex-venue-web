@@ -34,6 +34,7 @@ export interface SpeakerProfile {
     title?: string;                // job title, e.g. "CEO, ZECHL"
     company?: string;
     bio?: string;
+    bioShort?: string;             // condensed, no-scroll version shown in the projector spotlight
     photoUrl?: string;             // Firebase Storage URL
     order?: number;                // display order (ascending)
     linkedUserId?: string | null;  // links this card to a real user account

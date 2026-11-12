@@ -180,7 +180,7 @@ export default function EventDetailsClient() {
             name: sp.name,
             subtitle: [sp.title, sp.company].filter(Boolean).join(" · ") || "Guest Speaker",
             photoUrl: sp.photoUrl,
-            bio: sp.bio,
+            bio: sp.bioShort || sp.bio,
         }));
         const fromAccounts = participants
             .filter(p => p.role === "speaker" && !covered(p))
@@ -631,8 +631,11 @@ export default function EventDetailsClient() {
                         </div>
                         {/* Bio side — scrolls on its own, header stays put */}
                         <div className="flex flex-col md:h-full md:min-h-0">
-                            <div className="shrink-0 px-8 pt-6 md:px-12 md:pt-14 lg:pr-16">
-                                <div className="text-4xl md:text-6xl lg:text-7xl font-bold text-surface-dark dark:text-white leading-[1.05] tracking-tight">
+                            <div className="shrink-0 px-8 pt-6 md:px-12 md:pt-12 lg:pr-16">
+                                <div className="inline-flex items-center rounded-xl bg-[#0a1230] px-3.5 py-2 shadow-sm ring-1 ring-black/5">
+                                    <img src="/gtc26-logo.png" alt="Gralix Tech Conference 2026" className="h-6 md:h-8 w-auto" />
+                                </div>
+                                <div className="mt-5 text-4xl md:text-6xl lg:text-7xl font-bold text-surface-dark dark:text-white leading-[1.05] tracking-tight">
                                     {selectedSpeaker.name}
                                 </div>
                                 <div className="mt-4 text-lg md:text-3xl font-bold text-accent uppercase tracking-wider">
