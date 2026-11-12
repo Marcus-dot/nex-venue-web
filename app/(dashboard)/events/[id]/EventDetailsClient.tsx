@@ -76,7 +76,7 @@ export default function EventDetailsClient() {
     const [showTicket, setShowTicket] = useState(false);
     const [checkedIn, setCheckedIn] = useState(false);
     const [attendeePreviews, setAttendeePreviews] = useState<UserSummary[]>([]);
-    const [selectedSpeaker, setSelectedSpeaker] = useState<{ key: string; name: string; subtitle: string; photoUrl?: string; bio?: string; badge?: string } | null>(null);
+    const [selectedSpeaker, setSelectedSpeaker] = useState<{ key: string; name: string; subtitle: string; photoUrl?: string; bio?: string; badge?: string; representing?: string } | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -183,6 +183,7 @@ export default function EventDetailsClient() {
             photoUrl: sp.photoUrl,
             bio: sp.bioShort || sp.bio,
             badge: sp.badge,
+            representing: sp.representing,
         }));
         const fromAccounts = participants
             .filter(p => p.role === "speaker" && !covered(p))
@@ -647,6 +648,11 @@ export default function EventDetailsClient() {
                                 <div className="mt-5 text-4xl md:text-6xl lg:text-7xl font-bold text-surface-dark dark:text-white leading-[1.05] tracking-tight">
                                     {selectedSpeaker.name}
                                 </div>
+                                {selectedSpeaker.representing && (
+                                    <div className="mt-3 text-sm md:text-lg font-semibold italic text-surface-dark/60 dark:text-white/55">
+                                        {selectedSpeaker.representing}
+                                    </div>
+                                )}
                                 <div className="mt-4 text-lg md:text-3xl font-bold text-accent uppercase tracking-wider">
                                     {selectedSpeaker.subtitle}
                                 </div>
